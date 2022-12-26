@@ -1,0 +1,144 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%	MSc THESIS TEMPLATE
+%	developed for my master thesis at the Universitá di Torino
+%
+%	by Eugenio Senes (eugenio.senes@gmail.com)
+%
+%	released under MIT license, so share, modify and enjoy, but quoting the author !
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% DOCUMENT CLASS (alternative to book is 'report')
+% Print just right page or both sides (comment the other one)
+\documentclass[12pt,a4paper,openright,oneside]{book}	%%One sided
+%\documentclass[12pt,a4paper,openright,twoside]{book}	%%Double sided
+
+
+%% SET MARGINS OF THE PAGES
+\usepackage{geometry}
+\geometry{a4paper,portrait, left=35mm, right=20mm, top=35mm, bottom=30mm}
+
+\usepackage{textcomp,mathcomp}
+
+%% HEADERS AND FOOTERS
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} 			%clears default header and footer
+\rhead{} 			%right head
+\lhead{ \leftmark} 	%left head
+\rfoot{\thepage}
+%%consider using also chead, cfoot, lfoot
+%coherce the plain stile to this (e.g. the first page of every chapter)
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\rfoot{\thepage}
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}
+}
+%% CLEAR PAGE WITHOUT NUMBER AT THE BEGINNING OF CHAPTERS
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\origdoublepage}%
+}
+%% ALLOW PAGE ROTATION
+\usepackage{lscape}
+
+%% HYPERTEXT SETUP
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+%% PDF SETTINGS
+\hypersetup{
+    pdfauthor={AuthorName},
+    pdftitle={shortTitle},
+    pdfsubject={subject},
+    pdfkeywords={keyword1, keyword2}
+}
+%% FONTS AND SYMBOLS
+\usepackage[utf8]{inputenc}	%%input font setting
+\usepackage[T1]{fontenc} 		%%font for automatic recognition of letters with the accent
+\usepackage{amsfonts}		%%fonts for the mathematical rendering of formulas
+\usepackage{amssymb}
+\usepackage{amsmath}
+%% CHAPTERS STRUCTURE
+\usepackage[italian,english]{babel} %%Set English as main language of the document
+%% FIGURES
+\usepackage{graphicx}
+\usepackage{subfigure}		%%allow side by side figures with single caption
+%% TABLES
+\usepackage{multirow}		%%allow to merge rows in the tables
+\usepackage{booktabs}		%%allow use of \toprule, \midrule, \bottomrule in tables
+%%CAPTIONS
+\usepackage{caption}
+%% BIBLIOGRAPHY
+\usepackage[babel]{csquotes}
+%% CODE LISTINGS
+\usepackage{listings}		%%allow to use code listings
+
+%% HYPENATON
+\hyphenation{te-si pip-po paperino}	%manual hyphenation
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% BEGIN DOCUMENT
+\begin{document}
+
+%%%%%% HEAD  OF THE DOCUMENT
+\frontmatter
+%%FRONT PAGE
+\input{head/frontPage.tex}
+\clearemptydoublepage
+%%DEDICATION (the initial quote)
+\input{head/dedication}
+%\clearemptydoublepage
+%%ABSTRACT
+\input{head/abstract}
+\clearemptydoublepage
+%%INDEXES
+%summary
+\tableofcontents
+\clearemptydoublepage
+
+%%%%%% BODY OF THE DOCUMENT
+\mainmatter
+%%INTRODUCTION
+\input{body/introduction.tex}
+\clearemptydoublepage
+%% CHAPTERS
+\input{body/chapter2.tex}
+\clearemptydoublepage
+\input{body/chapter3.tex}
+\clearemptydoublepage
+\input{body/chapter4.tex}
+\clearemptydoublepage
+\input{body/chapter5.tex}
+\clearemptydoublepage
+\input{body/chapter6.tex}
+\clearemptydoublepage
+\input{body/chapter7.tex}
+\clearemptydoublepage
+\input{body/chapter8.tex}
+
+%%%% TAIL OF THE DOCUMENT
+\backmatter
+%list of figures
+\listoffigures
+\clearemptydoublepage
+%list of tables
+\listoftables
+\clearemptydoublepage
+%bibliography
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{bibliography/bibThesis}
+\bibliographystyle{ieeetr}
+\clearemptydoublepage
+
+
+\end{document}

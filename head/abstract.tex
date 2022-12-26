@@ -1,0 +1,18 @@
+\chapter*{Abstract}
+L’Anomaly Detection é un topic sempre più importante e il suo utilizzo spazia dal campo medico per arrivare a quello finanziario passando anche per approcci più standard come l'analisi di sensori installati su strumenti o macchinari.
+
+Il task che risolve é quello di identificare eventi o osservazioni rari oppure che deviano in maniera significativa dalla maggioranza dei dati e che non corrispondono ad una definizione di comportamento normale. Ricercare queste anomalie può essere utile quando si devono applicare metodi statistici ed una pulizia dei dati é necessaria, ma non solo. In molte applicazioni le anomalie sono di alto interesse in quanto possono contenere informazioni di rilievo e quindi necessitano di attenzione. 
+
+I metodi di Anomaly Detection si dividono tra Supervised, Semi-Supervised o Unsupervised Learning ed un ampio numero di essi sono stati proposti nella letteratura ma non esiste un metodo che sia il più accurato per ogni dataset. Inoltre, la disponibilità di Anomaly Labels per un certo dataset é bassa o completamente assente nella pratica. 
+
+----------------------------------
+
+L’obiettivo di questa tesi é quello applicare dei metodi di Unsupervised Anomaly Detection all'interno del progetto Beat 4.0 portato avanti da SKF e ALTEN ITALIA. L'obiettivo di questa collaborazione é l'innovazione digitale dell'impianto di produzione di SKF attraverso l'applicazione di tecniche di machine learning volte a migliorare l'efficienza della produzione ed ad aiutare gli operatori nelle decisioni.
+
+A seguito di un'introduzione sul contesto in cui si opera, dei problemi e delle principali tecniche proposte nella letteratura, verrà mostrato un algoritmo di Model Selection che va a rispondere alla seguente domanda: dato un dataset senza labels ed un set di Anomaly Detectors, come poter selezionare il modello più accurato? A questo scopo vengono definite tre classi di metriche non supervisionate chiamate \textit{model centrality}, \textit{clustering coefficient} e \textit{performance on injected synthetic anomalies} e viene mostrato come queste siano correlate rispetto a metriche supervisionate come AUPR o AUROC. Saranno proposti anche diversi metodi di Rank Aggregation per combinare insieme le 3 metriche non supervisionate e analisi sulle performance di ognuno.
+
+----------------------------------
+
+L’obiettivo di questa tesi é quello di studiare e proporre un metodo di Model Selection: dato un dataset senza labels ed un set di Anomaly Detectors come poter selezionare il modello più accurato? A questo scopo vengono definite tre classi di metriche non supervisionate chiamate \textit{model centrality}, \textit{clustering coefficient} e \textit{performance on injected synthetic anomalies} e viene mostrato come queste siano correlate rispetto a metriche supervisionate come AUPR o AUROC. Saranno proposti anche diversi metodi di Rank Aggregation per combinare insieme le 3 metriche non supervisionate e analisi sulle performance di ognuno.
+
+Infine, l'algoritmo di Model Selection sviluppato verrà usato all'interno del progetto Beat 4.0 portato avanti da SKF e ALTEN ITALIA. L'obiettivo di questa collaborazione é l'innovazione digitale dell'impianto di produzione di SKF attraverso l'applicazione di tecniche di machine learning volte a migliorare l'efficienza della produzione ed ad aiutare gli operatori nelle decisioni.

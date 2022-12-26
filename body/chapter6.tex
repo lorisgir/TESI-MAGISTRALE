@@ -1,0 +1,92 @@
+\chapter{Sperimentazione}
+In questo capitolo viene discussa l'implementazione e l'applicazione delle metriche di Model Selection e delle tecniche di Rank Aggregation. Infine viene proposta una valutazione su dataset di benchmark e quello di SKF.
+
+Riassumendo, questo capitolo si dividerà in:
+\begin{enumerate}
+\item Definizione e implementazione delle metriche surrogate per il Model Selection e delle tecniche di Rank Aggregation
+\item Benchmark Results
+\item SKF Results
+\end{enumerate}
+
+
+\section{Implementazione}
+Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come riferimento oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. 
+
+
+\subsection{Metriche Surrogate}
+Ogni metrica non supervisionata serve come misura della bontà di un modello e riduce il problema del Model Selection ad una selezione di quello con lo score piu alto. 
+Sono state identificate tre classi di metriche e vengono definite non supervisionate in quanto non richiedono labels. Tuttavia, due di queste utilizzano lo F1 Score, tipicamente utilizzato per la valutazione supervisionata; per evitare confusione viene quindi utilizzato il termine "surrogato".
+Di seguito viene analizzata ogni classe di metriche surrogate.
+
+\subsubsection{Model Centrality}
+\textit{Esiste una sola ground truth, quindi i modelli vicini a questa sono anch'essi vicini tra loro ed il modello più "centrale" è il migliore.}
+Metodi basati sulla centralita hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection. 
+Per adottare quest'idea al nostro task si e' fatto uso di diverse tecniche che andassero a produrre dei ranking nella quale i modelli con score piu alto erano indicati come quelli piu "centrali".
+Ognuno di questi metodi riceve come input un set di K modelli a cui e' stato fatto training non supervisionato su un dataset di riferimento.
+\begin{itemize}
+\item \textbf{Round Robin}: dati K modelli, viene selezionato un modello ad ogni iterazione e le sue labels vengono usate come ground truth per valutare le performance degli altri K-1 modelli. Infine viene prodotto un unico ranking finale andando a calcolare la media delle performance di ogni modello rispetto alle k-1 iterazioni. 
+\item \textbf{Majority Vote} e' il metodo piu semplice per generare consenso: dati K modelli e le loro labels viene generato un nuovo set di labels finale andando a prendere, per ogni sample, la label che riceve piu voti. Questo nuovo set viene usato come ground truth per valutare i K modelli.
+\item \textbf{Sampling}: per ogni sample all'interno del dataset viene scelto in maniera casuale un modello da usare per estrarre la label per quel sample. Viene quindi prodotto un nuovo set di labels da usare come ground truth per valutare i K modelli.
+\item \textbf{Score Correlation}: questo metodo utilizza gli scores prodotti da ogni modello. Vengono infatti calcolati i ranking per ognuno di questi set di scores: Sia $Ok(i)$ il rango del sample $i$ secondo gli scores prodotti dal modello K. Viene definita la distanza dal modello $Ak$ al modello $Al$ come la distanza di Kendall, ovvero il numero di disaccordi per ogni possibile coppia. Infine viene misurata la centralita di un modello come la distanza media rispetto ai suoi M vicini, dove M e' un parametro.
+\end{itemize}
+
+Ognuna di questi metodi produce un ranking finale per cui i modelli con lo score piu alto sono quelli piu centrali. In particolare i metodi Round Robin, Majority Vote e Samplig che utilizzando un ground truth generata sul momento, utilizzando lo F1 Score per valuatare ogni modello rispetto a questa ground truth.
+Questa metriga surrogata non e' perfetta, mentre funziona bene quando i modelli candidati sono tutti sufficientemente buoni da un punto di vista delle performance; nel caso siano presenti un numero relativamente alto di modelli "non buoni", questi potrebbero produrre risultati simili e formare un cluster che va di fatto a condizionare la centralita'.
+Nella parte della valutazione su dataset di benchmark vengono analizzate le performance di ognuna di queste 4 metodologie.
+
+
+\subsubsection{Performance on Synthetic Anomaly Injection}
+\textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell'iniezione di anomalie sintetiche per addestrare
+modelli di rilevamento delle anomalie [Carmona et al,
+2021]. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca
+valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Data una serie temporale di input senza labels, viene iniettata casualmente un'anomalia di un determinato tipo. La posizione dell'anomalia iniettata viene trattata come una label pseudo-positiva, mentre il resto dei punti temporali sono trattati come labels pseudo-negative. 
+Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-labels.
+
+Invece di affidarsi a modelli generativi complessi [Wen et al., 2020], e' stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 5: 
+\begin{enumerate}
+\item \textbf{Spike Anomaly} sono delle point anomalies in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno
+\item \textbf{Scale Anomalies} e' un intervallo di punti anomali in cui il  valore medio dei punti al suo interno e' significaticamente piu grande o piu piccolo rispetto all'intorno
+\item \textbf{Wander Anomalies} e' un intervallo di punti anomali in cui il valore di essi cresce o decresce linearmente nel tempo
+\item \textbf{Cutoff Anomalies} e' un intervallo di punti anonali in cui il valore di essi e' sempre 0
+\item \textbf{Speedup Anomalies} e' un intervallo di punti anomali che presenta la caratteristica di un'onda sinusoidale ad alta frequenza e rumorosa.
+\end{enumerate}
+La posizione nella quale vengono iniettate le anonalie sintetiche viene scelta casualmente; invece per quanto riguarda la lunghezza degli intervalli, viene scelto un valore diverso per ogni dataset trattato in base alle caratteristiche di questo come la frequenza dei dati o la presenza o meno di ciclicita.
+
+Questa procedura puo essere molto efficace ma non e' esente da problemi: (1) le anomalie reali non vengono considerate e di conseguenza sono labellate come pseudo-negative e (2) le tipologie di anonalie iniettate sono diverse rispetto a quelle reali. 
+\subsubsection{Clustering Cohesion}
+\textit{Un buon modello riesce a trovare una buona separazione tra i punti normali ed i punti anomali}.
+Nel contesto dei modelli non supervisionati, tecniche e metriche di valutazione inerenti al clustering sono molto efficaci quando non si hanno a disposizione le labels. Misure di coesione tra i cluster prodotti da un modello sono indicatori di quanto quest'ultimo sia riuscito a separare efficacemente i dati.
+All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al piu raggruppati in zone poco dense. 
+L'idea alla base di questa metrica surrogata e' quindi quella di calcolare la coesione e separazione tra il cluster di punti normali e quello di punti anomali prodotti da un modello di Anomaly Detection. Piu alto e' questo score, piu il modello riesce a separare questi dati e quindi puo essere considerato come un buon modello.
+La metrica utilizzata e' il Silouetthe Score, ma non viene calcolata subito dopo aver ottenuto le labels da un modello, sono neccessari prima alcuni passaggi di preprocessing.
+Immaginiamo di avere un dataset con due feature per la quale e' possibile plottare graficamente i punti in un piano cartesiano. Idealmente i punti considerati normali formano un unico cluster denso, ma la stessa cosa non si puo dire per i punti anomali. Questi possono essere sparsi per il piano come se fossero rumore oppure possono formare numerosi cluster di piccole dimensioni. Calcolare il silouette score assumendo solo questi due cluster il risultato potrebbe risultare falsato proprio per il fatto che i punti sparsi contribuiscono in maniera negativa allora score.
+La soluzione adottata e' quella di applicare l'algoritmo di DBSCAN sui punti anomali, per formare quindi piu cluster da questi e per scartare quei punti che vengono labellati dall'algoritmo come rumore.
+Prima di fare cio pero e' necessario ridurre la dimensionalita dei dati per evitare il problema del "Curse Of Dimensionality", il quale afferma che in un dataset ad alta dimensionalita', la distanza tra i singoli punti e' troppo alta per essere informativa.
+Applicando quindi PCA per riddure le dimensioni a 3, rende l'applicazione di DBSCAN piu efficace. Come parametri sono stati usati $min_samples=dim * 2$ e per quanto riguarda $eps$ e' stato ricavato il valore usando l'elbow method.
+Una volta applicato DBSCAN ed ottenuto i cluster per i punti anomali, viene calcolato il silouette score su questi, tenendo anche in considerazione il cluster di punti normali originario.
+Infine questa procedura viene applicata su ogni modello per andare a produrre un ranking finale.
+Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale e' relativamente bassa e quindi i punti sono quasi indipendenti tra di loro. Le point anomalies cosi come le collective anomalies sono identificate con piu precisione rispetto alle contextual anomalies. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con piu probabilita nel cluster di punti normali.
+\subsection{Rank Aggregation}
+Nel capitolo 4 e' stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sara' svolta nelle sezioni successive.
+Ognuno di questi metodi riceve in input un set di rankings, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un unico ranking finale.
+Nel caso delle metriche surrogate Model Centrality e Performance on Anomaly Injection, il ranking prodotto si basa sul F1 Score; mentre per Clustering Cohesion sul Silouette Score.
+\subsubsection{Kemeny-Young}
+E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo 4. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. I metodi successivi producono soluzioni approssimate ma con un tempo di esecuzione molto piu basso.
+\subsubsection{Borda}
+I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modelli vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto avra come nuovo valore 1, il secondo modello il valore 2 e cosi via. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e cosi via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. Questi punteggi vengono sommati, per ogni modello, rispetto alle 3 metriche surrogate e infine viene prodotto un nuovo ranking ordinato in maniera decrescente sulla base del punteggio finale.
+\subsubsection{Robust Borda}
+E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking.
+\subsubsection{Score}
+Questo metodo e' il piu semplice dei 3 in quanto viene semplicemente fatta una media degli score dei 3 ranking per ogni modello, per poi ordinare in ordine decrescente e quindi ottenere un ranking finale.
+
+\section{Benchmark Results}
+\subsection{Datasets}
+\subsection{Risultati}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\section{SKF Results}
+\subsection{Dataset}
+\subsection{Risultati}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+

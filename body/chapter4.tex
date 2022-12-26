@@ -1,0 +1,67 @@
+\chapter{Model Selection}
+
+\section{Definizione del problema}
+Model Selection è il processo di selezione di un modello finale, che sia di machine learning o deep learning, tra una serie di modelli candidati per uno specifico dataset.
+
+E' un processo che può essere applicato sia a diversi tipi di modelli, ad esempio regressione logistica, SVM, KNN ecc.; sia a modelli dello stesso tipo ma con configurazione di iper-parametri differenti, ad esempio kernel diversi in un SVM.
+
+Model Selection risulta molto utile ed efficace quando si e' interessati nel sviluppare un modello di classificazione o regressione per un dataset, ma non si sa a priori quale modello funzioni meglio. Di conseguenza la soluzione e' quella di fare training e valutazione per ogni modello preso in considerazione.
+
+TODO fare una definizione formale come a pagine 3 del paper di UOMS
+
+\section{Tecniche di Model Selection}
+\subsection{Resampling Methods}
+I metodi di resampling, come suggerisce il nome, sono semplici tecniche di partizionamento dei dati e servono per valutare se il modello generalizza bene anche sull'insieme di test. Diversi tipi di split possono essere applicati:
+\begin{itemize}
+\item \textbf{Random Split} genera in maniera casuale i tre insiemi di train, test e validazione. Il vantaggio di questo metodo è che c'è una buona probabilità che la popolazione originale sia ben rappresentata in tutti e tre gli insiemi, impedendo quindi un campionamento distorto dei dati.
+\item \textbf{Time Based Split} viene applicato sulle serie temporali in cui non e' possibile effettuare una suddivisione casuale dei dati in quanto si andrebbe a perdere informazioni come trend o seasonality. 
+In questi casi, si utilizza una suddivisione temporale in cui, ad esempio, l'insieme di train può contenere i dati piu' vecchi, mentre quelli piu' recenti sono assegnati all'insieme di test. Per evitare l'overfitting introdotto da questo metodo, una variante a finestre di scorrimento e' preferibile: il modello viene allenato iterativamente piu' volte su una finestra temporale e valutato sulla parte restante dei dati, per poi allargare la finestra di training ad ogni iterazione (riducendo cosi quella di valutazione).
+\item \textbf{K-Fold Cross Validation} genera in modo casuale $k$ gruppi di dati ed iterativamente vengono usati $k-1$ gruppi per il training ed un gruppo per la valutazione.
+\item \textbf{Stratified K-Fold} e' simile al Cross Validation ma con la differenza che questo metodo tiene in considerazione la distribuzione delle classi dei dati, generando quindi gruppi con rateo simile al dataset originale.
+\end{itemize}
+
+\subsection{Probabilistic Methods}
+I metodi probabilistici non tengono conto solo delle prestazioni del modello, ma anche della sua complessità. La complessità del modello è misurata dalla capacità di catturare la varianza dei dati. 
+Ad esempio, un modello con un bias alto come l'algoritmo di regressione lineare è meno complesso, mentre una rete neurale ha una complessità molto più elevata.
+Un altro punto importante da notare è che le prestazioni del modello prese in considerazione nelle misure probabilistiche sono calcolate solo dal set di train. In genere non è necessario un set di test.
+Uno svantaggio, invece, risiede tuttavia nel fatto che i metodi probabilistici non considerano l'incertezza dei modelli e hanno la possibilità di selezionare  quelli più semplici rispetto a quelli complessi.
+\begin{itemize}
+\item \textbf{Minimum Description Length} o MDL, deriva dalla teoria dell'informazione che si occupa di metriche come l'entropia, che misura il numero medio di bit necessari per rappresentare un evento da una distribuzione di probabilità o da una variabile casuale. 
+MDL è dunque il numero minimo di bit necessari per rappresentare il modello.
+\end{itemize}
+
+\section{Metriche di valutazione}
+I modelli possono essere valutati utilizzando diverse metriche, tuttavia, la scelta di una metrica di valutazione consona è cruciale e spesso dipende dal problema da risolvere. Una chiara comprensione di un'ampia gamma di metriche può aiutare a trovare una corrispondenza appropriata tra la descrizione del problema ed una metrica.
+Per una descrizione delle metriche utilizzabili nel Model Selection, fare riferimento al capitolo TODO
+
+\section{Unsupervised Model Selection}
+Tecniche e metriche sopra descritte hanno applicazione solamente quando si ha a disposizione ground truth labels. Spesso pero', e sopratutto nel dominio dell'Anomaly Detection, le labels non sono disponibili e bisogna quindi cambiare completamente approccio. 
+Unsupervised Outlier Model Selection, in breve UOMS, ha ricevuto fin'ora poca attenzione da parte dei ricercatori, tant'è' che solamente una manciata di lavori sono stati pubblicati. Queste proposte assumono diversi approcci al problema e possono essere divisi in due categorie: meta learning e metriche surrogate.
+
+\subsection{Meta Learning}
+Questo approccio mira ad identificare il modello migliore per un particolare dataset date le caratteristiche di questo come il numero di classi, attributi, istanze ecc. L'algoritmo si basa su una collezione di dataset storici di outlier detection in cui le labels sono presenti e sulle performance dei modelli su questi per imparare essenzialmente un mapping tra questi due elementi. 
+A questo punto l'algoritmo riceve in input il dataset su cui si vuole fare Model Selection (in cui le labels non sono presenti) ed il risultato di output sarà un modello che l'algoritmo ritiene come migliore sulla base di ciò che ha imparato nella fase di analisi sui dataset storici.
+Questo metodo pero' richiede quindi la disponibilità di dataset storici con labels e inoltre fallisce se non ne esiste uno che sia sufficientemente rappresentativo del dataset target.
+\subsection{Metriche Surrogate}
+A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa e' la definizione di nuove metriche che non hanno bisogno di labels ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc), da qui il termine metriche surrogate.
+La definizione di queste metriche non e' triviale, data proprio la loro caratteristica di essere completamente non supervisionate e possono ricadere in categorie completamente differenti tra di loro. Qualche esempio sono: model centrality o performance on injected synthetic anomalies. Un approfondimento su queste metriche e' presente nel capitolo successivo.
+
+
+\subsection{Rank Aggregation}
+Il ranking è alla base di centinaia di algoritmi come Netflix, Amazon e Google. 
+Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web a seguito di una ricerca da parte di un utente, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. 
+L'obiettivo del Rank Aggregation è riassumere le informazioni dei singoli ranking di input e fornire un'unica classifica finale, che dovrebbe in qualche modo rappresentare un risultato più accurato o veritiero. 
+
+Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa e' necessario definire una funzione oggetto. In questo costesto, vorremmo trovare una ranking finale che sia piu vicino possibile a tutte i singoli ranking contemporaneamente. In modo formale, si puo definire la funzione come: \[ \Phi(\delta) = \sum_{n=1}^{m} w_id(\delta,L_i), \]	
+dove $\delta$ e' un ranking di lunghezza $k=|L_i|$, $w_i$ e' il peso associato alla lista $L_i$, $d$ e' una funzione di distanza e $L_i$ e' la $i^{ma}$ lista ordinata.
+L'obiettivo e' di trovare $\delta^*$ che minimizzi la distanza totale tra $\delta^*$ e gli $L_i$
+\[ \delta^* = arg min \sum_{i=1}^{m} w_id(\delta,L_i). \]
+
+Selezionare la funzione di distanza piu appropriata e' molto importante e la scelta di solito ricade alla distanza di Kendall.
+Intuivamente, la distanza di Kendall viene definita come la sommatoria, per ogni possibile coppia di elementi date due liste in input, della seguente penalita:
+se due elementi $t$ e $u$ hanno lo stesso ordinamento in entrambe le liste, allora nessuna penalita viene data. Altrimenti se $t$ precede $u$ in una lista e $u$ precede $t$ nell'altra, allora viene imposta una penalita di 1.
+Questa distanza puo assumere valori compresi nell'intervallo $[0,n(n-1)/2]$ e non e' da confodnere con il coefficiente di Kendall. Quest'ultimo, essendo un coefficiente, assume valori nell'intervallo $[-1,1]$ ed e' prevalentemente usato in statistica. Sono due concetti differenti ma correlati da:
+\[K_c=1-4K_d/(n(n-1)), K_d = (1-K_c)(n(n-1))/4\]
+Quindi quando $K_c=1$ il valore di $K_d$ e' 0, al contrario quando $K_c=-1$ il valore di $K_d$ e' massimo.
+
+Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young problem". Purtroppo e' un problema NP-Hard anche con un numero di ranking basso come 4. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda. Dettagli su questi metodi saranno esposti nei capitoli successivi.
