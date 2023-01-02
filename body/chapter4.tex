@@ -9,7 +9,9 @@ Model Selection risulta molto utile ed efficace quando si e' interessati nel svi
 
 TODO fare una definizione formale come a pagine 3 del paper di UOMS
 
-\section{Tecniche di Model Selection}
+\section{Supervised Model Selection}
+Le metodologie di Model Selection supervisionato sono quelle classiche che di solito vengono applicate durante lo sviluppo di algoritmi di Machine o Deep Learning. Avendo a disposizione le labels, le scelte ricadono dunque su come partizionare il dataset in train/split e validation set, su come pesare la complessita di un modello e su quali metriche di valutazione adottare.
+
 \subsection{Resampling Methods}
 I metodi di resampling, come suggerisce il nome, sono semplici tecniche di partizionamento dei dati e servono per valutare se il modello generalizza bene anche sull'insieme di test. Diversi tipi di split possono essere applicati:
 \begin{itemize}
@@ -30,7 +32,7 @@ Uno svantaggio, invece, risiede tuttavia nel fatto che i metodi probabilistici n
 MDL è dunque il numero minimo di bit necessari per rappresentare il modello.
 \end{itemize}
 
-\section{Metriche di valutazione}
+\subsection{Metriche di valutazione}
 I modelli possono essere valutati utilizzando diverse metriche, tuttavia, la scelta di una metrica di valutazione consona è cruciale e spesso dipende dal problema da risolvere. Una chiara comprensione di un'ampia gamma di metriche può aiutare a trovare una corrispondenza appropriata tra la descrizione del problema ed una metrica.
 Per una descrizione delle metriche utilizzabili nel Model Selection, fare riferimento al capitolo TODO
 
@@ -65,3 +67,14 @@ Questa distanza puo assumere valori compresi nell'intervallo $[0,n(n-1)/2]$ e no
 Quindi quando $K_c=1$ il valore di $K_d$ e' 0, al contrario quando $K_c=-1$ il valore di $K_d$ e' massimo.
 
 Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young problem". Purtroppo e' un problema NP-Hard anche con un numero di ranking basso come 4. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda. Dettagli su questi metodi saranno esposti nei capitoli successivi.
+
+\subsubsection{Rank Comparison}
+Ottenuti i ranking di ogni metrica surrogata e generato il rank finale dopo l'aggregazione, per valutare le performance dell'algoritmo di Model Selection e' necessario comparare i risultati prodotti rispetto ad un rank di riferimento.
+In questa tesi saranno usati tre indici differenti applicati o sui ranking di posizione oppure sui ranking contenti gli score prodotti dal Model Selection e saranno:
+
+\begin{itemize}
+\item \textbf{Kendall}: coefficente che usa la distanza di Kendall sopra descritta. Usato sui ranking di posizione
+\item \textbf{Spearman}: usato anche sui ranking di posizione, questo metodo statistico quantifica il grado in cui le variabili sono associate da una funzione monotona, indicando quindi una relazione crescente o decrescete. Viene usato su variabili cardinali e tiene conto dei rank piuttosto che dei dati grezzi.
+\item \textbf{Pearson}: usato sui ranking di score, a differenza di Spearman viene usato solamente su variabili continue e misura una correlazione lineare tra le due variabili.
+\end{itemize}
+

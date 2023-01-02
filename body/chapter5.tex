@@ -42,6 +42,32 @@ Tutte le fasce sono positive per definizione ed ognuna di esse tratta uno specif
 
 Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione, i dati MVM sono prodotti ogni due secondi. Questi verranno poi aggregati in intervalli di 10 minuti. La scelta di dieci minuti per la lunghezza del gap temporale non è casuale, infatti è stata fatta per adattarsi alla granularità dei dati CoMo.
 
+\subsubsection{Qualita}
+I dati di qualica MVM vengono usati per definire la classe di qualita di appartenenza del cuscinetto a sfera. Per fare cio, sono state definite per ogni banda delle soglie alla quale il supermanto di una porta il prodotto a ricevere una classificazione di qualita piu bassa.
+La tabella X mostra come le classi di qualita vengano definite.
+
+
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Classe & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} \\ \hline
+Q1     & 25                           & 7.2                          & 7.2                          & 3.6                          \\ \hline
+Q2     & 36                           & 18.2                         & 18.2                         & 5.2                          \\ \hline
+Q3     & 48                           & 25.6                         & 25.6                         & 12                           \\ \hline
+Q4     & 72                           & 36                           & 36                           & 20                           \\ \hline
+\end{tabular}
+
+Valori di banda piu bassi indicano una qualita maggiore, di conseguenza la classe Q1 rappresenta i prodotti migliori mentre la classe Q4 rappresenta gli scarti. 
+Per passare da una classe alla successiva e' necessario che solamente una delle 4 bande superi il valore di soglia. 
+Tabella Y mostra un esempio di come le classi vengano computate.
+
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+Bearing & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} & Quality \\ \hline
+B1      & 20                           & 7                            & 4                            & 2                            & Q1      \\ \hline
+B2      & 19                           & 18                           & 2                            & 5.8                          & Q3      \\ \hline
+B3      & 70                           & 20                           & 20                           & 18                           & Q4      \\ \hline
+\end{tabular}
+
 \section{Processamento dei dati}
 I dati sono ricevuti da SKF in formato tabellare e sono suddivisi in dati CoMo e dati MVM. Ogni riga della tabella della qualità corrisponde a un cuscinetto analizzato dalla macchina di qualità, invece le colonne sono costituite dal timestamp di registrazione dei valori e dalle quattro bande.
 La tabella CoMo invece contiene le misure del Condition Monitoring e delle strutture insieme in formato non pivotante: ogni riga corrisponde a un singolo record contenente l'ora del record, il nome della macchina a cui il record si riferisce (la categoria "Facilties" è trattata come una macchina), il nome della caratteristica misurata e il valore registrato.
