@@ -116,12 +116,12 @@ Wilt             & 4819              & 5              & 257 (5.33\%)            
 \end{tabular}
 \end{table}
 
+Per questi dataset si e' deciso di adottare uno train/test split costituito da 66\% per il train e 33\% per il test. I dataset di train contengono al loro interno anche una percentuale di anomalie. Potrebbe non essere la situazione ideale in quanto e' consigliato per i modelli non supervisionati di essere allenati e quindi apprendere da dati il piu puliti possibili. Ma e' la situazione piu realistica in quanto nella realta la presenza di label non e' sempre garantita.  
+
 \subsubsection{SMD}
 Server Machine Dataset e' un dataset proveniente da una compagnia Internet, consiste in serie temporali multivariate della durata di 5 settimane in cui ogni osservazione e' equamente distribuita da una frequenza di 1 minuto. SMD contiene tre gruppi di macchinari (denotati SMD-1, SMD-2 e SMD-3 rispettivamente) per un totale di 28 macchinari, ed ognuno di questi ha 38 features. Sono presenti approssimativamente 28000 time step e sono divisi in due parti della stessa lunghezza come train e test set. 
-La percentuale di anomalie al suo interno si attesta intorno al 4.16%.
+La percentuale di anomalie al suo interno si attesta intorno al 4.16 e si trovano tutte nelle ultime due settimane di dati. In questo caso, le prime tre settimane sono usate per fare il training dei modelli mentre le ultime due per la valutazione di questi.
 
-\subsubsection{SML}
-Science Mars Laboratory e' una missione condotta dalla NASA riguardante l'esplorazione del pianeta Marte. Consiste in attivita' operanti il rover Curiosity e questo dataset comprende una serie di osservazioni catturate dal macchinario quando si trovava nei pressi del cratere di Gale. I dati sono stati registrati da differenti sensori posti sul rover come umidita, temperatura, vento ecc. Il dataset e' diviso in 27 canali ognuno dei quali comprende 55 features con un numero di samples intorno ai 30000.
 
 
 \subsection{Modelli}
@@ -134,6 +134,7 @@ La scelta dei valori modificati agli iper-parametri e' stata fatta manualmente a
 Per confrontare i risultati ottenuti dalle metriche surrogato si e' deciso di adottare le misure di correlazione tra rank o tra gli score dei rankings rispetto a quelli ottenuti usando le labels. Per questi ultimi, la metrica scelta e' F1 Score.
 Gli algoritmi di calcolo per il coefficiente di correlazione sono Kendall e Spearman per il rank correlation e Pearson per lo score correlation. Tutte e tre i coefficienti hanno un range compreso tra $[-1,1]$ dove un coefficiente di -1 indica una correlazione negativa, 0 nessuna correlazione mentre 1 una correlazione positiva.
 Questi indici di correlazione verranno computati sia per ogni ranking prodotto da ogni singola metrica surrogata, sia dai diversi metodi di rank aggregation. Questo permette di avere una panoramica completa delle performance di ognuno.
+
 
 
 
@@ -355,9 +356,25 @@ AVG         & \multicolumn{1}{l|}{0.686}          & \multicolumn{1}{l|}{\textbf{
 \end{tabular}
 \end{table}
 \section{SKF Results}
+Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo 5 pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) come detto prima, non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati e troppo alta e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
+Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato andando a produrre una lista di ranking e andando a prendere il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dati di uno specifico macchinario. Infine si utilizzano i dati di MVM per:
+\begin{itemize}
+\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la solia della classe Q1 e parangonando questi numeri tra i time-step segnalati come anomali dal modello, con i time-step segnalati come normali.
+\item Calcolare il valore di qualita media per ogni banda, sia sui time-step considerati normali e sia su quelli considerati anomali.
+\end{itemize}
+L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinario portino a qualita del prodotto finito piu bassa, ovvero a valori di MVM piu alti. Quello che si spera di ottenere e' vedere questa assunzione all'atto pratico, ovvero con valori di MVM mediamente piu alti per quei punti considerati anomali da un modello rispetto ai punti considerati normali.
+
+------------------------------------------------------------------------------------
+
+IDEA CHE PROBABILMENTE NON IMPLEMENTERO MAI.
+
+L'idea e' quella usare l'informazione di MVM come pseudo-labels per andare a creare una versione del Model Selection supervisionato per generare il ranking di riferimento su cui valutare i ranking prodotti dalle metriche surrogate. Alti valori dei dati di MVM per uno specifico time-step, che ricordo indicare una qualita del prodotto piu bassa, stanno a indicare che in quel momento c'e' stata un anomalia
+
+------------------------------------------------------------------------------------
 
 \subsection{Dataset}
+I dataset di SKF sono stati introdotti e dettagliati nel capitolo 5. Per questa fase di valutazione vengono usati sia i dati di MVM, piu nello specifico viene usata la banda A riguardante gli errori geometrici, ovvero il gridining. Questo perche si e' deciso di concentrarsi esclusivamente sul un macchinario che, per motivi di privacy, chiameremo M1. Questo macchinario e' il primo nella linea di produzione ed effettua il grinding, quindi direttamente interessato alla banda A.
+Per la fase di training e' stato scelto il periodo che va da gennaio a marzo 2022 in quanto i dati in quel periodo risultavano i piu puliti ed i piu stabili da un punto di vista di oscillazioni o data change. Mentre per la fase di prediction viene usato come riferimento il periodo maggio-giugno 2022.
 \subsection{Risultati}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 
