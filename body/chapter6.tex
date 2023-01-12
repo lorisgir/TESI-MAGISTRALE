@@ -601,17 +601,28 @@ Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima 
 \end{itemize}
 L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinario portino a qualita del prodotto finito piu bassa, ovvero a valori di MVM piu alti. Quello che si spera di ottenere e' vedere questa assunzione all'atto pratico, ovvero con valori di MVM mediamente piu alti per quei punti considerati anomali da un modello rispetto ai punti considerati normali.
 
-------------------------------------------------------------------------------------
-
-IDEA CHE PROBABILMENTE NON IMPLEMENTERO MAI.
-
-L'idea e' quella usare l'informazione di MVM come pseudo-labels per andare a creare una versione del Model Selection supervisionato per generare il ranking di riferimento su cui valutare i ranking prodotti dalle metriche surrogate. Alti valori dei dati di MVM per uno specifico time-step, che ricordo indicare una qualita del prodotto piu bassa, stanno a indicare che in quel momento c'e' stata un anomalia
-
-------------------------------------------------------------------------------------
 
 \subsection{Dataset}
 I dataset di SKF sono stati introdotti e dettagliati nel capitolo 5. Per questa fase di valutazione vengono usati sia i dati di MVM, piu nello specifico viene usata la banda A riguardante gli errori geometrici, ovvero il gridining. Questo perche si e' deciso di concentrarsi esclusivamente sul un macchinario che, per motivi di privacy, chiameremo M1. Questo macchinario e' il primo nella linea di produzione ed effettua il grinding, quindi direttamente interessato alla banda A.
 Per la fase di training e' stato scelto il periodo che va da gennaio a marzo 2022 in quanto i dati in quel periodo risultavano i piu puliti ed i piu stabili da un punto di vista di oscillazioni o data change. Mentre per la fase di prediction viene usato come riferimento il periodo maggio-giugno 2022.
-\subsection{Risultati}
 
+
+\subsection{Thresholding}
+Prima di procedere al training del modello e' necessario avere un riferimento sulla percentuale di anomalie nel dataset. A questo scopo e' stato utilizzato il metodo GammaY introdotto nel capitolo 3.
+Questo algoritmo riceve in input la stessa lista di modelli candidati usati poi nel model selection, e dopo essere stati allenati sul dataset di training senza andare ad indicare il fattore di contaminazione gli output score di ognuno di questi sono stati usati per computare la distribuzione di probabilita multivariata se i punti sono o meno anomali.
+Il risultato prodotto da questa tecnica di trhesoldin e' 0.05, ovvero il 5\% di punti vengono considerati anomali. Un dato ragionevole confermato da un analisi manuale dei dati.
+\subsection{Risultati}
+La valutazione del Modlel Selection, per i motivi spiegati, devve essere svolta manualmente tramite un ispezione grafica o utilizzando le qualita MVM.
+
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/kde}
+\centering
+\end{figure}
+
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/mvm_result}
+\centering
+\end{figure}
 

@@ -127,4 +127,8 @@ Come passo finale è necessario trattare i valori mancanti:
 \item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo e' quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non e' di nostro interesse rilevare anomalie in quei intervalli di tempo.
 \item Tutti gli altri valori nulli vengono interpolati linearmente.
 \end{itemize}
-Infine i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.
+A questo punto i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.
+Come ultimo passaggio si e' deciso di andare a normalizzare i valori utilizzando un MinMaxScaler.
+TODO inserire formula.
+
+
