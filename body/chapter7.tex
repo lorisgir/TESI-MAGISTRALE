@@ -1,11 +1,68 @@
-\chapter{Deploy}
+\chapter{Deployment}
+Il modello di inferenza e' stato rilasciato attraverso la piattaforma Microsoft Azure e anche reso fruibile per gli operatori SKF utilizzando PowerBI.
+Microsoft Azure e' una piattaforma cloud che offre una suite completa di servizi e risorse per computing, storage, gestione dati, comunicazione ecc.
+All'interno di questo progetto, sono stati utilizzate le seguenti risorse:
+\begin{itemize}
+\item Data Factory: e' uno strumento di orchestrazione per servizi di Data Integration ed esegue flussi di lavoro ETL (Extract, Transform, Load).
+\item Machine Learning: e' lo strumento Azure dedicato ai servizi di Machine Learning. Mette a disposizione macchine virtuali, pipeline schedulabili, endpoint per l'inferenza, gestione dei modelli registrati ecc.
+\end{itemize}
 
+PowerBI e' stato utilizzato per lo sviluppo front-end. E' un software interattivo per la Data Visualization con un focus primario alla business inteligence. Al suo interno sono presenti numerosi connettori da cui prelevare i dati, insieme ad una serie di strumenti per aggregare, filtrare, comporre e visualizzare i dati attraverso grafici o report.
+
+\section{Architettura}
+Questa sezione e' dedicata a come gli strumenti citati in precedenza comunicano e interagiscono tra di loro. L'architettura puo essere divisa in 4 macro aree:
+\begin{enumerate}
+\item \textbf{Data}: i dati sono archiviati all'interno di SQL Server e vengono aggiornati in tempo reale a seguito dell'inserimento di nuove registrazioni da parte di SKF.
+\item \textbf{Orchestrazione}: il workflow viene gestito da Data Factory il quale si occupa di richiamare l'endpoint di inferenza ad una frequenza regolare.
+\item \textbf{Training e Inferenza} sono gestiti da Azure Machine Learning. E' presente una pipeline di training che consiste nel processamento dati, training del modello e pubblicazione di esso. Il modello pubblicato generera un endpoint di inferenza richiamabile tramite chiamate HTTP. 
+\item \textbf{Visualizzazione} dei risultati di inferenza in tempo reale attraverso PowerBI.
+\end{enumerate}
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/deploy_scheme}
+\centering
+\end{figure}
+
+
+Il flusso delle operazioni si divide invece in Training e Inferenza.
+
+\subsubsection{Training}
+Il flusso di train (in viola) e' schedulato ogni mese. La pipeline di training recupera i dati da SQL server per andare a processarli e poi passarli alla funzione di fit del modello. L'ultimo step della pipeline riguarda la pubblicazione del modello allenato andando ad aggiornare l'endpoint di inferenza.
+
+\subsubsection{Inferenza}
+Il flusso di inferenza (in verde) e' orchestrato da Data Factory il quale e' stato programmato per interrogare l'archivio SQL ogni qual volta nuovi dati arrivano da SKF. I dati vengono quindi recuperati, preparati e inclusi nella richiesta HTTP verso l'endpoint di inferenza di Azure Machine Learning. Il risultato dell'inferenza viene poi restituito a Data Factory che si occupa di salvarlo dentro il database SQL, rendendo disponibile anche ad altri client come PowerBI. Attraverso l'utilizzo delle Direct Query, PowerBI interroga il database SQL per andare a recuperare sia i dati delle registrazione SKF, sia il risultato di inferenza per quei dati per poi mostrarli a video.
+
+
+\section{Training}
+\subsection{Azure Machine Learning Pipelines}
+Il core della piattaforma Azure Machine Learning risiede nelle pipeline. Queste permettono l'esecuzione di scripts Python come se fossero step di esecuzione di un flusso di lavoro. Quando la pipeline viene lanciata, una richiesta di attivazione viene inoltrata al compute cluster associato, il quale alloca una virtual machine per eseguire il codice. Questo tipo di gestione OnDemand, permette di utilizzare le risorse computazionali solamente quando servono, abbassando quindi i costi. Infatti, una volta terminata la pipeline, la virtual machine verra' deallocata dopo un periodo di delay specificato.
+La definizione della pipeline viene effettuata utilizzando l'SDK di AzureML. 
+I parametri richiesti sono (1) il nome del compute cluster su cui eseguire il flusso di lavoro e (2) specificare il nome dell'environment. L'environment e' un ambiente di lavoro che contiene informazioni sulle dipendenze e sulle versioni dei pacchetti, librerie o dell'interprete python necessari alla corretta esecuzione del codice. Gli environment sono definiti utilizzando un Dockerfile e registrati su Azure Machine Learning.
+Gli step della pipeline sono invece definiti dal percorso allo script del file, i parametri di input e i parametri di ouput. Condividono la stesso spazio di archiviazione, di conseguenza per passare dati tra gli step e' necessario andare a salvare su file questi dati e valorizzare i vari input e ouput con i percorsi ai file.
+A questo punto la pipeline e' completa e puo essere pubblicata su Azure Machine Learning per essere poi schedulata ad una cadenza regolare.
+
+\subsection{SKF Pipeline}
+In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
+La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
+Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
+Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori.
+Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
+Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
 \begin{figure}[t]
 \includegraphics[width=10cm, scale=1]{images/pipeline}
 \centering
 \end{figure}
 
+\section{Inference}
+
+\section{Dashboard}
+L'ultimo elemento dell'architettura e' PowerBI. Come introdotto a inizio capitolo, e' un software interattivo per la Data Visualization che offre diversi connettori da cui prelevare i dati. Uno di questi e' il Direct Query: questo strumento permette di collegarsi direttamente all'origine dei dati ed interrogarla on demand. E' un modo particolarmente efficace di recupare i dati quando si ha a disposizione un'archivio molto grande ma per la visualizzazione sono necessari solamente gli ultimi records. 
+L'interfaccia pensata per gli operatori di SKF risiede in un semplice grafico a line con delle barre verticale rosse per indicare l'anomalia in uno specifico timestamp. Per questo tipo di report, Direct Query e' indubbiamente la scelta migliore di recuperare i dati.  
+
+
 \begin{figure}[t]
 \includegraphics[width=14cm, scale=1]{images/powerbi}
 \centering
 \end{figure}
+
+
