@@ -3,19 +3,19 @@ In questo capitolo viene discussa l'implementazione e l'applicazione delle metri
 
 Riassumendo, questo capitolo si dividerà in:
 \begin{enumerate}
-\item Definizione e implementazione delle metriche surrogate per il Model Selection e delle tecniche di Rank Aggregation
-\item Benchmark Results
-\item SKF Results
+	\item Definizione e implementazione delle metriche surrogate per il Model Selection e delle tecniche di Rank Aggregation
+	\item Benchmark Results
+	\item SKF Results
 \end{enumerate}
 
 
 \section{Implementazione}
 Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione e' rappresentato in figura \ref{flow-scheme}.
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
-\caption{Flusso operazionale}
-\label{flow-scheme}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
+	\caption{Flusso operazionale}
+	\label{flow-scheme}
+	\centering
 \end{figure}
 
 \subsection{Metriche Surrogate}
@@ -30,10 +30,10 @@ Metodi basati sulla centralita hanno ottenuto successi recenti nel Model Selecti
 Per adottare quest'idea si e' fatto uso di diverse tecniche che andassero a produrre dei ranking nella quale i modelli con score piu alto erano indicati come quelli piu "centrali".
 Sono strate proposte 4 metodi per computare lo score di model centrality. Ognuna di queste riceve come input un set di K modelli a cui e' stato fatto training non supervisionato su un dataset di riferimento. 
 \begin{itemize}
-\item \textbf{Round Robin}: dati i K modelli, ognuno di questi viene selezionato a turno e le sue labels vengono usate come ground truth per valutare le performance degli altri K-1 modelli. Infine viene prodotto un unico ranking finale andando a calcolare la media delle performance di ogni modello rispetto alle k-1 iterazioni. 
-\item \textbf{Majority Vote} e' il metodo piu semplice per generare consenso: dati K modelli e le loro labels, viene generato un nuovo set di labels finale andando a prendere, per ogni sample, la label che riceve piu voti. Questo nuovo set viene usato come ground truth per valutare i K modelli.
-\item \textbf{Sampling}: per ogni sample all'interno del dataset viene scelto in maniera casuale un modello da usare per estrarre la label per quel sample. Viene quindi prodotto un nuovo set di labels da usare come ground truth per valutare i K modelli.
-\item \textbf{Score Correlation}: questo metodo utilizza gli scores prodotti da ogni modello, dove lo score al contrario delle labels, rappresenta un valore scalare direttamente proporzionale alla probabilita che quel sample sia anomalo. Vengono infatti calcolati i ranking per ognuno di questi set di scores: Sia $Ok(i)$ il rango del sample $i$ secondo gli scores prodotti dal modello K. Viene definita la distanza dal modello $Ak$ al modello $Al$ come la distanza di Kendall, ovvero il numero di disaccordi per ogni possibile coppia. Infine viene misurata la centralita di un modello come la distanza media rispetto ai suoi M vicini, dove M e' un parametro.
+	\item \textbf{Round Robin}: dati i K modelli, ognuno di questi viene selezionato a turno e le sue labels vengono usate come ground truth per valutare le performance degli altri K-1 modelli. Infine viene prodotto un unico ranking finale andando a calcolare la media delle performance di ogni modello rispetto alle k-1 iterazioni. 
+	\item \textbf{Majority Vote} e' il metodo piu semplice per generare consenso: dati K modelli e le loro labels, viene generato un nuovo set di labels finale andando a prendere, per ogni sample, la label che riceve piu voti. Questo nuovo set viene usato come ground truth per valutare i K modelli.
+	\item \textbf{Sampling}: per ogni sample all'interno del dataset viene scelto in maniera casuale un modello da usare per estrarre la label per quel sample. Viene quindi prodotto un nuovo set di labels da usare come ground truth per valutare i K modelli.
+	\item \textbf{Score Correlation}: questo metodo utilizza gli scores prodotti da ogni modello, dove lo score al contrario delle labels, rappresenta un valore scalare direttamente proporzionale alla probabilita che quel sample sia anomalo. Vengono infatti calcolati i ranking per ognuno di questi set di scores: Sia $Ok(i)$ il rango del sample $i$ secondo gli scores prodotti dal modello K. Viene definita la distanza dal modello $Ak$ al modello $Al$ come la distanza di Kendall, ovvero il numero di disaccordi per ogni possibile coppia. Infine viene misurata la centralita di un modello come la distanza media rispetto ai suoi M vicini, dove M e' un parametro.
 \end{itemize}
 
 Ognuna di questi metodi produce un ranking finale per cui i modelli con lo score piu alto sono quelli piu centrali. In particolare i metodi Round Robin, Majority Vote e Samplig che utilizzando un ground truth generata sul momento, utilizzando lo F1 Score per valuatare ogni modello rispetto a questa ground truth.
@@ -50,26 +50,28 @@ Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-la
 
 Invece di affidarsi a modelli generativi complessi [Wen et al., 2020], e' stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/anomalies}
-\caption{Tipologie di anomalie}
-\label{tipi-anomalie}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/anomalies}
+	\caption{Tipologie di anomalie}
+	\label{tipi-anomalie}
+	\centering
 \end{figure}
 
 
 \begin{enumerate}
-\item \textbf{Spike Anomaly} sono delle point anomalies in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno. Lo spike ha un magnitudo governato da una distribuzione \[s \approx N(1.5, 3) \]
-\item \textbf{Scale Anomalies} e' un intervallo di punti anomali in cui il  valore medio dei punti al suo interno e' significaticamente piu grande o piu piccolo rispetto all'intorno. I dati vengono scalati \[ ts_a[i, start:end] = factor*ts[i, start:end]\] dove factor segue sempre la distribuzione \(s \approx N(1.5, 3) \)
-\item \textbf{Wander Anomalies} e' un intervallo di punti anomali in cui il valore di essi cresce o decresce linearmente nel tempo. I dati vengono modificati secondo \[ ts_a[i, start:end] = np.linspace(0, baseline, end-start) + ts[i, start:end] \] 
+	\item \textbf{Spike Anomaly} sono delle point anomalies in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno. Lo spike ha un magnitudo governato da una distribuzione \[s \approx N(1.5, 3) \]
+	\item \textbf{Scale Anomalies} e' un intervallo di punti anomali in cui il  valore medio dei punti al suo interno e' significaticamente piu grande o piu piccolo rispetto all'intorno. I dati vengono scalati \[ ts_a[i, start:end] = factor*ts[i, start:end]\] dove factor segue sempre la distribuzione \(s \approx N(1.5, 3) \)
+	\item \textbf{Wander Anomalies} e' un intervallo di punti anomali in cui il valore di essi cresce o decresce linearmente nel tempo. I dati vengono modificati secondo \[ ts_a[i, start:end] = np.linspace(0, baseline, end-start) + ts[i, start:end] \] 
 \end{enumerate}
 
 Il numero di anomalie da initiettare viene calcolato sulla base del fattore di contaminazione associato ad un determinato dataset. Ad esempio, su un dataset con 10000 sample ed un fattore di contaminazione di 0.05, 500 anomalie saranno iniettate.
 La posizione nella quale vengono iniettate le spike anomalies viene scelta casualmente; invece per quanto riguarda le scale e wander anomalies, vengono generati casualmente dei punti di inizio intervallo anomalo mentre la lunghezza di questi e' predisposta a mano in base alla frequenza dei sample o alla dimensione del dataset.
 
-Attraverso uno studio di correlazione fra le feature del dataset si e' andanto a scoprire se due o piu feature devono essere considerate insieme quando si aggiunge un'anomalia in un determinato punto. In un esempio pratico, se la feature della Pressione e quella del Flow hanno una correlazione vicina a -1, quindi negativa, l'iniezione dell'anomalia prevede che una delle due feature vede il suo valore modificato verso l'alto mentre l'altro verso il basso. 
+Attraverso uno studio di correlazione fra le feature del dataset si e' andanto a scoprire se due o piu feature devono essere considerate insieme quando si aggiunge un'anomalia in un determinato punto. In un esempio pratico, se la feature della Pressione e quella del Flow hanno una correlazione vicina a -1, quindi negativa, l'iniezione dell'anomalia prevede che una delle due feature vede il suo valore modificato verso l'alto mentre l'altro verso il basso. L'immagine \ref{feature-correlazioni} mostra un esempio di correlazioni positiva e negativa.
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/corr}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/corr}
+    \caption{Correlazioni tra features}
+	\label{feature-correlazioni}
+	\centering
 \end{figure}
 
 Utilizzando il coefficiente di Skew si va a vedere in che direzione portare l'anomalia: se verso il basso o verso l'alto. Feature con un right-skew avranno anomalie orientate verso l'alto, left-swek verso il basso mentre se non rientrano in nessuno dei due casi allora si generano anomalie casuali o verso il basso o verso l'alto.
@@ -82,9 +84,9 @@ Ognuno di questi dataset prodotti viene poi utilizzato per effettuare la valutaz
 
 Il flusso di lavoro di questa metrica surrogata puo essere riassunta in questi step:
 \begin{enumerate}
-\item Training dei modelli sul dataset originario
-\item Creazione di dataset modificati andando ad iniettare i diversi tipi di anomalie e producendo quindi le pseudo-labels
-\item Valutazione dei modelli sui dataset modificati usando le pseudo-labels come ground truth e F1 Score come metrica di valutazione.
+	\item Training dei modelli sul dataset originario
+	\item Creazione di dataset modificati andando ad iniettare i diversi tipi di anomalie e producendo quindi le pseudo-labels
+	\item Valutazione dei modelli sui dataset modificati usando le pseudo-labels come ground truth e F1 Score come metrica di valutazione.
 \end{enumerate}
 
 
@@ -93,23 +95,27 @@ Questa procedura puo essere molto efficace ma non e' esente da problemi: (1) le 
 \subsubsection{Clustering Cohesion}
 \textit{Un buon modello riesce a trovare una buona separazione tra i punti normali ed i punti anomali}.
 Nel contesto dei modelli non supervisionati, tecniche e metriche di valutazione inerenti al clustering sono molto efficaci quando non si hanno a disposizione le labels. Misure di coesione tra i cluster prodotti da un modello sono indicatori di quanto quest'ultimo sia riuscito a separare efficacemente i dati.
-All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al piu raggruppati in zone poco dense. 
+All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al piu raggruppati in zone poco dense.
+\begin{center}
+  \includegraphics[width=12cm, scale=1]{images/plot-anomalies-normal}
+\end{center}
 L'idea alla base di questa metrica surrogata e' quindi quella di calcolare la coesione e separazione tra il cluster di punti normali e quello di punti anomali prodotti dalle labels di un modello di Anomaly Detection. Piu alto e' questo score, piu il modello riesce a separare questi dati e quindi puo essere considerato come un buon modello.
 La metrica utilizzata e' il Silouetthe Score, ma non viene calcolata subito dopo aver ottenuto le labels da un modello, sono neccessari prima alcuni passaggi di preprocessing.
 Immaginiamo di avere un dataset con due feature per la quale e' possibile plottare graficamente i punti in un piano cartesiano. Idealmente i punti considerati normali formano un unico cluster denso, ma la stessa cosa non si puo dire per i punti anomali.
-\begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/plot-anomalies-normal}
-\centering
-\end{figure}
+
+
+
 Questi possono essere sparsi per il piano come se fossero rumore oppure possono formare numerosi cluster di piccole dimensioni. Calcolare il silouette score assumendo solo questi due cluster il risultato potrebbe risultare falsato proprio per il fatto che i punti sparsi contribuiscono in maniera negativa allora score.
 La soluzione adottata e' quella di applicare l'algoritmo di DBSCAN sui punti anomali, per formare quindi piu cluster da questi e per scartare quei punti che vengono labellati dall'algoritmo come rumore.
 Prima di fare cio pero e' necessario ridurre la dimensionalita dei dati per evitare il problema del "Curse Of Dimensionality", il quale afferma che in un dataset ad alta dimensionalita', la distanza tra i singoli punti e' troppo alta per essere informativa.
 Applicando quindi PCA per riddure le dimensioni a 3, rende l'applicazione di DBSCAN piu efficace. Come parametri sono stati usati $min_samples=dim * 2$ e per quanto riguarda $eps$ e' stato ricavato il valore usando l'elbow method.
-Una volta applicato DBSCAN ed ottenuto i cluster per i punti anomali, viene calcolato il silouette score su questi, tenendo anche in considerazione il cluster di punti normali originario.
-\begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/plot-dbscan-anomalies}
-\centering
-\end{figure}
+Applicando quindi DBSCAN si ottengono i clster per i punti anomali.
+\begin{center}
+\includegraphics[width=12cm, scale=1]{images/plot-dbscan-anomalies}
+\end{center}
+
+Infine viene calcolato il silouette score su questi, tenendo anche in considerazione il cluster di punti normali originario.
+
 Infine questa procedura viene applicata su ogni modello per andare a produrre un ranking finale.
 Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale e' relativamente bassa e quindi i punti sono quasi indipendenti tra di loro. Le point anomalies cosi come le collective anomalies sono identificate con piu precisione rispetto alle contextual anomalies. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con piu probabilita nel cluster di punti normali.
 \subsection{Rank Aggregation}
@@ -121,48 +127,56 @@ E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggett
 \subsubsection{Borda}
 I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto sara' in posizione 1. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e cosi via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. A questo punto vengono effettuati i calcoli per ognuna delle 3 metriche surrogate ed il punteggio finale, per ogni modello, sara' la media dei 3 valori ottenuti.
 
+\begin{table}
+\caption{\label{borda}Esempio di aggregazione con Borda.}
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|l|l|}
+    	\hline
+    	   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
+    	M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
+    	M2 & 0.8 & 0.6 & 0.7 & 3     & 2      & 2.5   & 2.5           \\ \hline
+    	M3 & 0.7 & 0.7 & 0.8 & 2     & 3      & 4     & 3             \\ \hline
+    	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
+    \end{tabular}
+\end{table}
 
-\begin{tabular}{|l|l|l|l|l|l|l|l|}
-\hline
-   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
-M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
-M2 & 0.8 & 0.6 & 0.7 & 3     & 2      & 2.5   & 2.5           \\ \hline
-M3 & 0.7 & 0.7 & 0.8 & 2     & 3      & 4     & 3             \\ \hline
-M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
-\end{tabular}
 
-
-Nella tabella soprastante, viene proposto un esempio di Ranking Aggregation con Borda. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate. Le seconde 3 colonne invece rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto e' stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
+Nella tabella \ref{borda}, viene proposto un esempio di Ranking Aggregation con Borda. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate. Le seconde 3 colonne invece rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto e' stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
 \subsubsection{Robust Borda}
 E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking.
 
-
+\begin{table}
+\caption{\label{rborda}Esempio di aggregazione con Robust Borda.}
+    \centering
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
-\hline
-   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
-M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
-M2 & 0.8 & 0.6 & 0.7 & 3     & 1      & 2.5   & 2.16          \\ \hline
-M3 & 0.7 & 0.7 & 0.8 & 1     & 3      & 4     & 2.66          \\ \hline
-M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
+	\hline
+	   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
+	M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
+	M2 & 0.8 & 0.6 & 0.7 & 3     & 1      & 2.5   & 2.16          \\ \hline
+	M3 & 0.7 & 0.7 & 0.8 & 1     & 3      & 4     & 2.66          \\ \hline
+	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
 \end{tabular}
+\end{table}
 
-
-Ripropondendo l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi. Questo produce poi punteggi finali differenti.
+Riproponendo in tabella \ref{rborda} l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi. Questo produce poi punteggi finali differenti.
 \subsubsection{Score}
 Questo metodo e' il piu semplice dei 3 in quanto viene semplicemente fatta una media degli score dei 3 ranking per ogni modello, per poi ordinare in ordine decrescente e quindi ottenere un ranking finale.
+Utilizzando questo metodo e sempre considerando gli stessi score degli esempi precedenti, in tabella \ref{score} si puo notare come questa volta il modello migliore sia M2 e non piu M3.
 
-
+\begin{table}
+\caption{\label{score}Esempio di aggregazione con Score.}
+    \centering
 \begin{tabular}{|l|l|l|l|l|}
-\hline
-   & MC  & PAI & CC  & Final Ranking \\ \hline
-M1 & 0.9 & 0.5 & 0.7 & 0.7           \\ \hline
-M2 & 0.8 & 0.6 & 0.7 & 0.76          \\ \hline
-M3 & 0.7 & 0.7 & 0.8 & 0.73          \\ \hline
-M4 & 0.6 & 0.8 & 0.5 & 0.63          \\ \hline
+	\hline
+	   & MC  & PAI & CC  & Final Ranking \\ \hline
+	M1 & 0.9 & 0.5 & 0.7 & 0.7           \\ \hline
+	M2 & 0.8 & 0.6 & 0.7 & 0.76          \\ \hline
+	M3 & 0.7 & 0.7 & 0.8 & 0.73          \\ \hline
+	M4 & 0.6 & 0.8 & 0.5 & 0.63          \\ \hline
 \end{tabular}
+\end{table}
 
 
-Utilizzando questo metodo, sempre considerando gli stessi score degli esempi precedenti, si puo notare come questa volta il modello migliore sia M2 e non piu M3.
 
 Chiaramente il processo di Ranking Aggregation aggiunge complessita e variabilita al processo di Model Selection, un'analisi sui risultati di ognuno dei metodi appena proposti e' riportata nella sezione successiva. Il generale pero, il metodo ottimale di Kemeny-Young risultera il migliore e sara' poi quello utilizzato su SKF.
 
@@ -172,26 +186,30 @@ I dataset trattati sono diversi sia per struttura ma anche per tipologia: verran
 
 \subsubsection{ODDS}
 Outlier Detection DataSets e' una collezione di dataset per l'Outlier Detection. Questo archivio e' in continuo sviluppo dal 2016 da parte di numerosi ricercatori e comprende dataset di vari domini, dimensione, numero di features e percentuale di anomalie. 
-Sono presenti sia dataset multi-dimensionali a punto che dataset nella forma di serie temporali multivariate. Da questo archivio dati verranno presi in considerazione soltato i dataset del primo tipo; in particolare, verranno trattati i seguenti dataset multi-dimensionali a punto:
+Sono presenti sia dataset multi-dimensionali a punto che dataset nella forma di serie temporali multivariate. Da questo archivio dati verranno presi in considerazione soltato i dataset del primo tipo; in particolare, verranno trattati i seguenti dataset multi-dimensionali a punto.
 
+La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 
+\begin{table}
+\caption{\label{odds}Dataset ODDS}
+    \centering
 \begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Dataset} & \textbf{\#points} & \textbf{\#dim} & \textbf{\#outliers(\%)} & \textbf{domain} \\ \hline
-annthyroid       & 7200              & 6              & 534 (7.42\%)            & Healthcare      \\ \hline
-cardio           & 1831              & 21             & 176 (9.61\%)            & Healthcare      \\ \hline
-cover            & 286048            & 10             & 2747 (0.96\%)           & Botany          \\ \hline
-donors           & 619326            & 10             & 36710 (5.93\%)          & Sociology       \\ \hline
-mammography      & 11183             & 6              & 260 (2.32\%)            & Healthcare      \\ \hline
-PageBlocks       & 5393              & 10             & 510 (9.46\%)            & Document        \\ \hline
-satimage-2       & 5803              & 36             & 71 (1.22\%)             & Astronautics    \\ \hline
-shuttle          & 49097             & 9              & 3511 (7.15\%)           & Astronautics    \\ \hline
-thyroid          & 3772              & 6              & 93 (2.47\%)             & Healthcare      \\ \hline
-vowels           & 1456              & 12             & 50 (3.43\%)             & Linguistics     \\ \hline
-Waveform         & 3443              & 21             & 100 (2.9\%)             & Physics         \\ \hline
-Wilt             & 4819              & 5              & 257 (5.33\%)            & Botany          \\ \hline
+	\hline
+	\textbf{Dataset} & \textbf{\#points} & \textbf{\#dim} & \textbf{\#outliers(\%)} & \textbf{domain} \\ \hline
+	annthyroid       & 7200              & 6              & 534 (7.42\%)            & Healthcare      \\ \hline
+	cardio           & 1831              & 21             & 176 (9.61\%)            & Healthcare      \\ \hline
+	cover            & 286048            & 10             & 2747 (0.96\%)           & Botany          \\ \hline
+	donors           & 619326            & 10             & 36710 (5.93\%)          & Sociology       \\ \hline
+	mammography      & 11183             & 6              & 260 (2.32\%)            & Healthcare      \\ \hline
+	PageBlocks       & 5393              & 10             & 510 (9.46\%)            & Document        \\ \hline
+	satimage-2       & 5803              & 36             & 71 (1.22\%)             & Astronautics    \\ \hline
+	shuttle          & 49097             & 9              & 3511 (7.15\%)           & Astronautics    \\ \hline
+	thyroid          & 3772              & 6              & 93 (2.47\%)             & Healthcare      \\ \hline
+	vowels           & 1456              & 12             & 50 (3.43\%)             & Linguistics     \\ \hline
+	Waveform         & 3443              & 21             & 100 (2.9\%)             & Physics         \\ \hline
+	Wilt             & 4819              & 5              & 257 (5.33\%)            & Botany          \\ \hline
 \end{tabular}
-
+\end{table}
 
 Per questi dataset si e' deciso di adottare uno train/test split costituito da 66\% per il train e 33\% per il test. I dataset di train contengono al loro interno anche una percentuale di anomalie. Potrebbe non essere la situazione ideale in quanto e' consigliato per i modelli non supervisionati di essere allenati e quindi apprendere da dati il piu puliti possibili. Ma e' la situazione piu realistica in quanto nella realta la presenza di label non e' sempre garantita.  
 
@@ -202,7 +220,8 @@ La percentuale di anomalie al suo interno si attesta intorno al 4.16 e si trovan
 
 
 \subsection{Modelli}
-Per una valutazione piu completa si e' deciso di utilizzare un alto numero di modelli ognuno con caratteristiche e proprieta differenti. Algoritmi di Machine Learning basati sulla distanza, probabilistici o lineari; ma anche Neural Network come Auto Encoders o LSTM.
+Per una valutazione piu completa si e' deciso di utilizzare un alto numero di modelli ognuno con caratteristiche e proprieta differenti. Algoritmi di Machine Learning basati sulla distanza, probabilistici o lineari; ma anche Neural Network come Auto Encoders o LSTM. La tabella \ref{admodels} e' compresiva di tutti i modelli considerati.
+
 Gli algoritmi di machine learning considerano i sample in maniera indipendente, mentre quelli a rete neurale considerano una finestra temporale per per andare a fare sia training che prediction, risultando quindi time-aware, ovvero tengono in considerazione l'aspetto temporale dei dati. Il valore di questa finestra temporale viene passato come parametro e valorizzato manualmente.
 
 Ognuno di questi modelli e' stato allenato utilizzando sia i valori predefiniti per gli iper-parametri, sia variazioni di questi. 
@@ -212,48 +231,47 @@ La scelta dei valori modificati agli iper-parametri e' stata fatta manualmente a
 Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione e' ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non e' possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non e' presente. Per risolvere questo problema si utilizzera un metodo di Tresholding come introdotto nel capitolo 3 che stima il fattore di contaminazione. Un fattore di contaminazione stimato male porta ovviamente a degradare le performance del Model Selection. Cosi come per la variazione degli iper-parametri, in sviluppi futuri potrebbe risultare utile un'analisi piu approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
 
 
-% Please add the following required packages to your document preamble:
-% \usepackage{graphicx}
 \begin{table}[]
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Model} & \textbf{Type}     & \textbf{Algorithm}                                                               \\ \hline
-ECOD           & Probabilistic     & Outlier Detection Using Empirical Cumulative Distribution Functions \\ \hline
-COPOD          & Probabilistic     & Copula-Based Outlier Detection                                                   \\ \hline
-ABOD           & Probabilistic     & Angle-Based Outlier Detection                                                    \\ \hline
-SOS            & Probabilistic     & Stochastic Outlier Selection                                                     \\ \hline
-KDE            & Probabilistic     & Outlier Detection with Kernel Density Functions                                  \\ \hline
-Sampling       & Probabilistic     & Rapid distance-based outlier detection via sampling                              \\ \hline
-GMM            & Probabilistic     & Probabilistic Mixture Modeling for Outlier Analysis                              \\ \hline
-PCA            & Linear Model      & Principal Component Analysis                                                     \\ \hline
-KPCA           & Linear Model      & Kernel Principal Component Analysis                                              \\ \hline
-MCD            & Linear Model      & Minimum Covariance Determinant                                                   \\ \hline
-OCSVM          & Linear Model      & One-Class Support Vector Machines                                                \\ \hline
-LMDD           & Linear Model      & Deviation-based Outlier Detection                                                \\ \hline
-LOF            & Proximity-Based   & Local Outlier Factor                                                             \\ \hline
-COF            & Proximity-Based   & Connectivity-Based Outlier Factor                                                \\ \hline
-CBLOF          & Proximity-Based   & Clustering-Based Local Outlier Factor                                            \\ \hline
-HBOS           & Proximity-Based   & Histogram-based Outlier Score                                                    \\ \hline
-kNN            & Proximity-Based   & k Nearest Neighbors                                                              \\ \hline
-SOD            & Proximity-Based   & Subspace Outlier Detection                                                       \\ \hline
-ROD            & Proximity-Based   & Rotation-based Outlier Detection                                                 \\ \hline
-IForest        & Outlier Ensembles & Isolation Forest                                                                 \\ \hline
-INNE           & Outlier Ensembles & Isolation-based Anomaly Detection Using Nearest-Neighbor Ensembles               \\ \hline
-FB             & Outlier Ensembles & Feature Bagging                                                                  \\ \hline
-AutoEncoder    & Neural Networks   & Fully connected AutoEncoder                                                      \\ \hline
-VAE            & Neural Networks   & Variational AutoEncoder                                                          \\ \hline
-SO\_GAAL       & Neural Networks   & Single-Objective Generative Adversarial Active Learning                          \\ \hline
-DeepSVDD       & Neural Networks   & Deep One-Class Classification                                                    \\ \hline
-ALAD           & Neural Networks   & Adversarially learned anomaly detection                                          \\ \hline
-R-Graph        & Graph-based       & Outlier detection by R-graph                                                     \\ \hline
-LUNAR          & Graph-based       & Unifying Local Outlier Detection Methods via Graph Neural Networks               \\ \hline
-DeepLog        & Neural Networks   &                                                                                  \\ \hline
-Telemanom      & Neural Networks   &                                                                                  \\ \hline
-LSTM           & Neural Networks   &                                                                                  \\ \hline
-AutoRegressive & Neural Networks   &                                                                                  \\ \hline
-\end{tabular}%
-}
+    \caption{\label{admodels}Algoritmi di Anomaly Detection}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|l|l|l|}
+			\hline
+			\textbf{Model} & \textbf{Type}     & \textbf{Algorithm}                                                  \\ \hline
+			ECOD           & Probabilistic     & Outlier Detection Using Empirical Cumulative Distribution Functions \\ \hline
+			COPOD          & Probabilistic     & Copula-Based Outlier Detection                                      \\ \hline
+			ABOD           & Probabilistic     & Angle-Based Outlier Detection                                       \\ \hline
+			SOS            & Probabilistic     & Stochastic Outlier Selection                                        \\ \hline
+			KDE            & Probabilistic     & Outlier Detection with Kernel Density Functions                     \\ \hline
+			Sampling       & Probabilistic     & Rapid distance-based outlier detection via sampling                 \\ \hline
+			GMM            & Probabilistic     & Probabilistic Mixture Modeling for Outlier Analysis                 \\ \hline
+			PCA            & Linear Model      & Principal Component Analysis                                        \\ \hline
+			KPCA           & Linear Model      & Kernel Principal Component Analysis                                 \\ \hline
+			MCD            & Linear Model      & Minimum Covariance Determinant                                      \\ \hline
+			OCSVM          & Linear Model      & One-Class Support Vector Machines                                   \\ \hline
+			LMDD           & Linear Model      & Deviation-based Outlier Detection                                   \\ \hline
+			LOF            & Proximity-Based   & Local Outlier Factor                                                \\ \hline
+			COF            & Proximity-Based   & Connectivity-Based Outlier Factor                                   \\ \hline
+			CBLOF          & Proximity-Based   & Clustering-Based Local Outlier Factor                               \\ \hline
+			HBOS           & Proximity-Based   & Histogram-based Outlier Score                                       \\ \hline
+			kNN            & Proximity-Based   & k Nearest Neighbors                                                 \\ \hline
+			SOD            & Proximity-Based   & Subspace Outlier Detection                                          \\ \hline
+			ROD            & Proximity-Based   & Rotation-based Outlier Detection                                    \\ \hline
+			IForest        & Outlier Ensembles & Isolation Forest                                                    \\ \hline
+			INNE           & Outlier Ensembles & Isolation-based Anomaly Detection Using Nearest-Neighbor Ensembles  \\ \hline
+			FB             & Outlier Ensembles & Feature Bagging                                                     \\ \hline
+			AutoEncoder    & Neural Networks   & Fully connected AutoEncoder                                         \\ \hline
+			VAE            & Neural Networks   & Variational AutoEncoder                                             \\ \hline
+			SO\_GAAL       & Neural Networks   & Single-Objective Generative Adversarial Active Learning             \\ \hline
+			DeepSVDD       & Neural Networks   & Deep One-Class Classification                                       \\ \hline
+			ALAD           & Neural Networks   & Adversarially learned anomaly detection                             \\ \hline
+			R-Graph        & Graph-based       & Outlier detection by R-graph                                        \\ \hline
+			LUNAR          & Graph-based       & Unifying Local Outlier Detection Methods via Graph Neural Networks  \\ \hline
+			DeepLog        & Neural Networks   &                                                                     \\ \hline
+			Telemanom      & Neural Networks   &                                                                     \\ \hline
+			LSTM           & Neural Networks   &                                                                     \\ \hline
+			AutoRegressive & Neural Networks   &                                                                     \\ \hline
+		\end{tabular}%
+	}
 \end{table}
 
 \subsection{Valutazione}
@@ -273,370 +291,380 @@ I risultati delle diverse tecniche di Rank Aggregation saranno presentati allo s
 
 Infine viene presentata un'analisi sui rank dei modelli dei rankings prodotti dalle metriche surrogate paragonati ai rank del ranking prodotto in maniera supervisionata con le label.
 \subsubsection{Model Centrality}
-Questa metrica surrogata si basa sul concetto di Model Centrality andando a favorire quei modelli che producono output comparabili alla maggior parte degli altri modelli. Delle quattro tecniche proposte, Round Robin e' quella che generalemente si comporta meglio. In tabella X possiamo vedere come gli indici di correlazione favoriscano questa tecnica.
+Questa metrica surrogata si basa sul concetto di Model Centrality andando a favorire quei modelli che producono output comparabili alla maggior parte degli altri modelli. Delle quattro tecniche proposte, Round Robin e' quella che generalemente si comporta meglio. In tabella \ref{mc-results} possiamo vedere come gli indici di correlazione favoriscano questa tecnica.
 Moving Average e Sampling seguono con punteggi molto simili, sia per le performance medie che per la standard deviation. Il metodo score fatica a trovare correlazione con il ranking supervisionato. 
 
+\begin{table}[]
+    \caption{\label{mc-results}Risultati di correlatrazione per Model Centrality}
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
-\hline
-Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
-\hline
-\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
-\cline{2-13}
-                  & mv & rr & samp & score            & mv & rr & samp & score   & mv & rr & samp & score    \\ 
-\hline
-2\_annthyroid     & 0.823  & 0.837 & 0.836 & 0.773          & 0.584  & 0.581 & 0.605 & 0.584 & 0.739  & 0.735 & 0.753 & 0.671  \\ 
-\hline
-6\_cardio         & 0.807  & 0.787 & 0.787 & 0.654          & 0.612  & 0.563 & 0.564 & 0.565 & 0.746  & 0.715 & 0.718 & 0.626  \\ 
-\hline
-11\_donors        & 0.514  & 0.529 & 0.526 & 0.423          & 0.541  & 0.511 & 0.529 & 0.475 & 0.665  & 0.650 & 0.670 & 0.559  \\ 
-\hline
-20\_letter        & 0.559  & 0.631 & 0.763 & 0.669          & 0.473  & 0.499 & 0.692 & 0.536 & 0.565  & 0.608 & 0.840 & 0.642  \\ 
-\hline
-23\_mammography   & 0.795  & 0.829 & 0.801 & 0.607          & 0.694  & 0.722 & 0.649 & 0.439 & 0.834  & 0.821 & 0.809 & 0.561  \\ 
-\hline
-27\_PageBlocks    & 0.917  & 0.911 & 0.909 & 0.832          & 0.698  & 0.677 & 0.646 & 0.550 & 0.812  & 0.849 & 0.818 & 0.717  \\ 
-\hline
-31\_satimage-2    & 0.759  & 0.855 & 0.644 & 0.553          & 0.641  & 0.865 & 0.514 & 0.440 & 0.793  & 0.970 & 0.581 & 0.462  \\ 
-\hline
-32\_shuttle       & 0.489  & 0.846 & 0.827 & 0.661          & 0.446  & 0.774 & 0.770 & 0.565 & 0.456  & 0.894 & 0.890 & 0.728  \\ 
-\hline
-38\_thyroid       & 0.719  & 0.761 & 0.701 & 0.709          & 0.538  & 0.563 & 0.508 & 0.546 & 0.667  & 0.700 & 0.632 & 0.683  \\ 
-\hline
-40\_vowels        & 0.735  & 0.760 & 0.670 & 0.612          & 0.637  & 0.642 & 0.573 & 0.463 & 0.779  & 0.806 & 0.721 & 0.582  \\ 
-\hline
-41\_Waveform      & 0.428  & 0.464 & 0.440 & 0.481          & 0.466  & 0.582 & 0.569 & 0.423 & 0.572  & 0.709 & 0.647 & 0.541  \\ 
-\hline
-machine-1-1       & 0.561  & 0.582 & 0.641 & 0.556          & 0.458  & 0.458 & 0.499 & 0.468 & 0.558  & 0.572 & 0.607 & 0.595  \\ 
-\hline
-machine-1-2       & 0.842  & 0.877 & 0.866 & 0.771          & 0.633  & 0.732 & 0.723 & 0.570 & 0.834  & 0.839 & 0.836 & 0.738  \\ 
-\hline
-machine-1-3       & 0.949  & 0.836 & 0.828 & 0.480          & 0.855  & 0.633 & 0.645 & 0.437 & 0.934  & 0.841 & 0.826 & 0.428  \\ 
-\hline
-machine-1-4       & 0.966  & 0.949 & 0.917 & 0.576          & 0.835  & 0.706 & 0.711 & 0.412 & 0.927  & 0.842 & 0.840 & 0.553  \\ 
-\hline
-machine-1-5       & 0.441  & 0.494 & 0.465 & 0.353          & 0.458  & 0.477 & 0.456 & 0.432 & 0.587  & 0.514 & 0.584 & 0.419  \\ 
-\hline
-machine-1-6       & 0.588  & 0.551 & 0.576 & 0.585          & 0.550  & 0.527 & 0.528 & 0.521 & 0.621  & 0.582 & 0.578 & 0.601  \\ 
-\hline
-machine-1-7       & 0.630  & 0.596 & 0.626 & 0.597          & 0.546  & 0.491 & 0.543 & 0.467 & 0.693  & 0.636 & 0.680 & 0.593  \\ 
-\hline
-machine-1-8       & 0.594  & 0.563 & 0.553 & 0.628          & 0.494  & 0.421 & 0.492 & 0.406 & 0.590  & 0.433 & 0.514 & 0.553  \\ 
-\hline
-machine-2-1       & 0.791  & 0.838 & 0.847 & 0.566          & 0.561  & 0.595 & 0.563 & 0.465 & 0.653  & 0.687 & 0.690 & 0.535  \\ 
-\hline
-machine-2-2       & 0.822  & 0.824 & 0.827 & 0.683          & 0.608  & 0.594 & 0.565 & 0.503 & 0.794  & 0.770 & 0.739 & 0.601  \\ 
-\hline
-machine-2-3       & 0.825  & 0.827 & 0.834 & 0.606          & 0.648  & 0.610 & 0.638 & 0.444 & 0.819  & 0.771 & 0.798 & 0.546  \\ 
-\hline
-machine-2-4       & 0.307  & 0.309 & 0.285 & 0.192          & 0.357  & 0.348 & 0.301 & 0.389 & 0.411  & 0.369 & 0.310 & 0.317  \\ 
-\hline
-machine-2-5       & 0.044  & 0.133 & 0.126 & 0.136          & 0.332  & 0.379 & 0.351 & 0.383 & 0.380  & 0.356 & 0.326 & 0.325  \\ 
-\hline
-machine-2-6       & 0.896  & 0.872 & 0.893 & 0.568          & 0.703  & 0.648 & 0.679 & 0.511 & 0.816  & 0.823 & 0.801 & 0.594  \\ 
-\hline
-machine-2-7       & 0.882  & 0.885 & 0.839 & 0.820          & 0.683  & 0.718 & 0.662 & 0.648 & 0.823  & 0.848 & 0.806 & 0.806  \\ 
-\hline
-machine-2-8       & 0.991  & 0.989 & 0.983 & 0.803          & 0.861  & 0.876 & 0.847 & 0.532 & 0.961  & 0.966 & 0.950 & 0.627  \\ 
-\hline
-machine-2-9       & 0.627  & 0.649 & 0.664 & 0.420          & 0.492  & 0.472 & 0.480 & 0.414 & 0.597  & 0.569 & 0.571 & 0.409  \\ 
-\hline
-machine-3-1       & 0.458  & 0.467 & 0.532 & 0.485          & 0.431  & 0.444 & 0.453 & 0.381 & 0.483  & 0.504 & 0.591 & 0.427  \\ 
-\hline
-machine-3-2       & 0.613  & 0.646 & 0.670 & 0.727          & 0.595  & 0.595 & 0.627 & 0.638 & 0.753  & 0.761 & 0.785 & 0.814  \\ 
-\hline
-machine-3-3       & 0.345  & 0.379 & 0.365 & 0.388          & 0.420  & 0.384 & 0.364 & 0.468 & 0.475  & 0.451 & 0.434 & 0.454  \\ 
-\hline
-machine-3-4       & 0.158  & 0.168 & 0.224 & -0.036         & 0.271  & 0.241 & 0.293 & 0.095 & 0.331  & 0.281 & 0.334 & 0.154  \\ 
-\hline
-machine-3-5       & 0.857  & 0.871 & 0.864 & 0.521          & 0.699  & 0.774 & 0.759 & 0.470 & 0.817  & 0.880 & 0.870 & 0.523  \\ 
-\hline
-machine-3-6       & 0.338  & 0.311 & 0.292 & 0.069          & 0.393  & 0.305 & 0.391 & 0.365 & 0.463  & 0.379 & 0.351 & 0.312  \\ 
-\hline
-machine-3-7       & 0.308  & 0.361 & 0.321 & 0.299          & 0.469  & 0.447 & 0.452 & 0.365 & 0.493  & 0.464 & 0.474 & 0.443  \\ 
-\hline
-machine-3-8       & 0.648  & 0.651 & 0.700 & 0.471          & 0.579  & 0.547 & 0.590 & 0.412 & 0.696  & 0.682 & 0.727 & 0.570  \\ 
-\hline
-machine-3-9       & 0.580  & 0.477 & 0.496 & 0.431          & 0.665  & 0.589 & 0.588 & 0.463 & 0.833  & 0.710 & 0.719 & 0.595  \\ 
-\hline
-machine-3-10      & -0.009 & 0.015 & 0.116 & 0.010          & 0.269  & 0.288 & 0.300 & 0.210 & 0.348  & 0.322 & 0.324 & 0.272  \\ 
-\hline
-machine-3-11      & 0.837  & 0.626 & 0.560 & 0.372          & 0.640  & 0.465 & 0.332 & 0.348 & 0.813  & 0.470 & 0.401 & 0.315  \\ 
-\hline
-AVG               & 0.627  & 0.640 & 0.636 & 0.514          & 0.560  & 0.558 & 0.550 & 0.457 & 0.670  & 0.661 & 0.655 & 0.536  \\ 
-\hline
-STD               & 0.25   & 0.24  & 0.229 & 0.214          & 0.142  & 0.149 & 0.135 & 0.102 & 0.169  & 0.186 & 0.177 & 0.146  \\
-\hline
-\end{tabular}
+	\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
+		\hline
+		Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
+		\hline
+		\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
+		\cline{2-13}
+		                & mv     & rr    & samp  & score  & mv    & rr    & samp  & score & mv    & rr           & samp   & score \\ 
+		\hline
+		2\_annthyroid   & 0.823  & 0.837 & 0.836 & 0.773  & 0.584 & 0.581 & 0.605 & 0.584 & 0.739 & 0.735        & 0.753  & 0.671 \\ 
+		\hline
+		6\_cardio       & 0.807  & 0.787 & 0.787 & 0.654  & 0.612 & 0.563 & 0.564 & 0.565 & 0.746 & 0.715        & 0.718  & 0.626 \\ 
+		\hline
+		11\_donors      & 0.514  & 0.529 & 0.526 & 0.423  & 0.541 & 0.511 & 0.529 & 0.475 & 0.665 & 0.650        & 0.670  & 0.559 \\ 
+		\hline
+		20\_letter      & 0.559  & 0.631 & 0.763 & 0.669  & 0.473 & 0.499 & 0.692 & 0.536 & 0.565 & 0.608        & 0.840  & 0.642 \\ 
+		\hline
+		23\_mammography & 0.795  & 0.829 & 0.801 & 0.607  & 0.694 & 0.722 & 0.649 & 0.439 & 0.834 & 0.821        & 0.809  & 0.561 \\ 
+		\hline
+		27\_PageBlocks  & 0.917  & 0.911 & 0.909 & 0.832  & 0.698 & 0.677 & 0.646 & 0.550 & 0.812 & 0.849        & 0.818  & 0.717 \\ 
+		\hline
+		31\_satimage-2  & 0.759  & 0.855 & 0.644 & 0.553  & 0.641 & 0.865 & 0.514 & 0.440 & 0.793 & 0.970        & 0.581  & 0.462 \\ 
+		\hline
+		32\_shuttle     & 0.489  & 0.846 & 0.827 & 0.661  & 0.446 & 0.774 & 0.770 & 0.565 & 0.456 & 0.894        & 0.890  & 0.728 \\ 
+		\hline
+		38\_thyroid     & 0.719  & 0.761 & 0.701 & 0.709  & 0.538 & 0.563 & 0.508 & 0.546 & 0.667 & 0.700        & 0.632  & 0.683 \\ 
+		\hline
+		40\_vowels      & 0.735  & 0.760 & 0.670 & 0.612  & 0.637 & 0.642 & 0.573 & 0.463 & 0.779 & 0.806        & 0.721  & 0.582 \\ 
+		\hline
+		41\_Waveform    & 0.428  & 0.464 & 0.440 & 0.481  & 0.466 & 0.582 & 0.569 & 0.423 & 0.572 & 0.709        & 0.647  & 0.541 \\ 
+		\hline
+		machine-1-1     & 0.561  & 0.582 & 0.641 & 0.556  & 0.458 & 0.458 & 0.499 & 0.468 & 0.558 & 0.572        & 0.607  & 0.595 \\ 
+		\hline
+		machine-1-2     & 0.842  & 0.877 & 0.866 & 0.771  & 0.633 & 0.732 & 0.723 & 0.570 & 0.834 & 0.839        & 0.836  & 0.738 \\ 
+		\hline
+		machine-1-3     & 0.949  & 0.836 & 0.828 & 0.480  & 0.855 & 0.633 & 0.645 & 0.437 & 0.934 & 0.841        & 0.826  & 0.428 \\ 
+		\hline
+		machine-1-4     & 0.966  & 0.949 & 0.917 & 0.576  & 0.835 & 0.706 & 0.711 & 0.412 & 0.927 & 0.842        & 0.840  & 0.553 \\ 
+		\hline
+		machine-1-5     & 0.441  & 0.494 & 0.465 & 0.353  & 0.458 & 0.477 & 0.456 & 0.432 & 0.587 & 0.514        & 0.584  & 0.419 \\ 
+		\hline
+		machine-1-6     & 0.588  & 0.551 & 0.576 & 0.585  & 0.550 & 0.527 & 0.528 & 0.521 & 0.621 & 0.582        & 0.578  & 0.601 \\ 
+		\hline
+		machine-1-7     & 0.630  & 0.596 & 0.626 & 0.597  & 0.546 & 0.491 & 0.543 & 0.467 & 0.693 & 0.636        & 0.680  & 0.593 \\ 
+		\hline
+		machine-1-8     & 0.594  & 0.563 & 0.553 & 0.628  & 0.494 & 0.421 & 0.492 & 0.406 & 0.590 & 0.433        & 0.514  & 0.553 \\ 
+		\hline
+		machine-2-1     & 0.791  & 0.838 & 0.847 & 0.566  & 0.561 & 0.595 & 0.563 & 0.465 & 0.653 & 0.687        & 0.690  & 0.535 \\ 
+		\hline
+		machine-2-2     & 0.822  & 0.824 & 0.827 & 0.683  & 0.608 & 0.594 & 0.565 & 0.503 & 0.794 & 0.770        & 0.739  & 0.601 \\ 
+		\hline
+		machine-2-3     & 0.825  & 0.827 & 0.834 & 0.606  & 0.648 & 0.610 & 0.638 & 0.444 & 0.819 & 0.771        & 0.798  & 0.546 \\ 
+		\hline
+		machine-2-4     & 0.307  & 0.309 & 0.285 & 0.192  & 0.357 & 0.348 & 0.301 & 0.389 & 0.411 & 0.369        & 0.310  & 0.317 \\ 
+		\hline
+		machine-2-5     & 0.044  & 0.133 & 0.126 & 0.136  & 0.332 & 0.379 & 0.351 & 0.383 & 0.380 & 0.356        & 0.326  & 0.325 \\ 
+		\hline
+		machine-2-6     & 0.896  & 0.872 & 0.893 & 0.568  & 0.703 & 0.648 & 0.679 & 0.511 & 0.816 & 0.823        & 0.801  & 0.594 \\ 
+		\hline
+		machine-2-7     & 0.882  & 0.885 & 0.839 & 0.820  & 0.683 & 0.718 & 0.662 & 0.648 & 0.823 & 0.848        & 0.806  & 0.806 \\ 
+		\hline
+		machine-2-8     & 0.991  & 0.989 & 0.983 & 0.803  & 0.861 & 0.876 & 0.847 & 0.532 & 0.961 & 0.966        & 0.950  & 0.627 \\ 
+		\hline
+		machine-2-9     & 0.627  & 0.649 & 0.664 & 0.420  & 0.492 & 0.472 & 0.480 & 0.414 & 0.597 & 0.569        & 0.571  & 0.409 \\ 
+		\hline
+		machine-3-1     & 0.458  & 0.467 & 0.532 & 0.485  & 0.431 & 0.444 & 0.453 & 0.381 & 0.483 & 0.504        & 0.591  & 0.427 \\ 
+		\hline
+		machine-3-2     & 0.613  & 0.646 & 0.670 & 0.727  & 0.595 & 0.595 & 0.627 & 0.638 & 0.753 & 0.761        & 0.785  & 0.814 \\ 
+		\hline
+		machine-3-3     & 0.345  & 0.379 & 0.365 & 0.388  & 0.420 & 0.384 & 0.364 & 0.468 & 0.475 & 0.451        & 0.434  & 0.454 \\ 
+		\hline
+		machine-3-4     & 0.158  & 0.168 & 0.224 & -0.036 & 0.271 & 0.241 & 0.293 & 0.095 & 0.331 & 0.281        & 0.334  & 0.154 \\ 
+		\hline
+		machine-3-5     & 0.857  & 0.871 & 0.864 & 0.521  & 0.699 & 0.774 & 0.759 & 0.470 & 0.817 & 0.880        & 0.870  & 0.523 \\ 
+		\hline
+		machine-3-6     & 0.338  & 0.311 & 0.292 & 0.069  & 0.393 & 0.305 & 0.391 & 0.365 & 0.463 & 0.379        & 0.351  & 0.312 \\ 
+		\hline
+		machine-3-7     & 0.308  & 0.361 & 0.321 & 0.299  & 0.469 & 0.447 & 0.452 & 0.365 & 0.493 & 0.464        & 0.474  & 0.443 \\ 
+		\hline
+		machine-3-8     & 0.648  & 0.651 & 0.700 & 0.471  & 0.579 & 0.547 & 0.590 & 0.412 & 0.696 & 0.682        & 0.727  & 0.570 \\ 
+		\hline
+		machine-3-9     & 0.580  & 0.477 & 0.496 & 0.431  & 0.665 & 0.589 & 0.588 & 0.463 & 0.833 & 0.710        & 0.719  & 0.595 \\ 
+		\hline
+		machine-3-10    & -0.009 & 0.015 & 0.116 & 0.010  & 0.269 & 0.288 & 0.300 & 0.210 & 0.348 & 0.322        & 0.324  & 0.272 \\ 
+		\hline
+		machine-3-11    & 0.837  & 0.626 & 0.560 & 0.372  & 0.640 & 0.465 & 0.332 & 0.348 & 0.813 & 0.470        & 0.401  & 0.315 \\ 
+		\hline
+		AVG             & 0.627  & 0.640 & 0.636 & 0.514  & 0.560 & 0.558 & 0.550 & 0.457 & 0.670 & 0.661        & 0.655  & 0.536 \\ 
+		\hline
+		STD             & 0.25   & 0.24  & 0.229 & 0.214  & 0.142 & 0.149 & 0.135 & 0.102 & 0.169 & 0.186        & 0.177  & 0.146 \\
+		\hline
+	\end{tabular}
 }
+\end{table}
 
-
-
+\newpage
 \subsubsection{Performance on Synthethic Anomaly Injection}
-Passando alla metrica surrogata usante le pseudo-label dopo l'iniezione di anomalie, possiamo notare come generamente le performance siano inferiori rispetto alla tecnica del Model Centrality. I motivi di cio possono ricondursi agli aspetti negativi introdotti precedentemente che riguardano questo approccio: come le anomalie vengono generate ed il fatto che le anomalie vere vengano ignorate. Il primo punto non e' banale, avere una conoscenza forte dal dataset di riferimento permette di creare anomalie che possano risultare realistiche ma spesso la cio non e' possibile. Attraverso metodi statistici si possono estrarre informazioni riguardanti l'andamento e l'evoluzione dei dati ma spesso le anomalie non seguono un pattern preciso rendendo quindi la generazione di queste un problema non triviale. Il secondo punto puo inpattare negativemente i risultati in quanto e' possibile che il modello vada a labellare le anomalie reali come positive, nonostante abbiamo delle pseudo-label negative. Una soluzione a questo problema potrebbe essere quello di ricercare una finestra temporale del dataset che sia il piu pulita possibile dalla anomalie per poi andare ad effettuare le anomaly injection.
-Anche in questo caso ci troviamo di fronte a tre metodi con performance simili. 
+Passando alla metrica surrogata usante le pseudo-label dopo l'iniezione di anomalie, possiamo notare in tabella \ref{pai-results} come generamente le performance siano inferiori rispetto alla tecnica del Model Centrality. I motivi di cio possono ricondursi agli aspetti negativi introdotti precedentemente che riguardano questo approccio: come le anomalie vengono generate ed il fatto che le anomalie vere vengano ignorate. Il primo punto non e' banale, avere una conoscenza forte dal dataset di riferimento permette di creare anomalie che possano risultare realistiche ma spesso la cio non e' possibile. Attraverso metodi statistici si possono estrarre informazioni riguardanti l'andamento e l'evoluzione dei dati ma spesso le anomalie non seguono un pattern preciso rendendo quindi la generazione di queste un problema non triviale. Il secondo punto puo inpattare negativemente i risultati in quanto e' possibile che il modello vada a labellare le anomalie reali come positive, nonostante abbiamo delle pseudo-label negative. Una soluzione a questo problema potrebbe essere quello di ricercare una finestra temporale del dataset che sia il piu pulita possibile dalla anomalie per poi andare ad effettuare le anomaly injection.
+Anche in questo caso ci troviamo di fronte a tre metodi con performance simili con un quarto, in questo caso wander, meno performante.
+
+\begin{table}[]
+    \caption{\label{pai-results}Risultati di correlazione per Performance on Anomaly Injection}
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
-\hline
-Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
-\hline
-\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
-\cline{2-13}
-                  & wander & spike & scale & mix            & wander & spike & scale & mix   & wander & spike & scale & mix    \\ 
-\hline
-2\_annthyroid     & 0.111  & 0.272 & 0.331 & 0.196          & 0.267  & 0.440 & 0.465 & 0.408 & 0.281  & 0.487 & 0.414 & 0.457  \\ 
-\hline
-6\_cardio         & 0.269  & 0.575 & 0.554 & 0.381          & 0.129  & 0.337 & 0.431 & 0.356 & 0.176  & 0.406 & 0.416 & 0.396  \\ 
-\hline
-11\_donors        & 0.331  & 0.391 & 0.316 & 0.303          & 0.472  & 0.422 & 0.442 & 0.443 & 0.491  & 0.550 & 0.575 & 0.573  \\ 
-\hline
-20\_letter        & 0.457  & 0.577 & 0.811 & 0.560          & 0.489  & 0.607 & 0.718 & 0.527 & 0.563  & 0.742 & 0.805 & 0.597  \\ 
-\hline
-23\_mammography   & 0.378  & 0.401 & 0.396 & 0.494          & 0.423  & 0.562 & 0.486 & 0.535 & 0.530  & 0.671 & 0.591 & 0.597  \\ 
-\hline
-27\_PageBlocks    & 0.357  & 0.340 & 0.430 & 0.368          & 0.384  & 0.374 & 0.451 & 0.365 & 0.473  & 0.477 & 0.469 & 0.461  \\ 
-\hline
-31\_satimage-2    & 0.092  & 0.090 & 0.110 & 0.231          & 0.310  & 0.228 & 0.304 & 0.309 & 0.393  & 0.330 & 0.314 & 0.303  \\ 
-\hline
-32\_shuttle       & 0.308  & 0.333 & 0.330 & 0.355          & 0.319  & 0.303 & 0.360 & 0.344 & 0.408  & 0.368 & 0.436 & 0.414  \\ 
-\hline
-38\_thyroid       & 0.093  & 0.164 & 0.159 & 0.117          & 0.362  & 0.390 & 0.474 & 0.362 & 0.398  & 0.354 & 0.459 & 0.384  \\ 
-\hline
-40\_vowels        & 0.470  & 0.667 & 0.581 & 0.712          & 0.429  & 0.611 & 0.564 & 0.607 & 0.527  & 0.761 & 0.623 & 0.759  \\ 
-\hline
-41\_Waveform      & 0.810  & 0.775 & 0.679 & 0.764          & 0.627  & 0.571 & 0.580 & 0.639 & 0.783  & 0.737 & 0.721 & 0.823  \\ 
-\hline
-machine-1-1       & 0.379  & 0.490 & 0.597 & 0.583          & 0.425  & 0.407 & 0.697 & 0.535 & 0.557  & 0.584 & 0.835 & 0.634  \\ 
-\hline
-machine-1-2       & 0.339  & 0.373 & 0.393 & 0.364          & 0.399  & 0.316 & 0.345 & 0.351 & 0.457  & 0.354 & 0.417 & 0.368  \\ 
-\hline
-machine-1-3       & 0.117  & 0.487 & 0.335 & 0.368          & 0.334  & 0.561 & 0.325 & 0.469 & 0.210  & 0.682 & 0.180 & 0.566  \\ 
-\hline
-machine-1-4       & 0.170  & 0.206 & 0.347 & 0.193          & 0.354  & 0.444 & 0.131 & 0.309 & 0.229  & 0.489 & 0.238 & 0.313  \\ 
-\hline
-machine-1-5       & 0.108  & 0.468 & 0.209 & 0.417          & 0.316  & 0.468 & 0.383 & 0.473 & 0.360  & 0.545 & 0.325 & 0.415  \\ 
-\hline
-machine-1-6       & 0.423  & 0.566 & 0.471 & 0.441          & 0.351  & 0.449 & 0.473 & 0.405 & 0.470  & 0.575 & 0.562 & 0.494  \\ 
-\hline
-machine-1-7       & 0.301  & 0.436 & 0.351 & 0.318          & 0.329  & 0.541 & 0.432 & 0.389 & 0.397  & 0.615 & 0.440 & 0.328  \\ 
-\hline
-machine-1-8       & 0.342  & 0.472 & 0.538 & 0.357          & 0.426  & 0.429 & 0.478 & 0.368 & 0.454  & 0.447 & 0.596 & 0.350  \\ 
-\hline
-machine-2-1       & 0.516  & 0.547 & 0.497 & 0.469          & 0.502  & 0.515 & 0.479 & 0.397 & 0.576  & 0.560 & 0.446 & 0.410  \\ 
-\hline
-machine-2-2       & 0.500  & 0.464 & 0.462 & 0.516          & 0.459  & 0.403 & 0.455 & 0.476 & 0.588  & 0.523 & 0.554 & 0.591  \\ 
-\hline
-machine-2-3       & 0.555  & 0.471 & 0.470 & 0.550          & 0.540  & 0.479 & 0.428 & 0.567 & 0.647  & 0.556 & 0.540 & 0.714  \\ 
-\hline
-machine-2-4       & 0.201  & 0.422 & 0.540 & 0.522          & 0.243  & 0.425 & 0.439 & 0.517 & 0.291  & 0.443 & 0.582 & 0.584  \\ 
-\hline
-machine-2-5       & 0.459  & 0.463 & 0.401 & 0.451          & 0.498  & 0.545 & 0.558 & 0.638 & 0.579  & 0.632 & 0.712 & 0.781  \\ 
-\hline
-machine-2-6       & 0.156  & 0.438 & 0.132 & 0.404          & 0.222  & 0.462 & 0.270 & 0.492 & 0.228  & 0.569 & 0.267 & 0.596  \\ 
-\hline
-machine-2-7       & 0.391  & 0.343 & 0.450 & 0.360          & 0.476  & 0.433 & 0.468 & 0.307 & 0.495  & 0.414 & 0.560 & 0.382  \\ 
-\hline
-machine-2-8       & 0.776  & 0.330 & 0.042 & 0.771          & 0.500  & 0.345 & 0.094 & 0.510 & 0.598  & 0.423 & 0.052 & 0.575  \\ 
-\hline
-machine-2-9       & 0.463  & 0.361 & 0.329 & 0.322          & 0.512  & 0.464 & 0.366 & 0.404 & 0.577  & 0.574 & 0.429 & 0.491  \\ 
-\hline
-machine-3-1       & 0.348  & 0.366 & 0.721 & 0.411          & 0.571  & 0.507 & 0.667 & 0.520 & 0.614  & 0.566 & 0.813 & 0.580  \\ 
-\hline
-machine-3-2       & 0.443  & 0.401 & 0.374 & 0.318          & 0.474  & 0.493 & 0.402 & 0.356 & 0.453  & 0.483 & 0.455 & 0.397  \\ 
-\hline
-machine-3-3       & 0.458  & 0.336 & 0.404 & 0.347          & 0.508  & 0.336 & 0.547 & 0.467 & 0.557  & 0.432 & 0.619 & 0.457  \\ 
-\hline
-machine-3-4       & 0.351  & 0.363 & 0.408 & 0.360          & 0.442  & 0.378 & 0.415 & 0.409 & 0.445  & 0.477 & 0.542 & 0.520  \\ 
-\hline
-machine-3-5       & 0.077  & 0.188 & 0.841 & 0.036          & 0.117  & 0.255 & 0.771 & 0.035 & 0.121  & 0.240 & 0.823 & 0.056  \\ 
-\hline
-machine-3-6       & 0.513  & 0.445 & 0.359 & 0.516          & 0.450  & 0.421 & 0.338 & 0.460 & 0.576  & 0.537 & 0.314 & 0.462  \\ 
-\hline
-machine-3-7       & 0.470  & 0.486 & 0.484 & 0.406          & 0.487  & 0.551 & 0.398 & 0.493 & 0.592  & 0.702 & 0.499 & 0.484  \\ 
-\hline
-machine-3-8       & 0.371  & 0.355 & 0.202 & 0.357          & 0.464  & 0.484 & 0.271 & 0.439 & 0.432  & 0.588 & 0.350 & 0.540  \\ 
-\hline
-machine-3-9       & 0.339  & 0.310 & 0.447 & 0.378          & 0.382  & 0.387 & 0.591 & 0.472 & 0.383  & 0.484 & 0.658 & 0.463  \\ 
-\hline
-machine-3-10      & 0.344  & 0.465 & 0.398 & 0.379          & 0.428  & 0.530 & 0.541 & 0.516 & 0.486  & 0.623 & 0.613 & 0.555  \\ 
-\hline
-machine-3-11      & 0.516  & 0.663 & 0.394 & 0.693          & 0.496  & 0.504 & 0.395 & 0.551 & 0.503  & 0.607 & 0.461 & 0.693  \\ 
-\hline
-AVG               & 0.362  & 0.418 & 0.418 & 0.413          & 0.408  & 0.446 & 0.447 & 0.442 & 0.459  & 0.528 & 0.505 & 0.502  \\ 
-\hline
-STD               & 0.169  & 0.136 & 0.172 & 0.157          & 0.11   & 0.092 & 0.139 & 0.11  & 0.141  & 0.119 & 0.176 & 0.147  \\
-\hline
-\end{tabular}
+	\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
+		\hline
+		Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
+		\hline
+		\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
+		\cline{2-13}
+		                & wander & spike & scale & mix   & wander & spike & scale & mix   & wander & spike        & scale & mix   \\ 
+		\hline
+		2\_annthyroid   & 0.111  & 0.272 & 0.331 & 0.196 & 0.267  & 0.440 & 0.465 & 0.408 & 0.281  & 0.487        & 0.414 & 0.457 \\ 
+		\hline
+		6\_cardio       & 0.269  & 0.575 & 0.554 & 0.381 & 0.129  & 0.337 & 0.431 & 0.356 & 0.176  & 0.406        & 0.416 & 0.396 \\ 
+		\hline
+		11\_donors      & 0.331  & 0.391 & 0.316 & 0.303 & 0.472  & 0.422 & 0.442 & 0.443 & 0.491  & 0.550        & 0.575 & 0.573 \\ 
+		\hline
+		20\_letter      & 0.457  & 0.577 & 0.811 & 0.560 & 0.489  & 0.607 & 0.718 & 0.527 & 0.563  & 0.742        & 0.805 & 0.597 \\ 
+		\hline
+		23\_mammography & 0.378  & 0.401 & 0.396 & 0.494 & 0.423  & 0.562 & 0.486 & 0.535 & 0.530  & 0.671        & 0.591 & 0.597 \\ 
+		\hline
+		27\_PageBlocks  & 0.357  & 0.340 & 0.430 & 0.368 & 0.384  & 0.374 & 0.451 & 0.365 & 0.473  & 0.477        & 0.469 & 0.461 \\ 
+		\hline
+		31\_satimage-2  & 0.092  & 0.090 & 0.110 & 0.231 & 0.310  & 0.228 & 0.304 & 0.309 & 0.393  & 0.330        & 0.314 & 0.303 \\ 
+		\hline
+		32\_shuttle     & 0.308  & 0.333 & 0.330 & 0.355 & 0.319  & 0.303 & 0.360 & 0.344 & 0.408  & 0.368        & 0.436 & 0.414 \\ 
+		\hline
+		38\_thyroid     & 0.093  & 0.164 & 0.159 & 0.117 & 0.362  & 0.390 & 0.474 & 0.362 & 0.398  & 0.354        & 0.459 & 0.384 \\ 
+		\hline
+		40\_vowels      & 0.470  & 0.667 & 0.581 & 0.712 & 0.429  & 0.611 & 0.564 & 0.607 & 0.527  & 0.761        & 0.623 & 0.759 \\ 
+		\hline
+		41\_Waveform    & 0.810  & 0.775 & 0.679 & 0.764 & 0.627  & 0.571 & 0.580 & 0.639 & 0.783  & 0.737        & 0.721 & 0.823 \\ 
+		\hline
+		machine-1-1     & 0.379  & 0.490 & 0.597 & 0.583 & 0.425  & 0.407 & 0.697 & 0.535 & 0.557  & 0.584        & 0.835 & 0.634 \\ 
+		\hline
+		machine-1-2     & 0.339  & 0.373 & 0.393 & 0.364 & 0.399  & 0.316 & 0.345 & 0.351 & 0.457  & 0.354        & 0.417 & 0.368 \\ 
+		\hline
+		machine-1-3     & 0.117  & 0.487 & 0.335 & 0.368 & 0.334  & 0.561 & 0.325 & 0.469 & 0.210  & 0.682        & 0.180 & 0.566 \\ 
+		\hline
+		machine-1-4     & 0.170  & 0.206 & 0.347 & 0.193 & 0.354  & 0.444 & 0.131 & 0.309 & 0.229  & 0.489        & 0.238 & 0.313 \\ 
+		\hline
+		machine-1-5     & 0.108  & 0.468 & 0.209 & 0.417 & 0.316  & 0.468 & 0.383 & 0.473 & 0.360  & 0.545        & 0.325 & 0.415 \\ 
+		\hline
+		machine-1-6     & 0.423  & 0.566 & 0.471 & 0.441 & 0.351  & 0.449 & 0.473 & 0.405 & 0.470  & 0.575        & 0.562 & 0.494 \\ 
+		\hline
+		machine-1-7     & 0.301  & 0.436 & 0.351 & 0.318 & 0.329  & 0.541 & 0.432 & 0.389 & 0.397  & 0.615        & 0.440 & 0.328 \\ 
+		\hline
+		machine-1-8     & 0.342  & 0.472 & 0.538 & 0.357 & 0.426  & 0.429 & 0.478 & 0.368 & 0.454  & 0.447        & 0.596 & 0.350 \\ 
+		\hline
+		machine-2-1     & 0.516  & 0.547 & 0.497 & 0.469 & 0.502  & 0.515 & 0.479 & 0.397 & 0.576  & 0.560        & 0.446 & 0.410 \\ 
+		\hline
+		machine-2-2     & 0.500  & 0.464 & 0.462 & 0.516 & 0.459  & 0.403 & 0.455 & 0.476 & 0.588  & 0.523        & 0.554 & 0.591 \\ 
+		\hline
+		machine-2-3     & 0.555  & 0.471 & 0.470 & 0.550 & 0.540  & 0.479 & 0.428 & 0.567 & 0.647  & 0.556        & 0.540 & 0.714 \\ 
+		\hline
+		machine-2-4     & 0.201  & 0.422 & 0.540 & 0.522 & 0.243  & 0.425 & 0.439 & 0.517 & 0.291  & 0.443        & 0.582 & 0.584 \\ 
+		\hline
+		machine-2-5     & 0.459  & 0.463 & 0.401 & 0.451 & 0.498  & 0.545 & 0.558 & 0.638 & 0.579  & 0.632        & 0.712 & 0.781 \\ 
+		\hline
+		machine-2-6     & 0.156  & 0.438 & 0.132 & 0.404 & 0.222  & 0.462 & 0.270 & 0.492 & 0.228  & 0.569        & 0.267 & 0.596 \\ 
+		\hline
+		machine-2-7     & 0.391  & 0.343 & 0.450 & 0.360 & 0.476  & 0.433 & 0.468 & 0.307 & 0.495  & 0.414        & 0.560 & 0.382 \\ 
+		\hline
+		machine-2-8     & 0.776  & 0.330 & 0.042 & 0.771 & 0.500  & 0.345 & 0.094 & 0.510 & 0.598  & 0.423        & 0.052 & 0.575 \\ 
+		\hline
+		machine-2-9     & 0.463  & 0.361 & 0.329 & 0.322 & 0.512  & 0.464 & 0.366 & 0.404 & 0.577  & 0.574        & 0.429 & 0.491 \\ 
+		\hline
+		machine-3-1     & 0.348  & 0.366 & 0.721 & 0.411 & 0.571  & 0.507 & 0.667 & 0.520 & 0.614  & 0.566        & 0.813 & 0.580 \\ 
+		\hline
+		machine-3-2     & 0.443  & 0.401 & 0.374 & 0.318 & 0.474  & 0.493 & 0.402 & 0.356 & 0.453  & 0.483        & 0.455 & 0.397 \\ 
+		\hline
+		machine-3-3     & 0.458  & 0.336 & 0.404 & 0.347 & 0.508  & 0.336 & 0.547 & 0.467 & 0.557  & 0.432        & 0.619 & 0.457 \\ 
+		\hline
+		machine-3-4     & 0.351  & 0.363 & 0.408 & 0.360 & 0.442  & 0.378 & 0.415 & 0.409 & 0.445  & 0.477        & 0.542 & 0.520 \\ 
+		\hline
+		machine-3-5     & 0.077  & 0.188 & 0.841 & 0.036 & 0.117  & 0.255 & 0.771 & 0.035 & 0.121  & 0.240        & 0.823 & 0.056 \\ 
+		\hline
+		machine-3-6     & 0.513  & 0.445 & 0.359 & 0.516 & 0.450  & 0.421 & 0.338 & 0.460 & 0.576  & 0.537        & 0.314 & 0.462 \\ 
+		\hline
+		machine-3-7     & 0.470  & 0.486 & 0.484 & 0.406 & 0.487  & 0.551 & 0.398 & 0.493 & 0.592  & 0.702        & 0.499 & 0.484 \\ 
+		\hline
+		machine-3-8     & 0.371  & 0.355 & 0.202 & 0.357 & 0.464  & 0.484 & 0.271 & 0.439 & 0.432  & 0.588        & 0.350 & 0.540 \\ 
+		\hline
+		machine-3-9     & 0.339  & 0.310 & 0.447 & 0.378 & 0.382  & 0.387 & 0.591 & 0.472 & 0.383  & 0.484        & 0.658 & 0.463 \\ 
+		\hline
+		machine-3-10    & 0.344  & 0.465 & 0.398 & 0.379 & 0.428  & 0.530 & 0.541 & 0.516 & 0.486  & 0.623        & 0.613 & 0.555 \\ 
+		\hline
+		machine-3-11    & 0.516  & 0.663 & 0.394 & 0.693 & 0.496  & 0.504 & 0.395 & 0.551 & 0.503  & 0.607        & 0.461 & 0.693 \\ 
+		\hline
+		AVG             & 0.362  & 0.418 & 0.418 & 0.413 & 0.408  & 0.446 & 0.447 & 0.442 & 0.459  & 0.528        & 0.505 & 0.502 \\ 
+		\hline
+		STD             & 0.169  & 0.136 & 0.172 & 0.157 & 0.11   & 0.092 & 0.139 & 0.11  & 0.141  & 0.119        & 0.176 & 0.147 \\
+		\hline
+	\end{tabular}
 }
+\end{table}
 
-
+\newpage
 \subsubsection{Clustering Cohesion}
-Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben separate dai dati normali, infatti le performance variano di molto per ogni dataset preso in considerazione con un AVG score piu basso rispetto alle altre due metriche.
+Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben separate dai dati normali, infatti le performance variano di molto per ogni dataset preso in considerazione con un AVG score piu basso rispetto alle altre due metriche (tabella \ref{cc-results}).
 
+
+\begin{table}[]
+    \caption{\label{cc-results}Risultati di correlazione per Clustering Cohesion}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|l|l|l|}
-\hline
-Dataset         & \multicolumn{1}{c|}{SCORE CORRELATION} & \multicolumn{1}{c|}{RANK CORRELATION} &                               \\ \hline
-                & \multicolumn{1}{c|}{PEARSON}           & \multicolumn{1}{c|}{KENDALL}          & \multicolumn{1}{c|}{SPEARMAN} \\ \hline
-2\_annthyroid   & 0.821                                  & 0.432                                 & 0.557                         \\ \hline
-6\_cardio       & 0.409                                  & 0.375                                 & 0.436                         \\ \hline
-11\_donors      & 0.096                                  & 0.111                                 & -0.049                        \\ \hline
-20\_letter      & -0.034                                 & 0.061                                 & -0.049                        \\ \hline
-23\_mammography & 0.368                                  & 0.369                                 & 0.469                         \\ \hline
-27\_PageBlocks  & 0.837                                  & 0.496                                 & 0.487                         \\ \hline
-31\_satimage-2  & 0.467                                  & 0.389                                 & 0.355                         \\ \hline
-32\_shuttle     & 0.830                                  & 0.706                                 & 0.832                         \\ \hline
-38\_thyroid     & 0.606                                  & 0.483                                 & 0.581                         \\ \hline
-40\_vowels      & 0.444                                  & 0.393                                 & 0.487                         \\ \hline
-41\_Waveform    & 0.109                                  & 0.232                                 & 0.215                         \\ \hline
-machine-1-1     & -0.103                                 & 0.100                                 & -0.055                        \\ \hline
-machine-1-2     & 0.517                                  & 0.421                                 & 0.540                         \\ \hline
-machine-1-3     & -0.166                                 & -0.010                                & -0.137                        \\ \hline
-machine-1-4     & -0.109                                 & 0.045                                 & -0.033                        \\ \hline
-machine-1-5     & 0.376                                  & 0.435                                 & 0.438                         \\ \hline
-machine-1-6     & -0.332                                 & -0.215                                & -0.404                        \\ \hline
-machine-1-7     & 0.041                                  & -0.066                                & -0.189                        \\ \hline
-machine-1-8     & 0.004                                  & 0.107                                 & -0.030                        \\ \hline
-machine-2-1     & -0.043                                 & 0.112                                 & 0.032                         \\ \hline
-machine-2-2     & 0.474                                  & 0.386                                 & 0.357                         \\ \hline
-machine-2-3     & 0.786                                  & 0.505                                 & 0.636                         \\ \hline
-machine-2-4     & 0.343                                  & 0.193                                 & 0.167                         \\ \hline
-machine-2-5     & -0.092                                 & -0.111                                & -0.267                        \\ \hline
-machine-2-6     & 0.446                                  & 0.315                                 & 0.308                         \\ \hline
-machine-2-7     & 0.621                                  & 0.483                                 & 0.574                         \\ \hline
-machine-2-8     & 0.658                                  & 0.493                                 & 0.573                         \\ \hline
-machine-2-9     & 0.309                                  & 0.324                                 & 0.357                         \\ \hline
-machine-3-1     & 0.395                                  & 0.305                                 & 0.289                         \\ \hline
-machine-3-2     & 0.468                                  & 0.442                                 & 0.445                         \\ \hline
-machine-3-3     & -0.335                                 & -0.155                                & -0.343                        \\ \hline
-machine-3-4     & -0.016                                 & 0.117                                 & 0.028                         \\ \hline
-machine-3-5     & 0.682                                  & 0.514                                 & 0.607                         \\ \hline
-machine-3-6     & 0.093                                  & -0.009                                & -0.112                        \\ \hline
-machine-3-7     & 0.258                                  & 0.371                                 & 0.324                         \\ \hline
-machine-3-8     & 0.204                                  & 0.145                                 & 0.128                         \\ \hline
-machine-3-9     & 0.299                                  & 0.170                                 & 0.119                         \\ \hline
-machine-3-10    & -0.207                                 & -0.003                                & -0.182                        \\ \hline
-machine-3-11    & -0.050                                 & 0.095                                 & -0.006                        \\ \hline
-AVG             & 0.269                                  & 0.245                                 & 0.217                         \\ \hline
-STD             & 0.329                                  & 0.218                                 & 0.309                         \\ \hline
-\end{tabular}%
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		Dataset         & \multicolumn{1}{c|}{SCORE CORRELATION} & \multicolumn{1}{c|}{RANK CORRELATION} &                               \\ \hline
+		                & \multicolumn{1}{c|}{PEARSON}           & \multicolumn{1}{c|}{KENDALL}          & \multicolumn{1}{c|}{SPEARMAN} \\ \hline
+		2\_annthyroid   & 0.821                                  & 0.432                                 & 0.557                         \\ \hline
+		6\_cardio       & 0.409                                  & 0.375                                 & 0.436                         \\ \hline
+		11\_donors      & 0.096                                  & 0.111                                 & -0.049                        \\ \hline
+		20\_letter      & -0.034                                 & 0.061                                 & -0.049                        \\ \hline
+		23\_mammography & 0.368                                  & 0.369                                 & 0.469                         \\ \hline
+		27\_PageBlocks  & 0.837                                  & 0.496                                 & 0.487                         \\ \hline
+		31\_satimage-2  & 0.467                                  & 0.389                                 & 0.355                         \\ \hline
+		32\_shuttle     & 0.830                                  & 0.706                                 & 0.832                         \\ \hline
+		38\_thyroid     & 0.606                                  & 0.483                                 & 0.581                         \\ \hline
+		40\_vowels      & 0.444                                  & 0.393                                 & 0.487                         \\ \hline
+		41\_Waveform    & 0.109                                  & 0.232                                 & 0.215                         \\ \hline
+		machine-1-1     & -0.103                                 & 0.100                                 & -0.055                        \\ \hline
+		machine-1-2     & 0.517                                  & 0.421                                 & 0.540                         \\ \hline
+		machine-1-3     & -0.166                                 & -0.010                                & -0.137                        \\ \hline
+		machine-1-4     & -0.109                                 & 0.045                                 & -0.033                        \\ \hline
+		machine-1-5     & 0.376                                  & 0.435                                 & 0.438                         \\ \hline
+		machine-1-6     & -0.332                                 & -0.215                                & -0.404                        \\ \hline
+		machine-1-7     & 0.041                                  & -0.066                                & -0.189                        \\ \hline
+		machine-1-8     & 0.004                                  & 0.107                                 & -0.030                        \\ \hline
+		machine-2-1     & -0.043                                 & 0.112                                 & 0.032                         \\ \hline
+		machine-2-2     & 0.474                                  & 0.386                                 & 0.357                         \\ \hline
+		machine-2-3     & 0.786                                  & 0.505                                 & 0.636                         \\ \hline
+		machine-2-4     & 0.343                                  & 0.193                                 & 0.167                         \\ \hline
+		machine-2-5     & -0.092                                 & -0.111                                & -0.267                        \\ \hline
+		machine-2-6     & 0.446                                  & 0.315                                 & 0.308                         \\ \hline
+		machine-2-7     & 0.621                                  & 0.483                                 & 0.574                         \\ \hline
+		machine-2-8     & 0.658                                  & 0.493                                 & 0.573                         \\ \hline
+		machine-2-9     & 0.309                                  & 0.324                                 & 0.357                         \\ \hline
+		machine-3-1     & 0.395                                  & 0.305                                 & 0.289                         \\ \hline
+		machine-3-2     & 0.468                                  & 0.442                                 & 0.445                         \\ \hline
+		machine-3-3     & -0.335                                 & -0.155                                & -0.343                        \\ \hline
+		machine-3-4     & -0.016                                 & 0.117                                 & 0.028                         \\ \hline
+		machine-3-5     & 0.682                                  & 0.514                                 & 0.607                         \\ \hline
+		machine-3-6     & 0.093                                  & -0.009                                & -0.112                        \\ \hline
+		machine-3-7     & 0.258                                  & 0.371                                 & 0.324                         \\ \hline
+		machine-3-8     & 0.204                                  & 0.145                                 & 0.128                         \\ \hline
+		machine-3-9     & 0.299                                  & 0.170                                 & 0.119                         \\ \hline
+		machine-3-10    & -0.207                                 & -0.003                                & -0.182                        \\ \hline
+		machine-3-11    & -0.050                                 & 0.095                                 & -0.006                        \\ \hline
+		AVG             & 0.269                                  & 0.245                                 & 0.217                         \\ \hline
+		STD             & 0.329                                  & 0.218                                 & 0.309                         \\ \hline
+	\end{tabular}%
 }
-
+\end{table}
 
 Alcuni dataset, come annthyroid, page blocks, shuttle e waveform hanno una distribuzione dei dati tale da essere facilmente clusterizzabile da metodi come DBSCAN, usato appunto in questa metrica surrogata. Questo permette quindi di favorire quei modelli che riescono di fatto a trovare questa separazione tra i punti normali ed i punti anomali.
 Gli altri dataset invece faticano a trovare una forte correlazione con il ranking supervisionato, proprio per il fatto che in questo caso i punti anomali sono altamente mischiati in mezzo a quelli normali.
-Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati come nell'immagine X.
-\begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/plot-anomalies-normal}
-\centering
-\end{figure}
+Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati.
 
+
+\newpage
 \subsubsection{Rank Aggregation}
-A questo punto ci si puo concetrare sulle varie tecniche di aggregazione. A primo impatto si puo vedere come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati miglori rispetto al ranking supervisionato. 
+A questo punto ci si puo concetrare sulle varie tecniche di aggregazione. A primo impatto si puo vedere, in tabella \ref{agg-results}, come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati miglori rispetto al ranking supervisionato. 
 
-
+\begin{table}[]
+    \caption{\label{agg-results}Risultati di correlazione per aggregazione}
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
-\hline
-Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
-\hline
-\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
-\cline{2-13}
-                  & score & borda & rborda & opt            & score & borda & rborda & opt   & score & borda & rborda & opt    \\ 
-\hline
-2\_annthyroid     & 0.795 & 0.644 & 0.394  & 0.768          & 0.486 & 0.499 & 0.382  & 0.586 & 0.550 & 0.587 & 0.331  & 0.696  \\ 
-\hline
-6\_cardio         & 0.758 & 0.589 & 0.409  & 0.597          & 0.578 & 0.416 & 0.374  & 0.550 & 0.693 & 0.545 & 0.447  & 0.572  \\ 
-\hline
-11\_donors        & 0.404 & 0.633 & 0.164  & 0.541          & 0.348 & 0.553 & 0.129  & 0.573 & 0.430 & 0.672 & 0.195  & 0.683  \\ 
-\hline
-20\_letter        & 0.595 & 0.561 & 0.436  & 0.664          & 0.493 & 0.423 & 0.418  & 0.546 & 0.606 & 0.557 & 0.406  & 0.639  \\ 
-\hline
-23\_mammography   & 0.681 & 0.770 & 0.489  & 0.793          & 0.495 & 0.587 & 0.427  & 0.654 & 0.599 & 0.748 & 0.427  & 0.822  \\ 
-\hline
-27\_PageBlocks    & 0.843 & 0.753 & 0.395  & 0.860          & 0.594 & 0.551 & 0.323  & 0.659 & 0.690 & 0.713 & 0.375  & 0.822  \\ 
-\hline
-31\_satimage-2    & 0.574 & 0.761 & 0.489  & 0.730          & 0.428 & 0.559 & 0.389  & 0.630 & 0.584 & 0.736 & 0.457  & 0.816  \\ 
-\hline
-32\_shuttle       & 0.562 & 0.843 & 0.696  & 0.899          & 0.500 & 0.644 & 0.592  & 0.755 & 0.590 & 0.806 & 0.674  & 0.882  \\ 
-\hline
-38\_thyroid       & 0.623 & 0.616 & 0.367  & 0.644          & 0.477 & 0.451 & 0.390  & 0.526 & 0.536 & 0.561 & 0.334  & 0.655  \\ 
-\hline
-40\_vowels        & 0.765 & 0.813 & 0.578  & 0.807          & 0.649 & 0.632 & 0.430  & 0.661 & 0.833 & 0.816 & 0.546  & 0.858  \\ 
-\hline
-41\_Waveform      & 0.581 & 0.623 & 0.536  & 0.521          & 0.560 & 0.464 & 0.435  & 0.576 & 0.673 & 0.586 & 0.540  & 0.668  \\ 
-\hline
-machine-1-1       & 0.464 & 0.556 & 0.311  & 0.620          & 0.486 & 0.434 & 0.292  & 0.564 & 0.526 & 0.581 & 0.302  & 0.684  \\ 
-\hline
-machine-1-2       & 0.820 & 0.797 & 0.423  & 0.777          & 0.623 & 0.591 & 0.423  & 0.632 & 0.841 & 0.753 & 0.413  & 0.782  \\ 
-\hline
-machine-1-3       & 0.245 & 0.686 & 0.416  & 0.623          & 0.294 & 0.596 & 0.437  & 0.561 & 0.291 & 0.689 & 0.413  & 0.651  \\ 
-\hline
-machine-1-4       & 0.411 & 0.577 & 0.390  & 0.475          & 0.390 & 0.491 & 0.397  & 0.496 & 0.470 & 0.589 & 0.449  & 0.512  \\ 
-\hline
-machine-1-5       & 0.496 & 0.581 & 0.423  & 0.477          & 0.429 & 0.411 & 0.480  & 0.460 & 0.567 & 0.537 & 0.448  & 0.589  \\ 
-\hline
-machine-1-6       & 0.476 & 0.302 & 0.259  & 0.554          & 0.376 & 0.342 & 0.292  & 0.361 & 0.363 & 0.381 & 0.291  & 0.437  \\ 
-\hline
-machine-1-7       & 0.413 & 0.354 & 0.250  & 0.375          & 0.372 & 0.314 & 0.312  & 0.378 & 0.500 & 0.410 & 0.322  & 0.451  \\ 
-\hline
-machine-1-8       & 0.385 & 0.417 & 0.243  & 0.507          & 0.319 & 0.347 & 0.254  & 0.406 & 0.392 & 0.311 & 0.227  & 0.511  \\ 
-\hline
-machine-2-1       & 0.606 & 0.510 & 0.396  & 0.559          & 0.427 & 0.436 & 0.395  & 0.497 & 0.554 & 0.446 & 0.350  & 0.513  \\ 
-\hline
-machine-2-2       & 0.761 & 0.658 & 0.426  & 0.623          & 0.434 & 0.492 & 0.434  & 0.478 & 0.560 & 0.577 & 0.418  & 0.607  \\ 
-\hline
-machine-2-3       & 0.861 & 0.876 & 0.825  & 0.895          & 0.709 & 0.783 & 0.632  & 0.760 & 0.816 & 0.881 & 0.805  & 0.886  \\ 
-\hline
-machine-2-4       & 0.453 & 0.497 & 0.432  & 0.511          & 0.451 & 0.431 & 0.489  & 0.496 & 0.541 & 0.513 & 0.473  & 0.572  \\ 
-\hline
-machine-2-5       & 0.129 & 0.425 & 0.320  & 0.297          & 0.241 & 0.396 & 0.363  & 0.399 & 0.294 & 0.346 & 0.378  & 0.469  \\ 
-\hline
-machine-2-6       & 0.725 & 0.726 & 0.312  & 0.789          & 0.498 & 0.531 & 0.314  & 0.584 & 0.634 & 0.676 & 0.335  & 0.738  \\ 
-\hline
-machine-2-7       & 0.792 & 0.776 & 0.554  & 0.839          & 0.591 & 0.576 & 0.457  & 0.626 & 0.730 & 0.717 & 0.600  & 0.762  \\ 
-\hline
-machine-2-8       & 0.933 & 0.839 & 0.575  & 0.903          & 0.774 & 0.726 & 0.505  & 0.763 & 0.870 & 0.825 & 0.566  & 0.882  \\ 
-\hline
-machine-2-9       & 0.587 & 0.624 & 0.532  & 0.629          & 0.535 & 0.444 & 0.484  & 0.549 & 0.623 & 0.584 & 0.480  & 0.580  \\ 
-\hline
-machine-3-1       & 0.554 & 0.624 & 0.451  & 0.670          & 0.482 & 0.486 & 0.398  & 0.578 & 0.565 & 0.574 & 0.454  & 0.661  \\ 
-\hline
-machine-3-2       & 0.661 & 0.687 & 0.497  & 0.683          & 0.608 & 0.573 & 0.478  & 0.607 & 0.779 & 0.656 & 0.566  & 0.676  \\ 
-\hline
-machine-3-3       & 0.065 & 0.287 & 0.256  & 0.341          & 0.112 & 0.242 & 0.325  & 0.356 & 0.154 & 0.261 & 0.329  & 0.415  \\ 
-\hline
-machine-3-4       & 0.239 & 0.387 & 0.394  & 0.203          & 0.392 & 0.332 & 0.325  & 0.428 & 0.351 & 0.373 & 0.374  & 0.395  \\ 
-\hline
-machine-3-5       & 0.844 & 0.622 & 0.454  & 0.675          & 0.744 & 0.503 & 0.463  & 0.569 & 0.866 & 0.582 & 0.437  & 0.648  \\ 
-\hline
-machine-3-6       & 0.363 & 0.390 & 0.294  & 0.401          & 0.318 & 0.385 & 0.270  & 0.437 & 0.305 & 0.300 & 0.260  & 0.523  \\ 
-\hline
-machine-3-7       & 0.355 & 0.496 & 0.497  & 0.424          & 0.425 & 0.418 & 0.436  & 0.520 & 0.485 & 0.419 & 0.404  & 0.536  \\ 
-\hline
-machine-3-8       & 0.586 & 0.660 & 0.534  & 0.630          & 0.468 & 0.500 & 0.427  & 0.552 & 0.589 & 0.597 & 0.535  & 0.642  \\ 
-\hline
-machine-3-9       & 0.496 & 0.677 & 0.526  & 0.590          & 0.496 & 0.529 & 0.448  & 0.604 & 0.555 & 0.622 & 0.526  & 0.701  \\ 
-\hline
-machine-3-10      & 0.021 & 0.365 & 0.382  & 0.262          & 0.152 & 0.259 & 0.379  & 0.313 & 0.175 & 0.327 & 0.343  & 0.395  \\ 
-\hline
-machine-3-11      & 0.590 & 0.612 & 0.553  & 0.639          & 0.467 & 0.449 & 0.426  & 0.511 & 0.469 & 0.596 & 0.558  & 0.642  \\ 
-\hline
-AVG               & 0.552 & 0.605 & 0.433  & 0.610          & 0.467 & 0.482 & 0.401  & 0.544 & 0.555 & 0.576 & 0.430  & 0.640  \\ 
-\hline
-STD               & 0.22  & 0.154 & 0.127  & 0.177          & 0.141 & 0.115 & 0.09   & 0.107 & 0.177 & 0.156 & 0.121  & 0.138  \\
-\hline
-\end{tabular}
+	\begin{tabular}{|l||l|l|l|l||l|l|l|l||l|l|l|l|} 
+		\hline
+		Dataset           & \multicolumn{4}{c||}{SCORE CORRELATION} & \multicolumn{8}{c|}{RANK CORRELATION}                            \\ 
+		\hline
+		\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
+		\cline{2-13}
+		                & score & borda & rborda & opt   & score & borda & rborda & opt   & score & borda        & rborda & opt   \\ 
+		\hline
+		2\_annthyroid   & 0.795 & 0.644 & 0.394  & 0.768 & 0.486 & 0.499 & 0.382  & 0.586 & 0.550 & 0.587        & 0.331 & 0.696 \\ 
+		\hline
+		6\_cardio       & 0.758 & 0.589 & 0.409  & 0.597 & 0.578 & 0.416 & 0.374  & 0.550 & 0.693 & 0.545        & 0.447 & 0.572 \\ 
+		\hline
+		11\_donors      & 0.404 & 0.633 & 0.164  & 0.541 & 0.348 & 0.553 & 0.129  & 0.573 & 0.430 & 0.672        & 0.195 & 0.683 \\ 
+		\hline
+		20\_letter      & 0.595 & 0.561 & 0.436  & 0.664 & 0.493 & 0.423 & 0.418  & 0.546 & 0.606 & 0.557        & 0.406 & 0.639 \\ 
+		\hline
+		23\_mammography & 0.681 & 0.770 & 0.489  & 0.793 & 0.495 & 0.587 & 0.427  & 0.654 & 0.599 & 0.748        & 0.427 & 0.822 \\ 
+		\hline
+		27\_PageBlocks  & 0.843 & 0.753 & 0.395  & 0.860 & 0.594 & 0.551 & 0.323  & 0.659 & 0.690 & 0.713        & 0.375 & 0.822 \\ 
+		\hline
+		31\_satimage-2  & 0.574 & 0.761 & 0.489  & 0.730 & 0.428 & 0.559 & 0.389  & 0.630 & 0.584 & 0.736        & 0.457 & 0.816 \\ 
+		\hline
+		32\_shuttle     & 0.562 & 0.843 & 0.696  & 0.899 & 0.500 & 0.644 & 0.592  & 0.755 & 0.590 & 0.806        & 0.674 & 0.882 \\ 
+		\hline
+		38\_thyroid     & 0.623 & 0.616 & 0.367  & 0.644 & 0.477 & 0.451 & 0.390  & 0.526 & 0.536 & 0.561        & 0.334 & 0.655 \\ 
+		\hline
+		40\_vowels      & 0.765 & 0.813 & 0.578  & 0.807 & 0.649 & 0.632 & 0.430  & 0.661 & 0.833 & 0.816        & 0.546 & 0.858 \\ 
+		\hline
+		41\_Waveform    & 0.581 & 0.623 & 0.536  & 0.521 & 0.560 & 0.464 & 0.435  & 0.576 & 0.673 & 0.586        & 0.540 & 0.668 \\ 
+		\hline
+		machine-1-1     & 0.464 & 0.556 & 0.311  & 0.620 & 0.486 & 0.434 & 0.292  & 0.564 & 0.526 & 0.581        & 0.302 & 0.684 \\ 
+		\hline
+		machine-1-2     & 0.820 & 0.797 & 0.423  & 0.777 & 0.623 & 0.591 & 0.423  & 0.632 & 0.841 & 0.753        & 0.413 & 0.782 \\ 
+		\hline
+		machine-1-3     & 0.245 & 0.686 & 0.416  & 0.623 & 0.294 & 0.596 & 0.437  & 0.561 & 0.291 & 0.689        & 0.413 & 0.651 \\ 
+		\hline
+		machine-1-4     & 0.411 & 0.577 & 0.390  & 0.475 & 0.390 & 0.491 & 0.397  & 0.496 & 0.470 & 0.589        & 0.449 & 0.512 \\ 
+		\hline
+		machine-1-5     & 0.496 & 0.581 & 0.423  & 0.477 & 0.429 & 0.411 & 0.480  & 0.460 & 0.567 & 0.537        & 0.448 & 0.589 \\ 
+		\hline
+		machine-1-6     & 0.476 & 0.302 & 0.259  & 0.554 & 0.376 & 0.342 & 0.292  & 0.361 & 0.363 & 0.381        & 0.291 & 0.437 \\ 
+		\hline
+		machine-1-7     & 0.413 & 0.354 & 0.250  & 0.375 & 0.372 & 0.314 & 0.312  & 0.378 & 0.500 & 0.410        & 0.322 & 0.451 \\ 
+		\hline
+		machine-1-8     & 0.385 & 0.417 & 0.243  & 0.507 & 0.319 & 0.347 & 0.254  & 0.406 & 0.392 & 0.311        & 0.227 & 0.511 \\ 
+		\hline
+		machine-2-1     & 0.606 & 0.510 & 0.396  & 0.559 & 0.427 & 0.436 & 0.395  & 0.497 & 0.554 & 0.446        & 0.350 & 0.513 \\ 
+		\hline
+		machine-2-2     & 0.761 & 0.658 & 0.426  & 0.623 & 0.434 & 0.492 & 0.434  & 0.478 & 0.560 & 0.577        & 0.418 & 0.607 \\ 
+		\hline
+		machine-2-3     & 0.861 & 0.876 & 0.825  & 0.895 & 0.709 & 0.783 & 0.632  & 0.760 & 0.816 & 0.881        & 0.805 & 0.886 \\ 
+		\hline
+		machine-2-4     & 0.453 & 0.497 & 0.432  & 0.511 & 0.451 & 0.431 & 0.489  & 0.496 & 0.541 & 0.513        & 0.473 & 0.572 \\ 
+		\hline
+		machine-2-5     & 0.129 & 0.425 & 0.320  & 0.297 & 0.241 & 0.396 & 0.363  & 0.399 & 0.294 & 0.346        & 0.378 & 0.469 \\ 
+		\hline
+		machine-2-6     & 0.725 & 0.726 & 0.312  & 0.789 & 0.498 & 0.531 & 0.314  & 0.584 & 0.634 & 0.676        & 0.335 & 0.738 \\ 
+		\hline
+		machine-2-7     & 0.792 & 0.776 & 0.554  & 0.839 & 0.591 & 0.576 & 0.457  & 0.626 & 0.730 & 0.717        & 0.600 & 0.762 \\ 
+		\hline
+		machine-2-8     & 0.933 & 0.839 & 0.575  & 0.903 & 0.774 & 0.726 & 0.505  & 0.763 & 0.870 & 0.825        & 0.566 & 0.882 \\ 
+		\hline
+		machine-2-9     & 0.587 & 0.624 & 0.532  & 0.629 & 0.535 & 0.444 & 0.484  & 0.549 & 0.623 & 0.584        & 0.480 & 0.580 \\ 
+		\hline
+		machine-3-1     & 0.554 & 0.624 & 0.451  & 0.670 & 0.482 & 0.486 & 0.398  & 0.578 & 0.565 & 0.574        & 0.454 & 0.661 \\ 
+		\hline
+		machine-3-2     & 0.661 & 0.687 & 0.497  & 0.683 & 0.608 & 0.573 & 0.478  & 0.607 & 0.779 & 0.656        & 0.566 & 0.676 \\ 
+		\hline
+		machine-3-3     & 0.065 & 0.287 & 0.256  & 0.341 & 0.112 & 0.242 & 0.325  & 0.356 & 0.154 & 0.261        & 0.329 & 0.415 \\ 
+		\hline
+		machine-3-4     & 0.239 & 0.387 & 0.394  & 0.203 & 0.392 & 0.332 & 0.325  & 0.428 & 0.351 & 0.373        & 0.374 & 0.395 \\ 
+		\hline
+		machine-3-5     & 0.844 & 0.622 & 0.454  & 0.675 & 0.744 & 0.503 & 0.463  & 0.569 & 0.866 & 0.582        & 0.437 & 0.648 \\ 
+		\hline
+		machine-3-6     & 0.363 & 0.390 & 0.294  & 0.401 & 0.318 & 0.385 & 0.270  & 0.437 & 0.305 & 0.300        & 0.260 & 0.523 \\ 
+		\hline
+		machine-3-7     & 0.355 & 0.496 & 0.497  & 0.424 & 0.425 & 0.418 & 0.436  & 0.520 & 0.485 & 0.419        & 0.404 & 0.536 \\ 
+		\hline
+		machine-3-8     & 0.586 & 0.660 & 0.534  & 0.630 & 0.468 & 0.500 & 0.427  & 0.552 & 0.589 & 0.597        & 0.535 & 0.642 \\ 
+		\hline
+		machine-3-9     & 0.496 & 0.677 & 0.526  & 0.590 & 0.496 & 0.529 & 0.448  & 0.604 & 0.555 & 0.622        & 0.526 & 0.701 \\ 
+		\hline
+		machine-3-10    & 0.021 & 0.365 & 0.382  & 0.262 & 0.152 & 0.259 & 0.379  & 0.313 & 0.175 & 0.327        & 0.343 & 0.395 \\ 
+		\hline
+		machine-3-11    & 0.590 & 0.612 & 0.553  & 0.639 & 0.467 & 0.449 & 0.426  & 0.511 & 0.469 & 0.596        & 0.558 & 0.642 \\ 
+		\hline
+		AVG             & 0.552 & 0.605 & 0.433  & 0.610 & 0.467 & 0.482 & 0.401  & 0.544 & 0.555 & 0.576        & 0.430 & 0.640 \\ 
+		\hline
+		STD             & 0.22  & 0.154 & 0.127  & 0.177 & 0.141 & 0.115 & 0.09   & 0.107 & 0.177 & 0.156        & 0.121 & 0.138 \\
+		\hline
+	\end{tabular}
 }
+\end{table}
 
-
+\newpage
+\subsubsection{Varying K}
 Interessante vedere come Robust Borda, che sulla carta dovrebbe avere performance migliori, sia in verita inferiore alla sua versione standard Borda. Un motivo di cio puo stare nel fatto che ci sono modelli che sono nelle posizioni top per quanto riguarda alcune metriche surrogate ma che performano sufficientemente male in altre e vedendosi quindi penalizzate troppo.
 Si puo vedere infatti, nella tabella X, che all'aumentare del fattore K aumentano le performance di Robust Borda, fino arrivare al valore massimo con K=N, ovvero Borda normale.
 Il metodo di score e' il piu semplice ma produce anche risultati relativamente scarsi. Nel nostro caso, con sole 3 metriche surrogate che vengono aggregate, l'utilizzo del metodo ottimale risulta la scelta migliore nonostante la complessita temporale sia piu alta. Se si fossero prese in considerazione piu metriche, questo approccio non sarebbe piu possibile proprio per la natura NP-Hard del problema.
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/varying-k}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/varying-k}
+	\centering
 \end{figure}
 
 \subsubsection{Ripetitivita}
@@ -645,15 +673,15 @@ Per questo motivo e' stata fatta anche un'analisi andando a ripetere il Model Se
 Nell'immagine sottostante e' possibile vedere un Box Whisker Plot sugli score prodotti da Model Selection per ognuna delle metriche e metodi. Alcuni di questi non includono casualita come Round Robin, Majority Vote, Score Correlation e Score Clustering, di conseguenza il valore e' uguale ad ogni iterazione. Al contrario gli altri vedono differire il valore ad ogni iterazione, chi piu chi meno. In generale, vi e' un range che varia di circa 0.05 punti.
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/score_box}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/score_box}
+	\centering
 \end{figure}
 
 Queste differenze negli score vanno anche ad impattare poi il coefficiente di correlazione Kendall rispetto al Ranking Supervisionato. Anche qui, come prima, le differenze sono esigue ma sempre presenti.
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/kendall_box}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/kendall_box}
+	\centering
 \end{figure}
 
 
@@ -665,8 +693,8 @@ Passando a 4 quantili gli score di intersezione scendono, mostrando come il Mode
 Possiamo quindi concludere che mentre il model Selection non supervisionato non sia molto preciso nel trovare i modelli che siano effettivamente i migliori, e' in grado di escludere abbastanza bene quelli peggiori. A confermare questa ipotesi il calcolo dei quantile interserction con soltanto due bin, producendo uno score di interessezione di \(0.8\)
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/4quantile}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/4quantile}
+	\centering
 \end{figure}
 
 
@@ -675,8 +703,8 @@ Possiamo quindi concludere che mentre il model Selection non supervisionato non 
 Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo 5 pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) come detto prima, non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati e troppo alta e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
 Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato andando a produrre una lista di ranking e andando a prendere il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dati di uno specifico macchinario. Infine si utilizzano i dati di MVM per:
 \begin{itemize}
-\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la solia della classe Q1 e parangonando questi numeri tra i time-step segnalati come anomali dal modello, con i time-step segnalati come normali.
-\item Calcolare il valore di qualita media per ogni banda, sia sui time-step considerati normali e sia su quelli considerati anomali.
+	\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la solia della classe Q1 e parangonando questi numeri tra i time-step segnalati come anomali dal modello, con i time-step segnalati come normali.
+	\item Calcolare il valore di qualita media per ogni banda, sia sui time-step considerati normali e sia su quelli considerati anomali.
 \end{itemize}
 L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinario portino a qualita del prodotto finito piu bassa, ovvero a valori di MVM piu alti. Quello che si spera di ottenere e' vedere questa assunzione all'atto pratico, ovvero con valori di MVM mediamente piu alti per quei punti considerati anomali da un modello rispetto ai punti considerati normali.
 
@@ -697,36 +725,36 @@ Il risultato prodotto da questa tecnica di trhesoldin e' 0.05, ovvero il 5\% di 
 L'algoritmo di Model Selection, eseguito sul dataset del macchinario M1 utilizzando come modelli la medesima lista utilizzata con i dataset di benchmark, ha prodotto i seguenti risultati:
 
 \begin{table}[]
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Model}    & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
-KDE               & 0.544       & 0.391        & 0.549       & 0.990                \\ \hline
-CBLOF\_4          & 0.539       & 0.388        & 0.501       & 0.988                \\ \hline
-MCD               & 0.508       & 0.483        & 0.530       & 0.955                \\ \hline
-IForest\_200      & 0.509       & 0.320        & 0.554       & 0.938                \\ \hline
-OCSVM\_poly       & 0.452       & 0.386        & 0.542       & 0.920                \\ \hline
-OCSVM\_sig        & 0.452       & 0.384        & 0.542       & 0.919                \\ \hline
-PCAODetectorSKI-1 & 0.552       & 1.000        & 0.510       & 0.901                \\ \hline
-KPCA              & 0.548       & 0.335        & 0.528       & 0.899                \\ \hline
-PCA               & 0.552       & 0.077        & 0.510       & 0.893                \\ \hline
-KNN\_10           & 0.562       & 0.286        & 0.474       & 0.830                \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		\textbf{Model}    & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
+		KDE               & 0.544       & 0.391        & 0.549       & 0.990                \\ \hline
+		CBLOF\_4          & 0.539       & 0.388        & 0.501       & 0.988                \\ \hline
+		MCD               & 0.508       & 0.483        & 0.530       & 0.955                \\ \hline
+		IForest\_200      & 0.509       & 0.320        & 0.554       & 0.938                \\ \hline
+		OCSVM\_poly       & 0.452       & 0.386        & 0.542       & 0.920                \\ \hline
+		OCSVM\_sig        & 0.452       & 0.384        & 0.542       & 0.919                \\ \hline
+		PCAODetectorSKI-1 & 0.552       & 1.000        & 0.510       & 0.901                \\ \hline
+		KPCA              & 0.548       & 0.335        & 0.528       & 0.899                \\ \hline
+		PCA               & 0.552       & 0.077        & 0.510       & 0.893                \\ \hline
+		KNN\_10           & 0.562       & 0.286        & 0.474       & 0.830                \\ \hline
+	\end{tabular}
 \end{table}
 \begin{table}[]
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-\textbf{Model}     & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
-SO\_GAAL           & 0.005       & 0.029        & 0.314       & 0.030                \\ \hline
-TelemanomSKI-48    & 0.090       & 0.997        & 0.237       & 0.030                \\ \hline
-DeepSVDD           & 0.214       & 0.120        & 0.348       & 0.035                \\ \hline
-ALAD               & 0.071       & 0.092        & 0.375       & 0.067                \\ \hline
-SOS                & 0.218       & 0.143        & 0.391       & 0.098                \\ \hline
-SOS\_7             & 0.228       & 0.143        & 0.370       & 0.118                \\ \hline
-FeatureBagging     & 0.335       & 0.024        & 0.406       & 0.127                \\ \hline
-LOF                & 0.337       & 0.065        & 0.390       & 0.136                \\ \hline
-PCAODetectorSKI-48 & 0.103       & 0.997        & 0.394       & 0.136                \\ \hline
-ABOD               & 0.423       & 0.054        & 0.391       & 0.139                \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		\textbf{Model}     & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
+		SO\_GAAL           & 0.005       & 0.029        & 0.314       & 0.030                \\ \hline
+		TelemanomSKI-48    & 0.090       & 0.997        & 0.237       & 0.030                \\ \hline
+		DeepSVDD           & 0.214       & 0.120        & 0.348       & 0.035                \\ \hline
+		ALAD               & 0.071       & 0.092        & 0.375       & 0.067                \\ \hline
+		SOS                & 0.218       & 0.143        & 0.391       & 0.098                \\ \hline
+		SOS\_7             & 0.228       & 0.143        & 0.370       & 0.118                \\ \hline
+		FeatureBagging     & 0.335       & 0.024        & 0.406       & 0.127                \\ \hline
+		LOF                & 0.337       & 0.065        & 0.390       & 0.136                \\ \hline
+		PCAODetectorSKI-48 & 0.103       & 0.997        & 0.394       & 0.136                \\ \hline
+		ABOD               & 0.423       & 0.054        & 0.391       & 0.139                \\ \hline
+	\end{tabular}
 \end{table}
 
 Sono proposti i primi 10 e gli ultimi 10 modelli con i relativi score finali. Le metriche surrogate utilizzate sono state (1) Round Robin per Model Centrality, (2) Mix per Performance on Synthethic Anomaly Injection e (3) Clustering Cohesion. La tecnica di aggregazione utilizzata e' stato il metodo ottimale di Kenedy-Young.
@@ -737,13 +765,13 @@ Model Centrality va sicuramente a favorire quei modelli che producono output sim
 Attraverso un grafico a linee con barre verticali per rappresentare i timestep rilevati come anomalia, possiamo notare come KDE, ovvero il miglior modello, riesca a riconoscere bene i punti di spike o gli intervalli di spike in cui certi sensori raggiungono valori sufficientemente distanti da un comportamento standard. Al contrario, Telemanom raggruppa tutti i punti anomali in un unico intervallo continuo nonostante ci siano dei timestep che non presentino, ad occhio, un comportamento anomalo.
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/kde}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/kde}
+	\centering
 \end{figure}
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/worst_clf}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/worst_clf}
+	\centering
 \end{figure}
 
 Passando ad un plot scatter dopo aver ridotto la dimensionalita dei punti a 2 dimensioni tramite PCA, possiamo notare due cluster principali con punti sparsi nel mezzo. I punto anomali trovati da KDE si trovano principalmente nel cluster piu piccolo a destra e nei punti sparsi nel piano. Mentre il cluster blu in centro risulta ben omogeneo.
@@ -752,80 +780,80 @@ Ovviamente non si ha la certezza che il cluster di destra sia effettivamente com
 
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/kde_scatter}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/kde_scatter}
+	\centering
 \end{figure}
 
 
 
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/worst_clf_scatter}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/worst_clf_scatter}
+	\centering
 \end{figure}
 
 \subsubsection{Confronto Qualita}
 Puo essere utile un confronto tra le anomalie rilevate e la qualita registrata in quei timestep. Come anticipato piu volte, la qualita non e' da considerarsi un perfetto indicatore delle anomalie: 
 \begin{itemize}
-\item La qualita viene registrata ogni due secondi mentre i dati CoMo ogni 5 minuti. Di conseguenza la qualita viene aggregata con una media, andando a nascondere, nel calcolo aggregato, i valori piu alti che sono anche i piu rari. Usare altre tecniche di aggregazione come Min o Max non e' immediato in quanto avrebbe poi favorito troppo o troppo poco la presenza di valori di qualita' estremi.
-\item Analizzando un solo macchinario non e' possibile avere una situazione completa della linea di produzione, ma anche analizzando tutti i macchinari insieme non e' certo che la qualita' sia correllata al 100\% con i dati CoMo. Ci possono essere fattori come la qualita del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualita. Producendo quindi valori di qualita bassa nonostate registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualita.
+	\item La qualita viene registrata ogni due secondi mentre i dati CoMo ogni 5 minuti. Di conseguenza la qualita viene aggregata con una media, andando a nascondere, nel calcolo aggregato, i valori piu alti che sono anche i piu rari. Usare altre tecniche di aggregazione come Min o Max non e' immediato in quanto avrebbe poi favorito troppo o troppo poco la presenza di valori di qualita' estremi.
+	\item Analizzando un solo macchinario non e' possibile avere una situazione completa della linea di produzione, ma anche analizzando tutti i macchinari insieme non e' certo che la qualita' sia correllata al 100\% con i dati CoMo. Ci possono essere fattori come la qualita del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualita. Producendo quindi valori di qualita bassa nonostate registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualita.
 \end{itemize}
 
 Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da un modello, in questo caso prima KDE poi Telemanom, e i punti registrati come bassa qualita. Le correlazioni sono cosi spiegate:
 \begin{itemize}
-\item \textit{true positive} indica che il punto e' rilevato sia come anomalo che di bassa qualita
-\item \textit{true negative} indica che il punto e' rilevato sia come non anomalo che di qualita normale
-\item \textit{false negative} indica che il punto e' rilevato come non anomalo ma la qualita e' bassa
-\item \textit{false positive} indica che il punto e' rilevato come anomalo ma la qualita e' normale
+	\item \textit{true positive} indica che il punto e' rilevato sia come anomalo che di bassa qualita
+	\item \textit{true negative} indica che il punto e' rilevato sia come non anomalo che di qualita normale
+	\item \textit{false negative} indica che il punto e' rilevato come non anomalo ma la qualita e' bassa
+	\item \textit{false positive} indica che il punto e' rilevato come anomalo ma la qualita e' normale
 \end{itemize}
 
- La prima immagine rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
+La prima immagine rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/correlation_ssb1_quality_plot.png}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/correlation_ssb1_quality_plot.png}
+	\centering
 \end{figure}
 
 Con Telemanom la situazione non e' migliore, in generale e' presente confusione nell'identificazione dei punti con qualita bassa.
 
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/worst_correlation_ssb1_quality_plot}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/worst_correlation_ssb1_quality_plot}
+	\centering
 \end{figure}
 
 La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualita bassa.
 
 \begin{table}[]
-\begin{tabular}{|l|l|l|}
-\hline
-                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
-\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+		\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
+		\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
+	\end{tabular}
 \end{table}
 
 \begin{table}[]
-\begin{tabular}{|l|l|l|}
-\hline
-                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
-\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+		\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
+		\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
+	\end{tabular}
 \end{table}
 Si potrebbe risolvere, in parte, uno dei problemi della qualita andando a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le label per ogni timestep. Anche pero' in questo caso la corrispondenza e' bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter che la confusione matrix sono stati posti per visualizzazione.
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/correlation_all_quality_plot.png}
-\centering
+	\includegraphics[width=14cm, scale=1]{images/correlation_all_quality_plot.png}
+	\centering
 \end{figure}
 
 \begin{table}[]
-\begin{tabular}{|l|l|l|}
-\hline
-                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-\textbf{Positive} & 1510 (0.31)            & 2750 (0.37)            \\ \hline
-\textbf{Negative} & 3376 (0.69)            & 4507 (0.62)            \\ \hline
-\end{tabular}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+		\textbf{Positive} & 1510 (0.31)            & 2750 (0.37)            \\ \hline
+		\textbf{Negative} & 3376 (0.69)            & 4507 (0.62)            \\ \hline
+	\end{tabular}
 \end{table}
 
 \subsubsection{Conclusione}
