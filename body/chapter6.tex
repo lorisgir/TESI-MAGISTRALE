@@ -659,22 +659,149 @@ I dataset di SKF sono stati introdotti e dettagliati nel capitolo 5. Per questa 
 Per la fase di training e' stato scelto il periodo che va da gennaio a marzo 2022 in quanto i dati in quel periodo risultavano i piu puliti ed i piu stabili da un punto di vista di oscillazioni o data change. Mentre per la fase di prediction viene usato come riferimento il periodo maggio-giugno 2022.
 
 
+
 \subsection{Thresholding}
 Prima di procedere al training del modello e' necessario avere un riferimento sulla percentuale di anomalie nel dataset. A questo scopo e' stato utilizzato il metodo GammaY introdotto nel capitolo 3.
 Questo algoritmo riceve in input la stessa lista di modelli candidati usati poi nel model selection, e dopo essere stati allenati sul dataset di training senza andare ad indicare il fattore di contaminazione gli output score di ognuno di questi sono stati usati per computare la distribuzione di probabilita multivariata se i punti sono o meno anomali.
 Il risultato prodotto da questa tecnica di trhesoldin e' 0.05, ovvero il 5\% di punti vengono considerati anomali. Un dato ragionevole confermato da un analisi manuale dei dati.
-\subsection{Risultati}
-La valutazione del Modlel Selection, per i motivi spiegati, devve essere svolta manualmente tramite un ispezione grafica o utilizzando le qualita MVM.
 
+
+\subsection{Risultati}
+L'algoritmo di Model Selection, eseguito sul dataset del macchinario M1 utilizzando come modelli la medesima lista utilizzata con i dataset di benchmark, ha prodotto i seguenti risultati:
+
+\begin{table}[]
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Model}    & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
+KDE               & 0.544       & 0.391        & 0.549       & 0.990                \\ \hline
+CBLOF\_4          & 0.539       & 0.388        & 0.501       & 0.988                \\ \hline
+MCD               & 0.508       & 0.483        & 0.530       & 0.955                \\ \hline
+IForest\_200      & 0.509       & 0.320        & 0.554       & 0.938                \\ \hline
+OCSVM\_poly       & 0.452       & 0.386        & 0.542       & 0.920                \\ \hline
+OCSVM\_sig        & 0.452       & 0.384        & 0.542       & 0.919                \\ \hline
+PCAODetectorSKI-1 & 0.552       & 1.000        & 0.510       & 0.901                \\ \hline
+KPCA              & 0.548       & 0.335        & 0.528       & 0.899                \\ \hline
+PCA               & 0.552       & 0.077        & 0.510       & 0.893                \\ \hline
+KNN\_10           & 0.562       & 0.286        & 0.474       & 0.830                \\ \hline
+\end{tabular}
+\end{table}
+\begin{table}[]
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Model}     & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
+SO\_GAAL           & 0.005       & 0.029        & 0.314       & 0.030                \\ \hline
+TelemanomSKI-48    & 0.090       & 0.997        & 0.237       & 0.030                \\ \hline
+DeepSVDD           & 0.214       & 0.120        & 0.348       & 0.035                \\ \hline
+ALAD               & 0.071       & 0.092        & 0.375       & 0.067                \\ \hline
+SOS                & 0.218       & 0.143        & 0.391       & 0.098                \\ \hline
+SOS\_7             & 0.228       & 0.143        & 0.370       & 0.118                \\ \hline
+FeatureBagging     & 0.335       & 0.024        & 0.406       & 0.127                \\ \hline
+LOF                & 0.337       & 0.065        & 0.390       & 0.136                \\ \hline
+PCAODetectorSKI-48 & 0.103       & 0.997        & 0.394       & 0.136                \\ \hline
+ABOD               & 0.423       & 0.054        & 0.391       & 0.139                \\ \hline
+\end{tabular}
+\end{table}
+
+Sono proposti i primi 10 e gli ultimi 10 modelli con i relativi score finali. Le metriche surrogate utilizzate sono state (1) Round Robin per Model Centrality, (2) Mix per Performance on Synthethic Anomaly Injection e (3) Clustering Cohesion. La tecnica di aggregazione utilizzata e' stato il metodo ottimale di Kenedy-Young.
+Il primo modello e' KDE, ovvero Kernel Density Estimation ed in generale i metodi di Machine Learning hanno uno score piu alto di quelli Deep Learning. Situazione rimarcata dal fatto che per le ultime 10 posizioni sono presenti 4 metodi di Deep Learning. Una spiegazione ha questo fenomeno risiede nel fatto che questi modelli hanno score di Model Centrality e Anomaly Injection molto bassi. Eccezione per Telemanom che riesce a riconoscere quasi perfettamente tutte le anomalie sintetiche iniettate. Gli Score di Clustering Cohesion vanno anche questa volta a favorire metodi di Machine Learning, anche se in misura piu lieve. Infatti i modelli come DeepSVDD o ALAD riescono a  raggiungere punteggi intorno al 0.4, in linea con i migliori.
+Model Centrality va sicuramente a favorire quei modelli che producono output simile tra di loro, implicando una forte varianza dei risultati sulla base di quali modelli candidati vengono passati all'algoritmo di Model Selection. Potrebbe essere il caso che i modelli di Deep Learning siano effettivamente i migliori, ma essendo pochi rispetto al numero totale di modelli considerati, il loro punteggio di Model Centrality va abbassandosi. In questi casi, un'analisi grafica delle anomalie rilevate puo risultare utile.
+
+\subsubsection{Anomalie Rilevate}
+Attraverso un grafico a linee con barre verticali per rappresentare i timestep rilevati come anomalia, possiamo notare come KDE, ovvero il miglior modello, riesca a riconoscere bene i punti di spike o gli intervalli di spike in cui certi sensori raggiungono valori sufficientemente distanti da un comportamento standard. Al contrario, Telemanom raggruppa tutti i punti anomali in un unico intervallo continuo nonostante ci siano dei timestep che non presentino, ad occhio, un comportamento anomalo.
 
 \begin{figure}[t]
 \includegraphics[width=14cm, scale=1]{images/kde}
 \centering
 \end{figure}
 
-
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/mvm_result}
+\includegraphics[width=14cm, scale=1]{images/worst_clf}
 \centering
 \end{figure}
 
+Passando ad un plot scatter dopo aver ridotto la dimensionalita dei punti a 2 dimensioni tramite PCA, possiamo notare due cluster principali con punti sparsi nel mezzo. I punto anomali trovati da KDE si trovano principalmente nel cluster piu piccolo a destra e nei punti sparsi nel piano. Mentre il cluster blu in centro risulta ben omogeneo.
+Telemanom invece labella come anomali principalmente i punti del cluster di sinistra, risultando in una separazione meno chiara.
+Ovviamente non si ha la certezza che il cluster di destra sia effettivamente composto da tutti punti anomali, ma chiaramente un comportamento fuori dal normale c'e' in quanto la stragrande maggioranza dei dati, risiedenti nel cluster di sinistra, possiede valori molto diversi.
+
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/kde_scatter}
+\centering
+\end{figure}
+
+
+
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/worst_clf_scatter}
+\centering
+\end{figure}
+
+\subsubsection{Confronto Qualita}
+Puo essere utile un confronto tra le anomalie rilevate e la qualita registrata in quei timestep. Come anticipato piu volte, la qualita non e' da considerarsi un perfetto indicatore delle anomalie: 
+\begin{itemize}
+\item La qualita viene registrata ogni due secondi mentre i dati CoMo ogni 5 minuti. Di conseguenza la qualita viene aggregata con una media, andando a nascondere, nel calcolo aggregato, i valori piu alti che sono anche i piu rari. Usare altre tecniche di aggregazione come Min o Max non e' immediato in quanto avrebbe poi favorito troppo o troppo poco la presenza di valori di qualita' estremi.
+\item Analizzando un solo macchinario non e' possibile avere una situazione completa della linea di produzione, ma anche analizzando tutti i macchinari insieme non e' certo che la qualita' sia correllata al 100\% con i dati CoMo. Ci possono essere fattori come la qualita del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualita. Producendo quindi valori di qualita bassa nonostate registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualita.
+\end{itemize}
+
+Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da un modello, in questo caso prima KDE poi Telemanom, e i punti registrati come bassa qualita. Le correlazioni sono cosi spiegate:
+\begin{itemize}
+\item \textit{true positive} indica che il punto e' rilevato sia come anomalo che di bassa qualita
+\item \textit{true negative} indica che il punto e' rilevato sia come non anomalo che di qualita normale
+\item \textit{false negative} indica che il punto e' rilevato come non anomalo ma la qualita e' bassa
+\item \textit{false positive} indica che il punto e' rilevato come anomalo ma la qualita e' normale
+\end{itemize}
+
+ La prima immagine rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/correlation_ssb1_quality_plot.png}
+\centering
+\end{figure}
+
+Con Telemanom la situazione non e' migliore, in generale e' presente confusione nell'identificazione dei punti con qualita bassa.
+
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/worst_correlation_ssb1_quality_plot}
+\centering
+\end{figure}
+
+La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualita bassa.
+
+\begin{table}[]
+\begin{tabular}{|l|l|l|}
+\hline
+                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
+\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\begin{tabular}{|l|l|l|}
+\hline
+                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
+\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
+\end{tabular}
+\end{table}
+Si potrebbe risolvere, in parte, uno dei problemi della qualita andando a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le label per ogni timestep. Anche pero' in questo caso la corrispondenza e' bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter che la confusione matrix sono stati posti per visualizzazione.
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/correlation_all_quality_plot.png}
+\centering
+\end{figure}
+
+\begin{table}[]
+\begin{tabular}{|l|l|l|}
+\hline
+                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
+\textbf{Positive} & 1510 (0.31)            & 2750 (0.37)            \\ \hline
+\textbf{Negative} & 3376 (0.69)            & 4507 (0.62)            \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Conclusione}
+In conclusione, valutare in modo automatico le performance di un modello di Anomaly Detection su SKF e' di fatto impossibile. Sarebbero necessari le registrazioni di almeno tutti i machinari della linea e frequenza di registrazione ogni 2 secondi in modo da pareggiare la frequenza di MVM. A questo punto un'analisi piu accurata sulla relazione tra MVM e CoMo puo essere svolta, ma anche in questo caso non e' detto che ci sia correlazione perfetta.
+L'unico modo per valutare quindi il modello prodotto da Model Selection e' quello di portare in produzione una dashboard con PowerBI, in modo da notificare gli operatori i momenti di anomalia e ricevere feedback di conseguenza sulla precisione del modello.
+Una trattazione sul ciclo di deploy e distribuzione viene fatta nel capitolo successivo.
