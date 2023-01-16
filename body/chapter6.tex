@@ -10,9 +10,11 @@ Riassumendo, questo capitolo si dividerà in:
 
 
 \section{Implementazione}
-Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. 
+Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione e' rappresentato in figura \ref{flow-scheme}.
 \begin{figure}[t]
 \includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
+\caption{Flusso operazionale}
+\label{flow-scheme}
 \centering
 \end{figure}
 
@@ -46,21 +48,29 @@ modelli di rilevamento delle anomalie [Carmona et al,
 valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Data una serie temporale di input senza labels, viene iniettata casualmente un'anomalia di un determinato tipo. La posizione dell'anomalia iniettata viene trattata come una label pseudo-positiva, mentre il resto dei punti temporali sono trattati come labels pseudo-negative. 
 Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-labels.
 
-Invece di affidarsi a modelli generativi complessi [Wen et al., 2020], e' stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 5: 
+Invece di affidarsi a modelli generativi complessi [Wen et al., 2020], e' stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/anomalies}
+\caption{Tipologie di anomalie}
+\label{tipi-anomalie}
+\centering
+\end{figure}
+
+
 \begin{enumerate}
 \item \textbf{Spike Anomaly} sono delle point anomalies in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno. Lo spike ha un magnitudo governato da una distribuzione \[s \approx N(1.5, 3) \]
 \item \textbf{Scale Anomalies} e' un intervallo di punti anomali in cui il  valore medio dei punti al suo interno e' significaticamente piu grande o piu piccolo rispetto all'intorno. I dati vengono scalati \[ ts_a[i, start:end] = factor*ts[i, start:end]\] dove factor segue sempre la distribuzione \(s \approx N(1.5, 3) \)
 \item \textbf{Wander Anomalies} e' un intervallo di punti anomali in cui il valore di essi cresce o decresce linearmente nel tempo. I dati vengono modificati secondo \[ ts_a[i, start:end] = np.linspace(0, baseline, end-start) + ts[i, start:end] \] 
 \end{enumerate}
-\begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/anomalies}
-\centering
-\end{figure}
 
 Il numero di anomalie da initiettare viene calcolato sulla base del fattore di contaminazione associato ad un determinato dataset. Ad esempio, su un dataset con 10000 sample ed un fattore di contaminazione di 0.05, 500 anomalie saranno iniettate.
 La posizione nella quale vengono iniettate le spike anomalies viene scelta casualmente; invece per quanto riguarda le scale e wander anomalies, vengono generati casualmente dei punti di inizio intervallo anomalo mentre la lunghezza di questi e' predisposta a mano in base alla frequenza dei sample o alla dimensione del dataset.
 
-Attraverso uno studio di correlazione fra le feature del dataset si e' andanto a scoprire se due o piu feature devono essere considerate insieme quando si aggiunge un'anomalia in un determinato punto. In un esempio pratico, se la feature della Pressione e quella del Flow hanno una correlazione vicina a -1, quindi negativa, l'iniezione dell'anomalia prevede che una delle due feature vede il suo valore modificato verso l'alto mentre l'altro verso il basso. TODO IMMAGINE
+Attraverso uno studio di correlazione fra le feature del dataset si e' andanto a scoprire se due o piu feature devono essere considerate insieme quando si aggiunge un'anomalia in un determinato punto. In un esempio pratico, se la feature della Pressione e quella del Flow hanno una correlazione vicina a -1, quindi negativa, l'iniezione dell'anomalia prevede che una delle due feature vede il suo valore modificato verso l'alto mentre l'altro verso il basso. 
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/corr}
+\centering
+\end{figure}
 
 Utilizzando il coefficiente di Skew si va a vedere in che direzione portare l'anomalia: se verso il basso o verso l'alto. Feature con un right-skew avranno anomalie orientate verso l'alto, left-swek verso il basso mentre se non rientrano in nessuno dei due casi allora si generano anomalie casuali o verso il basso o verso l'alto.
 
@@ -515,8 +525,7 @@ STD             & 0.329                                  & 0.218                
 
 Alcuni dataset, come annthyroid, page blocks, shuttle e waveform hanno una distribuzione dei dati tale da essere facilmente clusterizzabile da metodi come DBSCAN, usato appunto in questa metrica surrogata. Questo permette quindi di favorire quei modelli che riescono di fatto a trovare questa separazione tra i punti normali ed i punti anomali.
 Gli altri dataset invece faticano a trovare una forte correlazione con il ranking supervisionato, proprio per il fatto che in questo caso i punti anomali sono altamente mischiati in mezzo a quelli normali.
-Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati.
-TODO PLOT GRAFICO
+Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati come nell'immagine X.
 \begin{figure}[t]
 \includegraphics[width=14cm, scale=1]{images/plot-anomalies-normal}
 \centering
@@ -629,6 +638,24 @@ Il metodo di score e' il piu semplice ma produce anche risultati relativamente s
 \includegraphics[width=14cm, scale=1]{images/varying-k}
 \centering
 \end{figure}
+
+\subsubsection{Ripetitivita}
+Alcune metriche surrogate includono al loro interno un fattore di casualita, in particolare Sampling e tutte e 4 le tecniche di anomaly injection. Il primo metodo puo variarire ad ogni suo utilizzo in quanto per ogni sample viene scelto a caso quale modello usare come riferimento per la label. Invece i metodi di anomaly injection genereranno sempre anomalie differenti in quanto sia la posizione che il magnitudo di anomalia cambia ogni volta.
+Per questo motivo e' stata fatta anche un'analisi andando a ripetere il Model Selection su due dataset per 5 volte.
+Nell'immagine sottostante e' possibile vedere un Box Whisker Plot sugli score prodotti da Model Selection per ognuna delle metriche e metodi. Alcuni di questi non includono casualita come Round Robin, Majority Vote, Score Correlation e Score Clustering, di conseguenza il valore e' uguale ad ogni iterazione. Al contrario gli altri vedono differire il valore ad ogni iterazione, chi piu chi meno. In generale, vi e' un range che varia di circa 0.05 punti.
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/score_box}
+\centering
+\end{figure}
+
+Queste differenze negli score vanno anche ad impattare poi il coefficiente di correlazione Kendall rispetto al Ranking Supervisionato. Anche qui, come prima, le differenze sono esigue ma sempre presenti.
+
+\begin{figure}[t]
+\includegraphics[width=14cm, scale=1]{images/kendall_box}
+\centering
+\end{figure}
+
 
 \subsubsection{Quantile Interesection}
 Oltre a valutare le performance sullo score di correlazione tra il ranking non supervisionato e quello supervisionato, puo risultare utile cambiare punto di vista e comparare i ranking in se.

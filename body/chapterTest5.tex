@@ -2,18 +2,26 @@
 
 A figure example, with text in line (NO CAPTION)
 \begin{center}
-
 \includegraphics[scale=0.15]{head/logo.png}
-
-
+\label{figura0}
 \end{center}
 
-A figure example, with floating object and caption
 
 \begin{figure}
 \centering
-
-\includegraphics[scale=0.15]{head/logo.png}
 \caption{the logo of UniTo}
-
+\includegraphics[scale=0.15]{head/logo.png}
+\label{figura1}
 \end{figure}
+
+
+A figure example, with floating object and caption, please refer to \ref{figura1}
+
+\begin{figure}
+\centering
+\caption{the logo of UniTo}
+\includegraphics[scale=0.15]{head/logo.png}
+\label{figura2}
+\end{figure}
+
+A figure example2, with floating object and caption, please refer to \ref{figura2}
