@@ -43,20 +43,41 @@ A questo punto la pipeline e' completa e puo essere pubblicata su Azure Machine 
 
 \subsection{SKF Pipeline}
 In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
-La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
-Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
-Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori.
-Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
-Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
+\begin{enumerate}
+\item La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
+\item Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
+\item Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori. Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
+\item Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
+\end{enumerate}
+
+
 \begin{figure}[t]
 \includegraphics[width=10cm, scale=1]{images/pipeline}
 \centering
 \end{figure}
 
 \section{Inference}
+\subsubsection{Azure Data Factory Inference}
+Come per la piattaforma Machine Learning, Azure Data Factory si basa sulle pipeline ma che a differenza del primo, non sono definite tramite l'SDK e non eseguono script python, ma si utilizza il pannello di controllo Data Factory Studio per impostare i passaggi e le operazioni da eseguire andando a comporre il flusso di lavoro con un approccio drag-and-drop.
+La piattaforma mette a disposizioni numerose operazioni come step della pipeline: recupero dati; copia dati; esecuzione di script, store procedure; chiamate http, azure functions e molto altro. 
+Gli step sono collegati tramite flussi condizionali sulla base se conclude correttamente o meno ed e' possibile passare dati in input dall'output precedente.
+Un'altra differenza con le pipeline di Azure Machine Learning e' che non bisogna definire l'environment a la compute instance ma e' tutto eseguito sulle risorse computazionali di Azure on demand.
+\subsubsection{SKF Pipeline}
+In questa sezione sono definiti gli step della pipeline di inferenza.
+\begin{enumerate}
+\item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 
+\item Il secondo step richiama l'endpoint di inferenza pubblicato dalla pipeline di training. E' una chiama POST nella quale al suo interno vengono inclusi i dati dello step 1.
+\item Infine il terzo step si occupa si salvare su database SQL, attraverso il richiamo di una stored procedure, il risultato dell'inferenza. Rendendolo cosi disponibile a tutti quei client che ne necessitano l'utilizzo, come PowerBI
+\end{enumerate}
+
+\begin{figure}[t]
+\includegraphics[width=10cm, scale=1]{images/pipeline-inference}
+\centering
+\end{figure}
 
 \section{Dashboard}
 L'ultimo elemento dell'architettura e' PowerBI. Come introdotto a inizio capitolo, e' un software interattivo per la Data Visualization che offre diversi connettori da cui prelevare i dati. Uno di questi e' il Direct Query: questo strumento permette di collegarsi direttamente all'origine dei dati ed interrogarla on demand. E' un modo particolarmente efficace di recupare i dati quando si ha a disposizione un'archivio molto grande ma per la visualizzazione sono necessari solamente gli ultimi records. 
+Attraverso questo metodo si ha quindi creato un collegamento al database SQL andando a prelevare i dati salvati dalla pipeline di inferenza.
 L'interfaccia pensata per gli operatori di SKF risiede in un semplice grafico a line con delle barre verticale rosse per indicare l'anomalia in uno specifico timestamp. Per questo tipo di report, Direct Query e' indubbiamente la scelta migliore di recuperare i dati.  
 
 
