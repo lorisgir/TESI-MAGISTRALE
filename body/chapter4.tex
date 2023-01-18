@@ -54,7 +54,7 @@ Il ranking è alla base di centinaia di algoritmi come Netflix, Amazon e Google.
 Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web a seguito di una ricerca da parte di un utente, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. 
 L'obiettivo del Rank Aggregation è riassumere le informazioni dei singoli ranking di input e fornire un'unica classifica finale, che dovrebbe in qualche modo rappresentare un risultato più accurato o veritiero. 
 
-Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa e' necessario definire una funzione oggetto. In questo costesto, vorremmo trovare una ranking finale che sia piu vicino possibile a tutte i singoli ranking contemporaneamente. In modo formale, si puo definire la funzione come: \[ \Phi(\delta) = \sum_{n=1}^{m} w_id(\delta,L_i), \]	
+Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa e' necessario definire una funzione oggetto. In questo costesto, vorremmo trovare una ranking finale che sia piu vicino possibile a tutte i singoli ranking contemporaneamente. In modo formale, si puo definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
 dove $\delta$ e' un ranking di lunghezza $k=|L_i|$, $w_i$ e' il peso associato alla lista $L_i$, $d$ e' una funzione di distanza e $L_i$ e' la $i^{ma}$ lista ordinata.
 L'obiettivo e' di trovare $\delta^*$ che minimizzi la distanza totale tra $\delta^*$ e gli $L_i$
 \[ \delta^* = arg min \sum_{i=1}^{m} w_id(\delta,L_i). \]

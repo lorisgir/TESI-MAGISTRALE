@@ -19,8 +19,12 @@ Questa sezione e' dedicata a come gli strumenti citati in precedenza comunicano 
 \end{enumerate}
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/deploy_scheme}
+	
 \centering
+\includegraphics[width=14cm, scale=1]{images/deploy_scheme}
+  \caption{Architettura Azure}
+	\label{azure}
+
 \end{figure}
 
 
@@ -41,7 +45,7 @@ I parametri richiesti sono (1) il nome del compute cluster su cui eseguire il fl
 Gli step della pipeline sono invece definiti dal percorso allo script del file, i parametri di input e i parametri di ouput. Condividono la stesso spazio di archiviazione, di conseguenza per passare dati tra gli step e' necessario andare a salvare su file questi dati e valorizzare i vari input e ouput con i percorsi ai file.
 A questo punto la pipeline e' completa e puo essere pubblicata su Azure Machine Learning per essere poi schedulata ad una cadenza regolare.
 
-\subsection{SKF Pipeline}
+\subsection{SKF Training Pipeline}
 In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
 \begin{enumerate}
 \item La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
@@ -52,17 +56,20 @@ In questa sezione vengono descritti i flussi di lavoro della pipeline per il tra
 
 
 \begin{figure}[t]
-\includegraphics[width=10cm, scale=1]{images/pipeline}
 \centering
+\includegraphics[width=10cm, scale=1]{images/pipeline}
+  \caption{Pipeline di Training}
+	\label{pipeline-training}
+
 \end{figure}
 
 \section{Inference}
-\subsubsection{Azure Data Factory Inference}
+\subsection{Azure Data Factory Pipelines}
 Come per la piattaforma Machine Learning, Azure Data Factory si basa sulle pipeline ma che a differenza del primo, non sono definite tramite l'SDK e non eseguono script python, ma si utilizza il pannello di controllo Data Factory Studio per impostare i passaggi e le operazioni da eseguire andando a comporre il flusso di lavoro con un approccio drag-and-drop.
 La piattaforma mette a disposizioni numerose operazioni come step della pipeline: recupero dati; copia dati; esecuzione di script, store procedure; chiamate http, azure functions e molto altro. 
 Gli step sono collegati tramite flussi condizionali sulla base se conclude correttamente o meno ed e' possibile passare dati in input dall'output precedente.
 Un'altra differenza con le pipeline di Azure Machine Learning e' che non bisogna definire l'environment a la compute instance ma e' tutto eseguito sulle risorse computazionali di Azure on demand.
-\subsubsection{SKF Pipeline}
+\subsection{SKF Inference Pipeline}
 In questa sezione sono definiti gli step della pipeline di inferenza.
 \begin{enumerate}
 \item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 
@@ -71,8 +78,11 @@ In questa sezione sono definiti gli step della pipeline di inferenza.
 \end{enumerate}
 
 \begin{figure}[t]
-\includegraphics[width=10cm, scale=1]{images/pipeline-inference}
 \centering
+\includegraphics[width=10cm, scale=1]{images/pipeline-inference}
+  \caption{Pipeline di Inferenza}
+	\label{pipeline-inferenza}
+
 \end{figure}
 
 \section{Dashboard}
@@ -82,8 +92,11 @@ L'interfaccia pensata per gli operatori di SKF risiede in un semplice grafico a 
 
 
 \begin{figure}[t]
-\includegraphics[width=14cm, scale=1]{images/powerbi}
 \centering
+\includegraphics[width=14cm, scale=1]{images/powerbi}
+  \caption{Dashboard PowerBI}
+	\label{powerbi}
+
 \end{figure}
 
 

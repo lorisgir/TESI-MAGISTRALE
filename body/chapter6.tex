@@ -12,10 +12,11 @@ Riassumendo, questo capitolo si dividerà in:
 \section{Implementazione}
 Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione e' rappresentato in figura \ref{flow-scheme}.
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
 	\caption{Flusso operazionale}
 	\label{flow-scheme}
-	\centering
+	
 \end{figure}
 
 \subsection{Metriche Surrogate}
@@ -50,10 +51,11 @@ Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-la
 
 Invece di affidarsi a modelli generativi complessi [Wen et al., 2020], e' stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/anomalies}
 	\caption{Tipologie di anomalie}
 	\label{tipi-anomalie}
-	\centering
+	
 \end{figure}
 
 
@@ -68,10 +70,11 @@ La posizione nella quale vengono iniettate le spike anomalies viene scelta casua
 
 Attraverso uno studio di correlazione fra le feature del dataset si e' andanto a scoprire se due o piu feature devono essere considerate insieme quando si aggiunge un'anomalia in un determinato punto. In un esempio pratico, se la feature della Pressione e quella del Flow hanno una correlazione vicina a -1, quindi negativa, l'iniezione dell'anomalia prevede che una delle due feature vede il suo valore modificato verso l'alto mentre l'altro verso il basso. L'immagine \ref{feature-correlazioni} mostra un esempio di correlazioni positiva e negativa.
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/corr}
     \caption{Correlazioni tra features}
 	\label{feature-correlazioni}
-	\centering
+	
 \end{figure}
 
 Utilizzando il coefficiente di Skew si va a vedere in che direzione portare l'anomalia: se verso il basso o verso l'alto. Feature con un right-skew avranno anomalie orientate verso l'alto, left-swek verso il basso mentre se non rientrano in nessuno dei due casi allora si generano anomalie casuali o verso il basso o verso l'alto.
@@ -98,6 +101,7 @@ Nel contesto dei modelli non supervisionati, tecniche e metriche di valutazione 
 All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al piu raggruppati in zone poco dense.
 \begin{center}
   \includegraphics[width=12cm, scale=1]{images/plot-anomalies-normal}
+  \captionof{figure}{Scatter plot dopo l'Anonaly Detection}
 \end{center}
 L'idea alla base di questa metrica surrogata e' quindi quella di calcolare la coesione e separazione tra il cluster di punti normali e quello di punti anomali prodotti dalle labels di un modello di Anomaly Detection. Piu alto e' questo score, piu il modello riesce a separare questi dati e quindi puo essere considerato come un buon modello.
 La metrica utilizzata e' il Silouetthe Score, ma non viene calcolata subito dopo aver ottenuto le labels da un modello, sono neccessari prima alcuni passaggi di preprocessing.
@@ -112,6 +116,7 @@ Applicando quindi PCA per riddure le dimensioni a 3, rende l'applicazione di DBS
 Applicando quindi DBSCAN si ottengono i clster per i punti anomali.
 \begin{center}
 \includegraphics[width=12cm, scale=1]{images/plot-dbscan-anomalies}
+\captionof{figure}{Scatter plot dopo DBSCAN sulle anomalie}
 \end{center}
 
 Infine viene calcolato il silouette score su questi, tenendo anche in considerazione il cluster di punti normali originario.
@@ -128,7 +133,7 @@ E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggett
 I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto sara' in posizione 1. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e cosi via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. A questo punto vengono effettuati i calcoli per ognuna delle 3 metriche surrogate ed il punteggio finale, per ogni modello, sara' la media dei 3 valori ottenuti.
 
 \begin{table}
-\caption{\label{borda}Esempio di aggregazione con Borda.}
+
     \centering
     \begin{tabular}{|l|l|l|l|l|l|l|l|}
     	\hline
@@ -138,6 +143,7 @@ I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni mo
     	M3 & 0.7 & 0.7 & 0.8 & 2     & 3      & 4     & 3             \\ \hline
     	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
     \end{tabular}
+    \caption{\label{borda}Esempio di aggregazione con Borda.}
 \end{table}
 
 
@@ -146,7 +152,7 @@ Nella tabella \ref{borda}, viene proposto un esempio di Ranking Aggregation con 
 E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking.
 
 \begin{table}
-\caption{\label{rborda}Esempio di aggregazione con Robust Borda.}
+
     \centering
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
 	\hline
@@ -156,6 +162,7 @@ E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per og
 	M3 & 0.7 & 0.7 & 0.8 & 1     & 3      & 4     & 2.66          \\ \hline
 	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
 \end{tabular}
+\caption{\label{rborda}Esempio di aggregazione con Robust Borda.}
 \end{table}
 
 Riproponendo in tabella \ref{rborda} l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi. Questo produce poi punteggi finali differenti.
@@ -164,7 +171,7 @@ Questo metodo e' il piu semplice dei 3 in quanto viene semplicemente fatta una m
 Utilizzando questo metodo e sempre considerando gli stessi score degli esempi precedenti, in tabella \ref{score} si puo notare come questa volta il modello migliore sia M2 e non piu M3.
 
 \begin{table}
-\caption{\label{score}Esempio di aggregazione con Score.}
+
     \centering
 \begin{tabular}{|l|l|l|l|l|}
 	\hline
@@ -174,12 +181,15 @@ Utilizzando questo metodo e sempre considerando gli stessi score degli esempi pr
 	M3 & 0.7 & 0.7 & 0.8 & 0.73          \\ \hline
 	M4 & 0.6 & 0.8 & 0.5 & 0.63          \\ \hline
 \end{tabular}
+\caption{\label{score}Esempio di aggregazione con Score.}
 \end{table}
 
 
 
 Chiaramente il processo di Ranking Aggregation aggiunge complessita e variabilita al processo di Model Selection, un'analisi sui risultati di ognuno dei metodi appena proposti e' riportata nella sezione successiva. Il generale pero, il metodo ottimale di Kemeny-Young risultera il migliore e sara' poi quello utilizzato su SKF.
 
+
+\newpage
 \section{Benchmark Results}
 \subsection{Dataset}
 I dataset trattati sono diversi sia per struttura ma anche per tipologia: verranno dapprima introdotti semplici dataset multidimensionali a punto per poi passare a serie temporali multivariate. 
@@ -191,7 +201,7 @@ Sono presenti sia dataset multi-dimensionali a punto che dataset nella forma di 
 La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 
 \begin{table}
-\caption{\label{odds}Dataset ODDS}
+
     \centering
 \begin{tabular}{|l|l|l|l|l|}
 	\hline
@@ -209,6 +219,7 @@ La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 	Waveform         & 3443              & 21             & 100 (2.9\%)             & Physics         \\ \hline
 	Wilt             & 4819              & 5              & 257 (5.33\%)            & Botany          \\ \hline
 \end{tabular}
+\caption{\label{odds}Dataset ODDS}
 \end{table}
 
 Per questi dataset si e' deciso di adottare uno train/test split costituito da 66\% per il train e 33\% per il test. I dataset di train contengono al loro interno anche una percentuale di anomalie. Potrebbe non essere la situazione ideale in quanto e' consigliato per i modelli non supervisionati di essere allenati e quindi apprendere da dati il piu puliti possibili. Ma e' la situazione piu realistica in quanto nella realta la presenza di label non e' sempre garantita.  
@@ -233,6 +244,7 @@ Il fattore di contaminazione passato ad ogni modello corrisponde esattamente all
 
 \begin{table}[]
     \caption{\label{admodels}Algoritmi di Anomaly Detection}
+    \centering
 	\resizebox{\textwidth}{!}{%
 		\begin{tabular}{|l|l|l|}
 			\hline
@@ -292,7 +304,24 @@ I risultati delle diverse tecniche di Rank Aggregation saranno presentati allo s
 Infine viene presentata un'analisi sui rank dei modelli dei rankings prodotti dalle metriche surrogate paragonati ai rank del ranking prodotto in maniera supervisionata con le label.
 \subsubsection{Model Centrality}
 Questa metrica surrogata si basa sul concetto di Model Centrality andando a favorire quei modelli che producono output comparabili alla maggior parte degli altri modelli. Delle quattro tecniche proposte, Round Robin e' quella che generalemente si comporta meglio. In tabella \ref{mc-results} possiamo vedere come gli indici di correlazione favoriscano questa tecnica.
-Moving Average e Sampling seguono con punteggi molto simili, sia per le performance medie che per la standard deviation. Il metodo score fatica a trovare correlazione con il ranking supervisionato. 
+Mahority Vote e Sampling seguono con punteggi molto simili, sia per le performance medie che per la standard deviation. Il metodo Score fatica a trovare correlazione con il ranking supervisionato. 
+Generalmente pero', la metrica funziona discretamente bene tranne qualche dataset specifico come Machine-3-10.  Nelle immagini \ref{model-centrality-plot-bad} e \ref{model-centrality-plot-good} sono mostrati dei scatter plot di dove ogni modello si posiziona in uno spazio bidimensionale. La posizione viene calcolata riducendo a due dimensioni l'output delle predizioni di ogni modello.  Nella figura della Machine-3-10 possiamo notare come i punti sono sparsi lungo tutto il piano rendendo difficile alla metrica surrogata riuscire a trovare una definizione per modello centrale.
+Per Machine-1-4, invece, le performance di correlazione sono migliori e possiamo anche notare come la maggior parte dei punti risieda nel cluster formatosi sulla sinistra. Questo permette di spostare la centralita di un modello verso quella zona ed e' anche altamente probabile che il miglior modello si trovi li, migliorando di conseguenza la correlazione tra il ranking di Model Centrality ed il ranking supervisionato.
+
+
+\begin{figure}[]
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{images/model_centrality_good2-8_2}
+    \caption{Machine-1-4}
+     \label{model-centrality-plot-good}
+  \end{minipage}
+  \begin{minipage}[b]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{images/model_centrality_bad3-10_2}
+    \caption{Machine-3-10}
+      \label{model-centrality-plot-bad}
+  \end{minipage}
+\end{figure}
 
 \begin{table}[]
     \caption{\label{mc-results}Risultati di correlatrazione per Model Centrality}
@@ -503,7 +532,7 @@ Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben
 \resizebox{\columnwidth}{!}{%
 	\begin{tabular}{|l|l|l|l|}
 		\hline
-		Dataset         & \multicolumn{1}{c|}{SCORE CORRELATION} & \multicolumn{1}{c|}{RANK CORRELATION} &                               \\ \hline
+		Dataset         & \multicolumn{1}{c|}{SCORE CORRELATION} & \multicolumn{2}{c|}{RANK CORRELATION}                         \\  \hline
 		                & \multicolumn{1}{c|}{PEARSON}           & \multicolumn{1}{c|}{KENDALL}          & \multicolumn{1}{c|}{SPEARMAN} \\ \hline
 		2\_annthyroid   & 0.821                                  & 0.432                                 & 0.557                         \\ \hline
 		6\_cardio       & 0.409                                  & 0.375                                 & 0.436                         \\ \hline
@@ -552,8 +581,16 @@ Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben
 
 Alcuni dataset, come annthyroid, page blocks, shuttle e waveform hanno una distribuzione dei dati tale da essere facilmente clusterizzabile da metodi come DBSCAN, usato appunto in questa metrica surrogata. Questo permette quindi di favorire quei modelli che riescono di fatto a trovare questa separazione tra i punti normali ed i punti anomali.
 Gli altri dataset invece faticano a trovare una forte correlazione con il ranking supervisionato, proprio per il fatto che in questo caso i punti anomali sono altamente mischiati in mezzo a quelli normali.
-Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati.
-
+Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul dataset che si vuole analizzare e si nota una chiara separazione dei dati. Un esempio sono due dataset, Machine-2-3 e Machine-1-7 in cui il primo ha una correlazione di Clustering Cohesion con il ranking supervisionato discretamente buona. A dimostrare questo si puo notare come nella prima figura i dati siano tutti concentrati nella zona di destra ed inoltre quella zona e' coperta principalmente da punti normali dove i punti anomali sono sparsi nel resto del piano. 
+Al contrario il dataset Machine-1-7 ha una correlazione nulla e graficamente il plot mostra come la distribuzione dei punti sia piu costante e le anomalie non sono ben separate come nel caso precedente. 
+\begin{center}
+  \includegraphics[width=9cm, scale=1]{images/scatter_cluster_good}
+  \captionof{figure}{Scatter Plot Machine-2-3}
+\end{center}
+\begin{center}
+  \includegraphics[width=9cm, scale=1]{images/scatter_cluster}
+  \captionof{figure}{Scatter Plot Machine-1-7}
+\end{center}
 
 \newpage
 \subsubsection{Rank Aggregation}
@@ -659,54 +696,66 @@ A questo punto ci si puo concetrare sulle varie tecniche di aggregazione. A prim
 \newpage
 \subsubsection{Varying K}
 Interessante vedere come Robust Borda, che sulla carta dovrebbe avere performance migliori, sia in verita inferiore alla sua versione standard Borda. Un motivo di cio puo stare nel fatto che ci sono modelli che sono nelle posizioni top per quanto riguarda alcune metriche surrogate ma che performano sufficientemente male in altre e vedendosi quindi penalizzate troppo.
-Si puo vedere infatti, nella tabella X, che all'aumentare del fattore K aumentano le performance di Robust Borda, fino arrivare al valore massimo con K=N, ovvero Borda normale.
+Si puo vedere infatti, nell'immagine \ref{varying-k}, che all'aumentare del fattore K aumentano le performance di Robust Borda, fino arrivare al valore massimo con K=N, ovvero Borda normale.
 Il metodo di score e' il piu semplice ma produce anche risultati relativamente scarsi. Nel nostro caso, con sole 3 metriche surrogate che vengono aggregate, l'utilizzo del metodo ottimale risulta la scelta migliore nonostante la complessita temporale sia piu alta. Se si fossero prese in considerazione piu metriche, questo approccio non sarebbe piu possibile proprio per la natura NP-Hard del problema.
 
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/varying-k}
-	\centering
+    \caption{Performance di Robust Borda al variare del parametro K}
+	\label{varying-k}
+	
 \end{figure}
 
 \subsubsection{Ripetitivita}
 Alcune metriche surrogate includono al loro interno un fattore di casualita, in particolare Sampling e tutte e 4 le tecniche di anomaly injection. Il primo metodo puo variarire ad ogni suo utilizzo in quanto per ogni sample viene scelto a caso quale modello usare come riferimento per la label. Invece i metodi di anomaly injection genereranno sempre anomalie differenti in quanto sia la posizione che il magnitudo di anomalia cambia ogni volta.
 Per questo motivo e' stata fatta anche un'analisi andando a ripetere il Model Selection su due dataset per 5 volte.
-Nell'immagine sottostante e' possibile vedere un Box Whisker Plot sugli score prodotti da Model Selection per ognuna delle metriche e metodi. Alcuni di questi non includono casualita come Round Robin, Majority Vote, Score Correlation e Score Clustering, di conseguenza il valore e' uguale ad ogni iterazione. Al contrario gli altri vedono differire il valore ad ogni iterazione, chi piu chi meno. In generale, vi e' un range che varia di circa 0.05 punti.
+Nell'immagine \ref{score-box}  e' possibile vedere un Box Whisker Plot sugli score prodotti da Model Selection per ognuna delle metriche e metodi. Alcuni di questi non includono casualita come Round Robin, Majority Vote, Score Correlation e Score Clustering, di conseguenza il valore e' uguale ad ogni iterazione. Al contrario gli altri vedono differire il valore ad ogni iterazione, chi piu chi meno. In generale, vi e' un range che varia di circa 0.05 punti.
 
 \begin{figure}[t]
-	\includegraphics[width=14cm, scale=1]{images/score_box}
 	\centering
+	\includegraphics[width=15cm, scale=1]{images/score_box}
+    \caption{Score Box Plot}
+	\label{score-box}
+
 \end{figure}
 
-Queste differenze negli score vanno anche ad impattare poi il coefficiente di correlazione Kendall rispetto al Ranking Supervisionato. Anche qui, come prima, le differenze sono esigue ma sempre presenti.
+Queste differenze negli score vanno anche ad impattare poi il coefficiente di correlazione Kendall rispetto al Ranking Supervisionato. Anche qui, come prima, le differenze sono esigue ma sempre presenti; immagine \ref{kendall-box}.
 
 \begin{figure}[t]
-	\includegraphics[width=14cm, scale=1]{images/kendall_box}
-	\centering
+\centering
+	\includegraphics[width=15cm, scale=1]{images/kendall_box}
+    \caption{Kendall Correlation Box Plot}
+	\label{kendall-box}
+	
 \end{figure}
 
 
 \subsubsection{Quantile Interesection}
 Oltre a valutare le performance sullo score di correlazione tra il ranking non supervisionato e quello supervisionato, puo risultare utile cambiare punto di vista e comparare i ranking in se.
 Per questa valutazione sono stati ordinati i ranking per il loro score e poi sono stati divisi in 2 o 4 quantili. Successivamente viene calcolata l'interesezione del quantile di un ranking con il corrispondente del secondo ranking.
-Come mostrato in tabella, si puo notare come dividendo in 2 quantili, l'intersezione sia quasi perfetta, segno che l'algoritmo di model selection sa distinguere i modelli piu performanti con quelli meno performanti.
+Come mostrato nella figura \ref{quantile-intersection}, si puo notare come dividendo in 2 quantili, l'intersezione sia quasi perfetta, segno che l'algoritmo di model selection sa distinguere i modelli piu performanti con quelli meno performanti.
 Passando a 4 quantili gli score di intersezione scendono, mostrando come il Model Selection faccia piu fatica a trovare una corrispondenza perfetta. Si puo comunque notare come il quarto quantile sia stato trovato con un'alta confidenza.
 Possiamo quindi concludere che mentre il model Selection non supervisionato non sia molto preciso nel trovare i modelli che siano effettivamente i migliori, e' in grado di escludere abbastanza bene quelli peggiori. A confermare questa ipotesi il calcolo dei quantile interserction con soltanto due bin, producendo uno score di interessezione di \(0.8\)
 
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/4quantile}
-	\centering
+    \caption{Intersezione tra quantili}
+	\label{quantile-intersection}
+	
 \end{figure}
 
 
-
+\newpage
 \section{SKF Results}
-Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo 5 pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) come detto prima, non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati e troppo alta e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
-Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato andando a produrre una lista di ranking e andando a prendere il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dati di uno specifico macchinario. Infine si utilizzano i dati di MVM per:
+Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo 5 pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati CoMo e troppo bassa e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
+Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato sul dataset di uno specifico macchinario andando a produrre una lista di ranking e ottenendo cosi il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dato sempre dello stesso macchinario. Infine si utilizzano i dati di MVM per:
 \begin{itemize}
-	\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la solia della classe Q1 e parangonando questi numeri tra i time-step segnalati come anomali dal modello, con i time-step segnalati come normali.
-	\item Calcolare il valore di qualita media per ogni banda, sia sui time-step considerati normali e sia su quelli considerati anomali.
+	\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la soglia della banda A per la classe Q1 nell'intervallo di 10 minuti e paragonare questi numeri tra i time-step segnalati come anomali dal modello con i time-step segnalati come normali.
+	\item Calcolare la qualita media per ogni intervallo di 10 minuti e misurare la correlazione tra la qualita con le label generate dal modello per ogni intervallo.
 \end{itemize}
-L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinario portino a qualita del prodotto finito piu bassa, ovvero a valori di MVM piu alti. Quello che si spera di ottenere e' vedere questa assunzione all'atto pratico, ovvero con valori di MVM mediamente piu alti per quei punti considerati anomali da un modello rispetto ai punti considerati normali.
+L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinario portino a qualita del prodotto finito piu bassa, ovvero a valori di MVM piu alti. Quello che si spera di ottenere e' vedere questa assunzione all'atto pratico, ovvero con valori di MVM mediamente piu alti(qualita piu bassa) per quei punti considerati anomali da un modello rispetto ai punti considerati normali.
 
 
 \subsection{Dataset}
@@ -717,79 +766,124 @@ Per la fase di training e' stato scelto il periodo che va da gennaio a marzo 202
 
 \subsection{Thresholding}
 Prima di procedere al training del modello e' necessario avere un riferimento sulla percentuale di anomalie nel dataset. A questo scopo e' stato utilizzato il metodo GammaY introdotto nel capitolo 3.
-Questo algoritmo riceve in input la stessa lista di modelli candidati usati poi nel model selection, e dopo essere stati allenati sul dataset di training senza andare ad indicare il fattore di contaminazione gli output score di ognuno di questi sono stati usati per computare la distribuzione di probabilita multivariata se i punti sono o meno anomali.
+Questo algoritmo riceve in input la stessa lista di modelli candidati usati poi nel model selection, e dopo essere stati allenati sul dataset di training senza andare ad indicare il fattore di contaminazione sono stati usati gli output score prodotti da ognuno di questi per computare la distribuzione di probabilita multivariata delle anomalie.
 Il risultato prodotto da questa tecnica di trhesoldin e' 0.05, ovvero il 5\% di punti vengono considerati anomali. Un dato ragionevole confermato da un analisi manuale dei dati.
 
 
 \subsection{Risultati}
 L'algoritmo di Model Selection, eseguito sul dataset del macchinario M1 utilizzando come modelli la medesima lista utilizzata con i dataset di benchmark, ha prodotto i seguenti risultati:
 
-\begin{table}[]
-	\begin{tabular}{|l|l|l|l|l|}
-		\hline
-		\textbf{Model}    & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
-		KDE               & 0.544       & 0.391        & 0.549       & 0.990                \\ \hline
-		CBLOF\_4          & 0.539       & 0.388        & 0.501       & 0.988                \\ \hline
-		MCD               & 0.508       & 0.483        & 0.530       & 0.955                \\ \hline
-		IForest\_200      & 0.509       & 0.320        & 0.554       & 0.938                \\ \hline
-		OCSVM\_poly       & 0.452       & 0.386        & 0.542       & 0.920                \\ \hline
-		OCSVM\_sig        & 0.452       & 0.384        & 0.542       & 0.919                \\ \hline
-		PCAODetectorSKI-1 & 0.552       & 1.000        & 0.510       & 0.901                \\ \hline
-		KPCA              & 0.548       & 0.335        & 0.528       & 0.899                \\ \hline
-		PCA               & 0.552       & 0.077        & 0.510       & 0.893                \\ \hline
-		KNN\_10           & 0.562       & 0.286        & 0.474       & 0.830                \\ \hline
-	\end{tabular}
-\end{table}
-\begin{table}[]
-	\begin{tabular}{|l|l|l|l|l|}
-		\hline
-		\textbf{Model}     & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{Final Score} \\ \hline
-		SO\_GAAL           & 0.005       & 0.029        & 0.314       & 0.030                \\ \hline
-		TelemanomSKI-48    & 0.090       & 0.997        & 0.237       & 0.030                \\ \hline
-		DeepSVDD           & 0.214       & 0.120        & 0.348       & 0.035                \\ \hline
-		ALAD               & 0.071       & 0.092        & 0.375       & 0.067                \\ \hline
-		SOS                & 0.218       & 0.143        & 0.391       & 0.098                \\ \hline
-		SOS\_7             & 0.228       & 0.143        & 0.370       & 0.118                \\ \hline
-		FeatureBagging     & 0.335       & 0.024        & 0.406       & 0.127                \\ \hline
-		LOF                & 0.337       & 0.065        & 0.390       & 0.136                \\ \hline
-		PCAODetectorSKI-48 & 0.103       & 0.997        & 0.394       & 0.136                \\ \hline
-		ABOD               & 0.423       & 0.054        & 0.391       & 0.139                \\ \hline
-	\end{tabular}
-\end{table}
+
+\begin{table}[H]
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \resizebox{\columnwidth}{!}{%
+   \begin{tabular}{|l|l|l|l|l|l|} 
+\hline
+\textbf{\#} & \textbf{Model} & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{F.Score}  \\ 
+\hline
+1           & KDE            & 0.544       & 0.391        & 0.549       & 0.990             \\ 
+\hline
+2           & CBLOF\_4       & 0.539       & 0.388        & 0.501       & 0.988             \\ 
+\hline
+3           & MCD            & 0.508       & 0.483        & 0.530       & 0.955             \\ 
+\hline
+4           & IForest\_200   & 0.509       & 0.320        & 0.554       & 0.938             \\ 
+\hline
+5           & OCSVM\_poly    & 0.452       & 0.386        & 0.542       & 0.920             \\ 
+\hline
+6           & OCSVM\_sig     & 0.452       & 0.384        & 0.542       & 0.919             \\ 
+\hline
+7           & PCAODetector   & 0.552       & 1.000        & 0.510       & 0.901             \\ 
+\hline
+8           & KPCA           & 0.548       & 0.335        & 0.528       & 0.899             \\ 
+\hline
+9           & PCA            & 0.552       & 0.077        & 0.510       & 0.893             \\ 
+\hline
+10          & KNN\_10        & 0.562       & 0.286        & 0.474       & 0.830             \\
+\hline
+\end{tabular}
+}\captionof{table}{Top 10}
+    \end{minipage}
+    \begin{minipage}{.5\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{%
+     \begin{tabular}{|l|l|l|l|l|l|} 
+\hline
+\textbf{\#} & \textbf{Model} & \textbf{RR} & \textbf{MIX} & \textbf{CC} & \textbf{F.Score}  \\ 
+\hline
+70          & SO\_GAAL       & 0.005       & 0.029        & 0.314       & 0.030             \\ 
+\hline
+69          & Telemanom      & 0.090       & 0.997        & 0.237       & 0.030             \\ 
+\hline
+68          & DeepSVDD       & 0.214       & 0.120        & 0.348       & 0.035             \\ 
+\hline
+67          & ALAD           & 0.071       & 0.092        & 0.375       & 0.067             \\ 
+\hline
+66          & SOS            & 0.218       & 0.143        & 0.391       & 0.098             \\ 
+\hline
+65          & SOS\_7         & 0.228       & 0.143        & 0.370       & 0.118             \\ 
+\hline
+64          & FeatureBagging & 0.335       & 0.024        & 0.406       & 0.127             \\ 
+\hline
+63          & LOF            & 0.337       & 0.065        & 0.390       & 0.136             \\ 
+\hline
+62          & PCAODetector   & 0.103       & 0.997        & 0.394       & 0.136             \\ 
+\hline
+61          & ABOD           & 0.423       & 0.054        & 0.391       & 0.139             \\
+\hline
+\end{tabular}}\captionof{table}{Worst 10}
+    \end{minipage}
+  \end{table}
+
+
+
 
 Sono proposti i primi 10 e gli ultimi 10 modelli con i relativi score finali. Le metriche surrogate utilizzate sono state (1) Round Robin per Model Centrality, (2) Mix per Performance on Synthethic Anomaly Injection e (3) Clustering Cohesion. La tecnica di aggregazione utilizzata e' stato il metodo ottimale di Kenedy-Young.
 Il primo modello e' KDE, ovvero Kernel Density Estimation ed in generale i metodi di Machine Learning hanno uno score piu alto di quelli Deep Learning. Situazione rimarcata dal fatto che per le ultime 10 posizioni sono presenti 4 metodi di Deep Learning. Una spiegazione ha questo fenomeno risiede nel fatto che questi modelli hanno score di Model Centrality e Anomaly Injection molto bassi. Eccezione per Telemanom che riesce a riconoscere quasi perfettamente tutte le anomalie sintetiche iniettate. Gli Score di Clustering Cohesion vanno anche questa volta a favorire metodi di Machine Learning, anche se in misura piu lieve. Infatti i modelli come DeepSVDD o ALAD riescono a  raggiungere punteggi intorno al 0.4, in linea con i migliori.
 Model Centrality va sicuramente a favorire quei modelli che producono output simile tra di loro, implicando una forte varianza dei risultati sulla base di quali modelli candidati vengono passati all'algoritmo di Model Selection. Potrebbe essere il caso che i modelli di Deep Learning siano effettivamente i migliori, ma essendo pochi rispetto al numero totale di modelli considerati, il loro punteggio di Model Centrality va abbassandosi. In questi casi, un'analisi grafica delle anomalie rilevate puo risultare utile.
 
 \subsubsection{Anomalie Rilevate}
-Attraverso un grafico a linee con barre verticali per rappresentare i timestep rilevati come anomalia, possiamo notare come KDE, ovvero il miglior modello, riesca a riconoscere bene i punti di spike o gli intervalli di spike in cui certi sensori raggiungono valori sufficientemente distanti da un comportamento standard. Al contrario, Telemanom raggruppa tutti i punti anomali in un unico intervallo continuo nonostante ci siano dei timestep che non presentino, ad occhio, un comportamento anomalo.
+Attraverso un grafico a linee con barre verticali per rappresentare i timestep rilevati come anomalia, possiamo notare nella figura \ref{kde} come KDE, ovvero il miglior modello, riesca a riconoscere bene i punti di spike o gli intervalli di spike in cui certi sensori raggiungono valori sufficientemente distanti da un comportamento standard. Al contrario, figura \ref{worst_clf}, Telemanom raggruppa tutti i punti anomali in un unico intervallo continuo nonostante ci siano dei timestep che non presentino, ad occhio, un comportamento anomalo.
 
 \begin{figure}[t]
+	\centering
 	\includegraphics[width=14cm, scale=1]{images/kde}
-	\centering
+    \caption{Anomalie Rilevate da KDE}
+	\label{kde}
+
 \end{figure}
 
 \begin{figure}[t]
-	\includegraphics[width=14cm, scale=1]{images/worst_clf}
 	\centering
+	\includegraphics[width=14cm, scale=1]{images/worst_clf}
+  \caption{Anomalie Rilevate da Telemanom}
+	\label{worst_clf}
+
 \end{figure}
 
-Passando ad un plot scatter dopo aver ridotto la dimensionalita dei punti a 2 dimensioni tramite PCA, possiamo notare due cluster principali con punti sparsi nel mezzo. I punto anomali trovati da KDE si trovano principalmente nel cluster piu piccolo a destra e nei punti sparsi nel piano. Mentre il cluster blu in centro risulta ben omogeneo.
-Telemanom invece labella come anomali principalmente i punti del cluster di sinistra, risultando in una separazione meno chiara.
+Passando ad un plot scatter dopo aver ridotto la dimensionalita dei punti a 2 dimensioni tramite PCA, possiamo notare in figura \ref{kde_scatter} due cluster principali con punti sparsi nel mezzo. I punto anomali trovati da KDE si trovano principalmente nel cluster piu piccolo a destra e nei punti sparsi nel piano. Mentre il cluster blu in centro risulta ben omogeneo.
+Telemanom invece labella come anomali principalmente i punti del cluster di sinistra, risultando in una separazione meno chiara, figura \ref{worst_clf_scatter}.
 Ovviamente non si ha la certezza che il cluster di destra sia effettivamente composto da tutti punti anomali, ma chiaramente un comportamento fuori dal normale c'e' in quanto la stragrande maggioranza dei dati, risiedenti nel cluster di sinistra, possiede valori molto diversi.
 
 
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/kde_scatter}
-	\centering
+   \caption{Scatter Plot delle anomalie KDE}
+	\label{kde_scatter}
+	
 \end{figure}
 
 
 
 
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/worst_clf_scatter}
-	\centering
+   \caption{Scatter Plot delle anomalie Telemanom}
+	\label{worst_clf_scatter}
+	
 \end{figure}
 
 \subsubsection{Confronto Qualita}
@@ -799,6 +893,7 @@ Puo essere utile un confronto tra le anomalie rilevate e la qualita registrata i
 	\item Analizzando un solo macchinario non e' possibile avere una situazione completa della linea di produzione, ma anche analizzando tutti i macchinari insieme non e' certo che la qualita' sia correllata al 100\% con i dati CoMo. Ci possono essere fattori come la qualita del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualita. Producendo quindi valori di qualita bassa nonostate registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualita.
 \end{itemize}
 
+
 Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da un modello, in questo caso prima KDE poi Telemanom, e i punti registrati come bassa qualita. Le correlazioni sono cosi spiegate:
 \begin{itemize}
 	\item \textit{true positive} indica che il punto e' rilevato sia come anomalo che di bassa qualita
@@ -807,53 +902,95 @@ Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma 
 	\item \textit{false positive} indica che il punto e' rilevato come anomalo ma la qualita e' normale
 \end{itemize}
 
-La prima immagine rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
+L' immagine \ref{kde_quality} rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
 \begin{figure}[t]
+\centering
 	\includegraphics[width=14cm, scale=1]{images/correlation_ssb1_quality_plot.png}
-	\centering
+ \caption{Scatter Plot Correlazione Qualita KDE}
+	\label{kde_quality}
 \end{figure}
 
-Con Telemanom la situazione non e' migliore, in generale e' presente confusione nell'identificazione dei punti con qualita bassa.
+Con Telemanom, immagine \ref{worst_clf_quality} la situazione non e' migliore, in generale e' presente confusione nell'identificazione dei punti con qualita bassa.
 
 
 \begin{figure}[t]
-	\includegraphics[width=14cm, scale=1]{images/worst_correlation_ssb1_quality_plot}
 	\centering
+	\includegraphics[width=14cm, scale=1]{images/worst_correlation_ssb1_quality_plot}
+ \caption{Scatter Plot Correlazione Qualita Telemanom}
+	\label{worst_clf_quality}
 \end{figure}
 
-La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualita bassa.
+La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualita bassa:
 
-\begin{table}[]
-	\begin{tabular}{|l|l|l|}
+
+
+\begin{table}[H]
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{|l|l|l|}
 		\hline
 		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
 		\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
 		\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
 	\end{tabular}
-\end{table}
-
-\begin{table}[]
-	\begin{tabular}{|l|l|l|}
+}\captionof{table}{KDE Confusion Matrix}
+    \end{minipage}
+    \begin{minipage}{.5\textwidth}
+      \centering
+            \resizebox{\columnwidth}{!}{%
+     	\begin{tabular}{|l|l|l|}
 		\hline
 		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
 		\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
 		\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
-	\end{tabular}
+	\end{tabular}}\captionof{table}{Telemanom Confusion Matrix}
+    \end{minipage}
+  \end{table}
+
+
+\subsubsection{Confronto Qualita - Alternative}
+Si potrebbe tentare di risolvere i due problemi elencati ad inizio paragrafo andando a cambiare approccio per l'analisi della correlazione.
+Per il primo di questi, ovvero il problema della media di tutte le registrazioni di qualita in un dato intervallo di 10 che va a nascondere eventuali registrazioni piu rare in cui la qualita e' bassa, si puo andare a contare il numero di registrazioni, sempre all'interno di ogni intervallo, che superano la soglia Q1 per la banda A.
+I risultati ottenuti sono riportati nella tabella \ref{quality_count}.
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|ll|ll|}
+\hline
+\multirow{2}{*}{}       & \multicolumn{2}{l|}{\textbf{Punti Normali}} & \multicolumn{2}{l|}{\textbf{Punti Anomali}} \\ \cline{2-5} 
+                        & \multicolumn{1}{l|}{Telenamom}     & KDE    & \multicolumn{1}{l|}{Telemanom}     & KDE    \\ \hline
+\textbf{Banda A}        & \multicolumn{1}{l|}{19}            & 19     & \multicolumn{1}{l|}{14}            & 19     \\ \hline
+\textbf{Tutte le bande} & \multicolumn{1}{l|}{87}            & 85     & \multicolumn{1}{l|}{72}            & 86     \\ \hline
+\end{tabular}
+ \caption{\label{quality_count}Media MVM sopra-soglia per intervallo}
 \end{table}
-Si potrebbe risolvere, in parte, uno dei problemi della qualita andando a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le label per ogni timestep. Anche pero' in questo caso la corrispondenza e' bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter che la confusione matrix sono stati posti per visualizzazione.
+
+Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 19, lo stesso per gli intervalli classificati come anomali. Facendo anche un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D), i risultati sono 85 per i punti normali e 86 per quelli anomali. Questi risultati implicano che non c'e' nessuna correlazione tra qualita bassa e punti anomali. 
+Questo esperimento e' stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
+
+Per quanto riguarda il secondo punto, ovvero il problema di considerare solamente un macchinario, si e' pensato di andare a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le label per ogni timestep.
+In questo esperimento, i dati hanno bisogno di una fase di processing aggiuntiva, ovvero e' necessario allineare le registrazioni di tutti i macchinari tenendo in considerazione il tempo che impiega il cuscinetto a sfera a spostarsi lungo la linea di montaggio. In un esempio, ipotizzando tre macchine di cui la terza e' MVM ed un cuscinetto a sfera che parte dalla linea di montaggio a tempo $t$, la prima macchina esegue la registrazione su quel cuscinetto a sfera a tempo $t$, la seconda a tempo $t+1$ e la terza a tempo $t+2$. Per allineare le registrazioni viene quindi rimossa un'unita temporale dalle registrazioni del secondo macchinario e 2 unita' dalle registrazioni del terzo macchinario. Cosi facendo si crea un'istantanea delle registrazioni per ogni cuscinetto a sfera. Questo procedimento e' simile a quello svolto per le valutazioni precedenti, con la differenza che in questo caso si aveva soltato il macchinario M1 ed MVM, di conseguenza solamente i dati MVM erano da traslare.
+Allineati i dati e' necessario aggregare le label di ogni macchinario per ogni timestep. E' stata scelto di applicare un approccio del tipo \textit{almeno uno}, ovvero se il modello di AD trova un'anomalia per un dato macchinario e per un dato timestep, quel timestep risultera anomalo. 
+Purtroppo pero' anche con questo approccio la corrispondenza tra anomalie e qualita e' bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione e aggregando con il metodo \textit{almeno uno}, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter, figura \ref{quality_all_machines} che la confusion matrix, tabella \ref{cm_quality_all}, sono stati posti per visualizzazione.
 
 \begin{figure}[t]
-	\includegraphics[width=14cm, scale=1]{images/correlation_all_quality_plot.png}
 	\centering
+	\includegraphics[width=14cm, scale=1]{images/correlation_all_quality_plot.png}
+ \caption{Correlazione KDE su tutti i macchinari}
+	\label{quality_all_machines}
 \end{figure}
 
 \begin{table}[]
+\centering
 	\begin{tabular}{|l|l|l|}
 		\hline
 		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
 		\textbf{Positive} & 1510 (0.31)            & 2750 (0.37)            \\ \hline
 		\textbf{Negative} & 3376 (0.69)            & 4507 (0.62)            \\ \hline
 	\end{tabular}
+    \caption{\label{cm_quality_all}Confusion Matrix KDE su tutti i macchinari}
+
 \end{table}
 
 \subsubsection{Conclusione}
