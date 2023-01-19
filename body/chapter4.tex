@@ -1,26 +1,40 @@
 \chapter{Model Selection}
 
-\section{Definizione del problema}
+\section{Introduzione}
 Model Selection è il processo di selezione di un modello finale, che sia di machine learning o deep learning, tra una serie di modelli candidati per uno specifico dataset.
 
 E' un processo che può essere applicato sia a diversi tipi di modelli, ad esempio regressione logistica, SVM, KNN ecc.; sia a modelli dello stesso tipo ma con configurazione di iper-parametri differenti, ad esempio kernel diversi in un SVM.
 
 Model Selection risulta molto utile ed efficace quando si e' interessati nel sviluppare un modello di classificazione o regressione per un dataset, ma non si sa a priori quale modello funzioni meglio. Di conseguenza la soluzione e' quella di fare training e valutazione per ogni modello preso in considerazione.
 
-TODO fare una definizione formale come a pagine 3 del paper di UOMS
+
+\subsubsection{Definizione del problema}
+Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e label di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) e' anomala. Le labels saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
+
+Sia \(M=\{A_i\}^N_{i=1}\) un set di N modelli candidati di anomaly detction dove ogni modello \(A_i\) e' una tupla (\(detector, iper-parametri\)) .
+I modelli di anomaly detection non necessitano labels per il training e di conseguenza la fase di train/test split puo essere ignorata.  Questi passaggi vengono comunque eseguiti e consideriamo quindi uno split \(\{x_t\}_{t=1}^{t_{test}-1}\),\(\{x_t\}^{T}_{t=t_{test}}\).
+
+Viene assunto che il modello allenato \(A_i\), quando applicato alle osservazioni \(\{x_t\}^{T}_{t=t_{test}}\) , produca degli score di anomalia \(\{s_t^i\}_{t=t_{test}}^T\),\(s^i_t\in\Re_{\geq0}\). Valori piu alti per gli score di anomalia indicano che l'osservazione e' piu probabile essere anomala.
+Le performance di un modello possono essere misurate usando una metrica supervisionata \(Q(\{s_t\}^T_{t=1},\{y_t\}^T_{t=1})\) come F1 Score.
+
+Possiamo ora definire il problema come: date le osservazioni \(X_{test}\) ed un set di modelli \(M=\{A_i\}^N_{i=1}\) allenato usando \(X_{train}\), selezionare un modello che massimizzi la misura di qualita' \(Q(A_i(X_{test}),Y_{test})\) senza utilizzo di label per la selezione.
 
 \section{Supervised Model Selection}
 Le metodologie di Model Selection supervisionato sono quelle classiche che di solito vengono applicate durante lo sviluppo di algoritmi di Machine o Deep Learning. Avendo a disposizione le labels, le scelte ricadono dunque su come partizionare il dataset in train/split e validation set, su come pesare la complessita di un modello e su quali metriche di valutazione adottare.
-TODO ADD HYPER PARAMETER OPTIMIZATION
+
 \subsection{Resampling Methods}
 I metodi di resampling, come suggerisce il nome, sono semplici tecniche di partizionamento dei dati e servono per valutare se il modello generalizza bene anche sull'insieme di test. Diversi tipi di split possono essere applicati:
 \begin{itemize}
-\item \textbf{Random Split} genera in maniera casuale i tre insiemi di train, test e validazione. Il vantaggio di questo metodo è che c'è una buona probabilità che la popolazione originale sia ben rappresentata in tutti e tre gli insiemi, impedendo quindi un campionamento distorto dei dati.
-\item \textbf{Time Based Split} viene applicato sulle serie temporali in cui non e' possibile effettuare una suddivisione casuale dei dati in quanto si andrebbe a perdere informazioni come trend o seasonality. 
-In questi casi, si utilizza una suddivisione temporale in cui, ad esempio, l'insieme di train può contenere i dati piu' vecchi, mentre quelli piu' recenti sono assegnati all'insieme di test. Per evitare l'overfitting introdotto da questo metodo, una variante a finestre di scorrimento e' preferibile: il modello viene allenato iterativamente piu' volte su una finestra temporale e valutato sulla parte restante dei dati, per poi allargare la finestra di training ad ogni iterazione (riducendo cosi quella di valutazione).
-\item \textbf{K-Fold Cross Validation} genera in modo casuale $k$ gruppi di dati ed iterativamente vengono usati $k-1$ gruppi per il training ed un gruppo per la valutazione.
-\item \textbf{Stratified K-Fold} e' simile al Cross Validation ma con la differenza che questo metodo tiene in considerazione la distribuzione delle classi dei dati, generando quindi gruppi con rateo simile al dataset originale.
+	\item \textbf{Random Split} genera in maniera casuale i tre insiemi di train, test e validazione. Il vantaggio di questo metodo è che c'è una buona probabilità che la popolazione originale sia ben rappresentata in tutti e tre gli insiemi, impedendo quindi un campionamento distorto dei dati.
+	\item \textbf{Time Based Split} viene applicato sulle serie temporali in cui non e' possibile effettuare una suddivisione casuale dei dati in quanto si andrebbe a perdere informazioni come trend o seasonality. 
+	      In questi casi, si utilizza una suddivisione temporale in cui, ad esempio, l'insieme di train può contenere i dati piu' vecchi, mentre quelli piu' recenti sono assegnati all'insieme di test. Per evitare l'overfitting introdotto da questo metodo, una variante a finestre di scorrimento e' preferibile: il modello viene allenato iterativamente piu' volte su una finestra temporale e valutato sulla parte restante dei dati, per poi allargare la finestra di training ad ogni iterazione (riducendo cosi quella di valutazione).
+	\item \textbf{K-Fold Cross Validation} genera in modo casuale $k$ gruppi di dati ed iterativamente vengono usati $k-1$ gruppi per il training ed un gruppo per la valutazione.
+	\item \textbf{Stratified K-Fold} e' simile al Cross Validation ma con la differenza che questo metodo tiene in considerazione la distribuzione delle classi dei dati, generando quindi gruppi con rateo simile al dataset originale.
 \end{itemize}
+
+\subsection{Ottimizzazione degli iper-parametri}
+L'ottimizzazione degli iperparametri è il processo di ricerca del miglior insieme di iperparametri per un modello di machine learning. Gli iperparametri sono dei parametri che non vengono appresi dai dati durante l'addestramento, ma vengono impostati prima dell'inizio di questo. Esempi di iperparametri sono il learning rate di una rete neurale, il numero di alberi in una random forest o regularization factor di un modello lineare. Nell'ambito del model selection, l'obiettivo dell'ottimizzazione degli iperparametri è quello di trovare l'insieme di iperparametri che consente di ottenere le migliori prestazioni per il modello in analisi. Ciò può essere fatto utilizzando tecniche come grid search, random search o l'ottimizzazione bayesiana per esplorare lo spazio degli iperparametri e trovare l'insieme ottimale.
+
 
 \subsection{Probabilistic Methods}
 I metodi probabilistici non tengono conto solo delle prestazioni del modello, ma anche della sua complessità. La complessità del modello è misurata dalla capacità di catturare la varianza dei dati. 
@@ -28,8 +42,8 @@ Ad esempio, un modello con un bias alto come l'algoritmo di regressione lineare 
 Un altro punto importante da notare è che le prestazioni del modello prese in considerazione nelle misure probabilistiche sono calcolate solo dal set di train. In genere non è necessario un set di test.
 Uno svantaggio, invece, risiede tuttavia nel fatto che i metodi probabilistici non considerano l'incertezza dei modelli e hanno la possibilità di selezionare  quelli più semplici rispetto a quelli complessi.
 \begin{itemize}
-\item \textbf{Minimum Description Length} o MDL, deriva dalla teoria dell'informazione che si occupa di metriche come l'entropia, che misura il numero medio di bit necessari per rappresentare un evento da una distribuzione di probabilità o da una variabile casuale. 
-MDL è dunque il numero minimo di bit necessari per rappresentare il modello.
+	\item \textbf{Minimum Description Length} o MDL, deriva dalla teoria dell'informazione che si occupa di metriche come l'entropia, che misura il numero medio di bit necessari per rappresentare un evento da una distribuzione di probabilità o da una variabile casuale. 
+	      MDL è dunque il numero minimo di bit necessari per rappresentare il modello.
 \end{itemize}
 
 \subsection{Metriche di valutazione}
@@ -73,8 +87,7 @@ Ottenuti i ranking di ogni metrica surrogata e generato il rank finale dopo l'ag
 In questa tesi saranno usati tre indici differenti applicati o sui ranking di posizione oppure sui ranking contenti gli score prodotti dal Model Selection e saranno:
 
 \begin{itemize}
-\item \textbf{Kendall}: coefficente che usa la distanza di Kendall sopra descritta. Usato sui ranking di posizione
-\item \textbf{Spearman}: usato anche sui ranking di posizione, questo metodo statistico quantifica il grado in cui le variabili sono associate da una funzione monotona, indicando quindi una relazione crescente o decrescete. Viene usato su variabili cardinali e tiene conto dei rank piuttosto che dei dati grezzi.
-\item \textbf{Pearson}: usato sui ranking di score, a differenza di Spearman viene usato solamente su variabili continue e misura una correlazione lineare tra le due variabili.
+	\item \textbf{Kendall}: coefficente che usa la distanza di Kendall sopra descritta. Usato sui ranking di posizione
+	\item \textbf{Spearman}: usato anche sui ranking di posizione, questo metodo statistico quantifica il grado in cui le variabili sono associate da una funzione monotona, indicando quindi una relazione crescente o decrescete. Viene usato su variabili cardinali e tiene conto dei rank piuttosto che dei dati grezzi.
+	\item \textbf{Pearson}: usato sui ranking di score, a differenza di Spearman viene usato solamente su variabili continue e misura una correlazione lineare tra le due variabili.
 \end{itemize}
-

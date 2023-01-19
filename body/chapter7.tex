@@ -3,8 +3,8 @@ Il modello di inferenza e' stato rilasciato attraverso la piattaforma Microsoft 
 Microsoft Azure e' una piattaforma cloud che offre una suite completa di servizi e risorse per computing, storage, gestione dati, comunicazione ecc.
 All'interno di questo progetto, sono stati utilizzate le seguenti risorse:
 \begin{itemize}
-\item Data Factory: e' uno strumento di orchestrazione per servizi di Data Integration ed esegue flussi di lavoro ETL (Extract, Transform, Load).
-\item Machine Learning: e' lo strumento Azure dedicato ai servizi di Machine Learning. Mette a disposizione macchine virtuali, pipeline schedulabili, endpoint per l'inferenza, gestione dei modelli registrati ecc.
+	\item Data Factory: e' uno strumento di orchestrazione per servizi di Data Integration ed esegue flussi di lavoro ETL (Extract, Transform, Load).
+	\item Machine Learning: e' lo strumento Azure dedicato ai servizi di Machine Learning. Mette a disposizione macchine virtuali, pipeline schedulabili, endpoint per l'inferenza, gestione dei modelli registrati ecc.
 \end{itemize}
 
 PowerBI e' stato utilizzato per lo sviluppo front-end. E' un software interattivo per la Data Visualization con un focus primario alla business inteligence. Al suo interno sono presenti numerosi connettori da cui prelevare i dati, insieme ad una serie di strumenti per aggregare, filtrare, comporre e visualizzare i dati attraverso grafici o report.
@@ -12,19 +12,19 @@ PowerBI e' stato utilizzato per lo sviluppo front-end. E' un software interattiv
 \section{Architettura}
 Questa sezione e' dedicata a come gli strumenti citati in precedenza comunicano e interagiscono tra di loro. L'architettura puo essere divisa in 4 macro aree:
 \begin{enumerate}
-\item \textbf{Data}: i dati sono archiviati all'interno di SQL Server e vengono aggiornati in tempo reale a seguito dell'inserimento di nuove registrazioni da parte di SKF.
-\item \textbf{Orchestrazione}: il workflow viene gestito da Data Factory il quale si occupa di richiamare l'endpoint di inferenza ad una frequenza regolare.
-\item \textbf{Training e Inferenza} sono gestiti da Azure Machine Learning. E' presente una pipeline di training che consiste nel processamento dati, training del modello e pubblicazione di esso. Il modello pubblicato generera un endpoint di inferenza richiamabile tramite chiamate HTTP. 
-\item \textbf{Visualizzazione} dei risultati di inferenza in tempo reale attraverso PowerBI.
+	\item \textbf{Data}: i dati sono archiviati all'interno di SQL Server e vengono aggiornati in tempo reale a seguito dell'inserimento di nuove registrazioni da parte di SKF.
+	\item \textbf{Orchestrazione}: il workflow viene gestito da Data Factory il quale si occupa di richiamare l'endpoint di inferenza ad una frequenza regolare.
+	\item \textbf{Training e Inferenza} sono gestiti da Azure Machine Learning. E' presente una pipeline di training che consiste nel processamento dati, training del modello e pubblicazione di esso. Il modello pubblicato generera un endpoint di inferenza richiamabile tramite chiamate HTTP. 
+	\item \textbf{Visualizzazione} dei risultati di inferenza in tempo reale attraverso PowerBI.
 \end{enumerate}
 
 \begin{figure}[t]
-	
-\centering
-\includegraphics[width=14cm, scale=1]{images/deploy_scheme}
-  \caption{Architettura Azure}
+		
+	\centering
+	\includegraphics[width=14cm, scale=1]{images/deploy_scheme}
+	\caption{Architettura Azure}
 	\label{azure}
-
+	
 \end{figure}
 
 
@@ -48,19 +48,18 @@ A questo punto la pipeline e' completa e puo essere pubblicata su Azure Machine 
 \subsection{SKF Training Pipeline}
 In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
 \begin{enumerate}
-\item La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
-\item Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
-\item Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori. Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
-\item Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
+	\item La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
+	\item Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
+	\item Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori. Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
+	\item Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
 \end{enumerate}
 
 
 \begin{figure}[t]
-\centering
-\includegraphics[width=10cm, scale=1]{images/pipeline}
-  \caption{Pipeline di Training}
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/pipeline}
+	\caption{Pipeline di Training}
 	\label{pipeline-training}
-
 \end{figure}
 
 \section{Inference}
@@ -72,17 +71,16 @@ Un'altra differenza con le pipeline di Azure Machine Learning e' che non bisogna
 \subsection{SKF Inference Pipeline}
 In questa sezione sono definiti gli step della pipeline di inferenza.
 \begin{enumerate}
-\item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 
-\item Il secondo step richiama l'endpoint di inferenza pubblicato dalla pipeline di training. E' una chiama POST nella quale al suo interno vengono inclusi i dati dello step 1.
-\item Infine il terzo step si occupa si salvare su database SQL, attraverso il richiamo di una stored procedure, il risultato dell'inferenza. Rendendolo cosi disponibile a tutti quei client che ne necessitano l'utilizzo, come PowerBI
+	\item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 
+	\item Il secondo step richiama l'endpoint di inferenza pubblicato dalla pipeline di training. E' una chiama POST nella quale al suo interno vengono inclusi i dati dello step 1.
+	\item Infine il terzo step si occupa si salvare su database SQL, attraverso il richiamo di una stored procedure, il risultato dell'inferenza. Rendendolo cosi disponibile a tutti quei client che ne necessitano l'utilizzo, come PowerBI
 \end{enumerate}
 
 \begin{figure}[t]
-\centering
-\includegraphics[width=10cm, scale=1]{images/pipeline-inference}
-  \caption{Pipeline di Inferenza}
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/pipeline-inference}
+	\caption{Pipeline di Inferenza}
 	\label{pipeline-inferenza}
-
 \end{figure}
 
 \section{Dashboard}
@@ -92,11 +90,8 @@ L'interfaccia pensata per gli operatori di SKF risiede in un semplice grafico a 
 
 
 \begin{figure}[t]
-\centering
-\includegraphics[width=14cm, scale=1]{images/powerbi}
-  \caption{Dashboard PowerBI}
+	\centering
+	\includegraphics[width=14cm, scale=1]{images/powerbi}
+	\caption{Dashboard PowerBI}
 	\label{powerbi}
-
 \end{figure}
-
-

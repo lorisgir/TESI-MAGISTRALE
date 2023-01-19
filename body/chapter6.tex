@@ -101,6 +101,7 @@ Nel contesto dei modelli non supervisionati, tecniche e metriche di valutazione 
 All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al piu raggruppati in zone poco dense.
 \begin{center}
 	\includegraphics[width=12cm, scale=1]{images/plot-anomalies-normal}
+    \captionsetup{type=figure}
 	\captionof{figure}{Scatter plot dopo l'Anonaly Detection}
 \end{center}
 L'idea alla base di questa metrica surrogata e' quindi quella di calcolare la coesione e separazione tra il cluster di punti normali e quello di punti anomali prodotti dalle labels di un modello di Anomaly Detection. Piu alto e' questo score, piu il modello riesce a separare questi dati e quindi puo essere considerato come un buon modello.
@@ -116,6 +117,7 @@ Applicando quindi PCA per riddure le dimensioni a 3, rende l'applicazione di DBS
 Applicando quindi DBSCAN si ottengono i clster per i punti anomali.
 \begin{center}
 	\includegraphics[width=12cm, scale=1]{images/plot-dbscan-anomalies}
+    \captionsetup{type=figure}
 	\captionof{figure}{Scatter plot dopo DBSCAN sulle anomalie}
 \end{center}
 
@@ -128,11 +130,10 @@ Nel capitolo 4 e' stata fatta una panoramica su Rank Aggregation, vediamo ora qu
 Ognuno di questi metodi riceve in input un set di rankings, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un unico ranking finale.
 Nel caso delle metriche surrogate Model Centrality e Performance on Anomaly Injection, il ranking prodotto si basa sul F1 Score; mentre per Clustering Cohesion sul Silouette Score.
 \subsubsection{Kemeny-Young}
-E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo 4. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. I metodi successivi producono soluzioni approssimate ma con un tempo di esecuzione molto piu basso.
+E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo 4. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. Nella tabella \ref{kemeny-young}, viene proposto un esempio di Ranking Aggregation con questo metodo. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate mentre gli indici di riga corrispondono a 3 modelli.
 \begin{table}
 	\centering
-	\caption{\label{borda}Esempio di aggregazione con Kemedy-Young.}
-	\label{borda}
+	\caption{\label{kemeny-young}Esempio di aggregazione con Kemedy-Young.}
 	\begin{tabular}{|l|l|l|l|l|} 
 		\hline
 		   & MC  & PAI & CC  & Final Ranking \\ 
@@ -166,7 +167,7 @@ I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni mo
 \end{table}
 
 
-Nella tabella \ref{borda}, viene proposto un esempio di Ranking Aggregation con Borda. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate. Le seconde 3 colonne invece rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto e' stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
+Nella tabella \ref{borda}, viene riproposto l'esempio precedente ma utilizzando Borda. Le prime 3 colonne sono gli stessi score delle metriche surrogate, invece le seconde 3 colonne rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto e' stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
 \subsubsection{Robust Borda}
 E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking. 
 
@@ -184,7 +185,7 @@ E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per og
 	\caption{\label{rborda}Esempio di aggregazione con Robust Borda.}
 \end{table}
 
-Riproponendo in tabella \ref{rborda} l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano rispettivamente per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi andando a penalizzare il loro score finale. M3 e' sempre quello con score piu alto ma in questo caso la differenza con M1 si e' fatta piu piccola.
+Continuando con lo stesso esempio in tabella \ref{rborda} e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano rispettivamente per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi andando a penalizzare il loro score finale. M3 e' sempre quello con score piu alto ma in questo caso la differenza con M1 si e' fatta piu piccola.
 
 \subsubsection{Score}
 Questo metodo e' il piu semplice dei 3 in quanto viene semplicemente fatta una media degli score dei 3 ranking per ogni modello, per poi ordinare in ordine decrescente e quindi ottenere un ranking finale.
@@ -267,6 +268,8 @@ La percentuale di anomalie al suo interno si attesta intorno al 4.16 e si trovan
 Per una valutazione piu completa si e' deciso di utilizzare un alto numero di modelli ognuno con caratteristiche e proprieta differenti. Algoritmi di Machine Learning basati sulla distanza, probabilistici o lineari; ma anche Neural Network come Auto Encoders o LSTM. La tabella \ref{admodels} e' compresiva di tutti i modelli considerati.
 
 Gli algoritmi di machine learning considerano i sample in maniera indipendente, mentre quelli a rete neurale considerano una finestra temporale per per andare a fare sia training che prediction, risultando quindi time-aware, ovvero tengono in considerazione l'aspetto temporale dei dati. Il valore di questa finestra temporale viene passato come parametro e valorizzato manualmente.
+
+Come definito nel capitolo 4, questi modelli producono in output uno score per ogni sample utilizzato per la predizione dove uno score piu alto indica una probabilita maggiore che quel modello sia anomalo. Questi score vengono trasformati in labels \(\in \{0,1\}\) andando a specificare un fattore di contaminazione, ovvero la percentuale di punti anomali. I sample che rientrano nell'insieme costituito da un numero di elementi pari alla percentuale definita prima con lo score piu alto avranno una label che indicano che sono anomali.
 
 Ognuno di questi modelli e' stato allenato utilizzando sia i valori predefiniti per gli iper-parametri, sia variazioni di questi. 
 Per ogni algoritmo sono state considerate in media 3 versioni con parametri differenti, portando il totale dei modelli a 70.
@@ -639,10 +642,12 @@ Questa tecnica e quindi consigliabile se si hanno conoscenze pregresse sul datas
 Al contrario il dataset Machine-1-7 ha una correlazione nulla e graficamente il plot mostra come la distribuzione dei punti sia piu costante e le anomalie non sono ben separate come nel caso precedente. 
 \begin{center}
 	\includegraphics[width=9cm, scale=1]{images/scatter_cluster_good}
+    \captionsetup{type=figure}
 	\captionof{figure}{Scatter Plot Machine-2-3}
 \end{center}
 \begin{center}
 	\includegraphics[width=9cm, scale=1]{images/scatter_cluster}
+    \captionsetup{type=figure}
 	\captionof{figure}{Scatter Plot Machine-1-7}
 \end{center}
 

@@ -8,8 +8,8 @@ I due anelli vengono poi assemblati insieme ad altri componenti come la gabbia e
 
 I dati prodotti dai macchinari sono quindi divisi in due categorie: 
 \begin{itemize}
-  \item \textbf{CoMo}: dati relativi ai sensori installati sui macchinari di rettifica e levigatura cui fanno riferimento a vibrazione, temperatura, velocità, pressione e scorrimento.
-  \item \textbf{MVM}: sono i dati prodotti dai macchinari di controllo qualità sul prodotto finito.
+	\item \textbf{CoMo}: dati relativi ai sensori installati sui macchinari di rettifica e levigatura cui fanno riferimento a vibrazione, temperatura, velocità, pressione e scorrimento.
+	\item \textbf{MVM}: sono i dati prodotti dai macchinari di controllo qualità sul prodotto finito.
 \end{itemize}
 
 Lo scopo di questo progetto e di questa tesi e' quello di applicare tecniche non supervisionate di rilevamento anomalie utilizzando i dati a disposizione prodotti dai sensori installati sui macchinari.
@@ -33,9 +33,9 @@ I dati di qualità vengono registrati per ogni prodotto che esce dalla catena di
 Le misure di qualità fornite sono quattro fasce, indicate con A, B, C e D.
 Tutte le fasce sono positive per definizione ed ognuna di esse tratta uno specifico tipo di difetto in ogni cuscinetto attraverso l'analisi dello spettro. In particolare:
 \begin{itemize}
-  \item Banda A riguarda i cosiddetti errori geometrici risultanti dalla fase di rettifica.
-  \item Banda B e C riguardano errori nella fase di lappatura.
-  \item Banda D trova errori causati dalla presenza di impurità negli oli o liquidi di pulizia usati sui cuscinetti.
+	\item Banda A riguarda i cosiddetti errori geometrici risultanti dalla fase di rettifica.
+	\item Banda B e C riguardano errori nella fase di lappatura.
+	\item Banda D trova errori causati dalla presenza di impurità negli oli o liquidi di pulizia usati sui cuscinetti.
 \end{itemize}
 
 Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione, i dati MVM sono prodotti ogni due secondi. Questi verranno poi aggregati in intervalli di 10 minuti. La scelta di dieci minuti per la lunghezza del gap temporale non è casuale, infatti è stata fatta per adattarsi alla granularità dei dati CoMo.
@@ -45,16 +45,16 @@ I dati di qualica MVM vengono usati per definire la classe di qualita di apparte
 La tabella \ref{mvm-soglie} mostra come le classi di qualita vengano definite.
 
 \begin{table}
-\caption{\label{mvm-soglie}Soglie bande MVM.}
-\centering
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-Classe & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} \\ \hline
-Q1     & 25                           & 7.2                          & 7.2                          & 3.6                          \\ \hline
-Q2     & 36                           & 18.2                         & 18.2                         & 5.2                          \\ \hline
-Q3     & 48                           & 25.6                         & 25.6                         & 12                           \\ \hline
-Q4     & 72                           & 36                           & 36                           & 20                           \\ \hline
-\end{tabular}
+	\caption{\label{mvm-soglie}Soglie bande MVM.}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		Classe & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} \\ \hline
+		Q1     & 25                           & 7.2                          & 7.2                          & 3.6                          \\ \hline
+		Q2     & 36                           & 18.2                         & 18.2                         & 5.2                          \\ \hline
+		Q3     & 48                           & 25.6                         & 25.6                         & 12                           \\ \hline
+		Q4     & 72                           & 36                           & 36                           & 20                           \\ \hline
+	\end{tabular}
 \end{table}
 
 Valori di banda piu bassi indicano una qualita maggiore, di conseguenza la classe Q1 rappresenta i prodotti migliori mentre la classe Q4 rappresenta gli scarti. 
@@ -62,15 +62,15 @@ Per passare da una classe alla successiva e' necessario che solamente una delle 
 La tabella \ref{mvm-esempio} mostra un esempio di come le classi vengano computate.
 
 \begin{table}
-\caption{\label{mvm-esempio}Esempio di associazione di Classe qualita.}
-\centering
-\begin{tabular}{|l|l|l|l|l|l|}
-\hline
-Bearing & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} & Quality \\ \hline
-B1      & 20                           & 7                            & 4                            & 2                            & Q1      \\ \hline
-B2      & 19                           & 18                           & 2                            & 5.8                          & Q3      \\ \hline
-B3      & 70                           & 20                           & 20                           & 18                           & Q4      \\ \hline
-\end{tabular}
+	\caption{\label{mvm-esempio}Esempio di associazione di Classe qualita.}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|l|}
+		\hline
+		Bearing & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} & Quality \\ \hline
+		B1      & 20                           & 7                            & 4                            & 2                            & Q1      \\ \hline
+		B2      & 19                           & 18                           & 2                            & 5.8                          & Q3      \\ \hline
+		B3      & 70                           & 20                           & 20                           & 18                           & Q4      \\ \hline
+	\end{tabular}
 \end{table}
 
 \section{Processamento dei dati}
@@ -118,11 +118,11 @@ Le series temporali di SKF presentano un comportamento stabile nel tempo. Come m
 Per questo motivo, nelle fasi di processamento, operazioni di decomposizione delle serie temporali non sono state fatte.
 E' possibile comunque notare un'alta variabilita dei dati all'interno della singola serie temporale, con fluttuazioni piu o meno visibili.
 \begin{figure}[t]
-\centering
+	\centering
 	\includegraphics[width=14cm, scale=1]{images/sensors_plot}
-    \caption{Andamento Serie Temporali}
+	\caption{Andamento Serie Temporali}
 	\label{sensors_plot}
-	
+		
 \end{figure}
 
 \subsection{Processamento}
@@ -138,8 +138,8 @@ Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all
 Dopo i passaggi precedenti, è possibile fare il pivoting della tabella CoMo  prendendo il timestamp come indice di riga. Il risultato è una tabella in cui ogni colonna corrisponde a una serie temporale. 
 Come passo finale è necessario trattare i valori mancanti:
 \begin{itemize}
-\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo e' quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non e' di nostro interesse rilevare anomalie in quei intervalli di tempo.
-\item Tutti gli altri valori nulli vengono interpolati linearmente.
+	\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo e' quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non e' di nostro interesse rilevare anomalie in quei intervalli di tempo.
+	\item Tutti gli altri valori nulli vengono interpolati linearmente.
 \end{itemize}
 A questo punto i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.
 Come ultimo passaggio si e' deciso di andare a normalizzare i valori utilizzando un MinMaxScaler. Questa tecnica permette di normalizzare i valori passando un range come input, in questo caso [0,1], secondo la seguente formula:
