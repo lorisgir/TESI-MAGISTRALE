@@ -102,25 +102,43 @@ Riassumendo:
 
 A questo punto e' possibile introdurre tutte le misure di performance:
 \begin{itemize}
-\item Accuracy
-\item Error Rate
-\item Recall
-\item Specificity
-\item Precision
+\item Accuracy: E' il rapporto tra i punti correttamente classificati rispetto al totale dei punti 
+\[\frac{1}{|Te|} \sum_{x \in T_e} I[\hat{c}(x)=c(x)]\]
+\item Error Rate: E' il rapporto tra i punti erroneamente classificati rispetto al totale dei punti, in breve \(1-accuracy\) 
+\[\frac{1}{|Te|} \sum_{x \in T_e} I[\hat{c}(x)\neq c(x)]\]
+\item True Negative Rate / Specificity: E' il rapporto tra i punti classificati correttamente come negativi rispetto al numero totale di punti realmente negativi
+\[\frac{\sum_{x \in T_e} I[\hat{c}(x)=c(x)=-]}{\sum_{x \in T_e} I[c(x)=-]}\]
+\item True Positive Rate / Recall: E' il rapporto tra i punti classificati correttamente come positivi rispetto al numero totale di punti realmente positivi
+\[\frac{\sum_{x \in T e} I[\hat{c}(x)=c(x)=+]}{\sum_{x \in T_e} I[c(x)=+]}\]
+\item Precision: E' il rapporto tra i punti correttamente classificati come positivi rispetto al numero di punti classificati come positivi
+\[\frac{\sum_{x \in T_c} I[\hat{c}(x)=c(x)=+]}{\sum_{x \in T e} I[\hat{c}(x)=+]}\]
+\item F-Measure Score: E' la media armonica tra precision e recall
+\[F_\beta=\frac{\left(1+\beta^2\right) \cdot(\text { precision } \cdot \text { recall })}{\left(\beta^2 \cdot \text { precision }+\text { recall }\right)}\]
 \end{itemize}
 
+In generale non esiste una misura migliore e bisogna fare un'attenta valutazione su quale sia la preferibile rispetto al task da risolvere.
+Ad esempio bisogna tenere in considerazione se c'e' una prevalenza di punti di una classe. Accuracy e' preferibile quando ci si aspetta una distribuzione uguale delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision e' preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall e' la scelta corretta.
+F-Measure invece e' necessaria quando si cerca un bilanciamento tra precision e recall dando importanza a entrambi i falsi-positivi ed i falsi-negativi.
 
-\section{Thresholding}
-iqr, o gammaY del tipo
+
 
 \section{Machine Learning Models}
 \subsection{Linear Models}
+pca, ocsvm, LMDD, autoregressive
 \subsection{Distance Based Models}
+kmeans, dbscan, lof, 
 \subsection{Probabilistic Models}
+kde,gmm, sampling, abod, ecod, copod
 \subsection{Ensemble Models}
+iforest, inne, feature bagging
 
 \section{Neural Network Models}
 \subsection{Auto Encoders}
+auto, vae
 \subsection{LSTM}
+lstm, telemanom, DeepLog
 \subsection{Adversarial Networks}
-\subsection{Graph Based}
+anogan
+
+\section{Thresholding}
+iqr, z-score, o yGMM del tipo
