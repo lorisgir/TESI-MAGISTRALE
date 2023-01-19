@@ -129,6 +129,25 @@ Ognuno di questi metodi riceve in input un set di rankings, ognuno prodotto da u
 Nel caso delle metriche surrogate Model Centrality e Performance on Anomaly Injection, il ranking prodotto si basa sul F1 Score; mentre per Clustering Cohesion sul Silouette Score.
 \subsubsection{Kemeny-Young}
 E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo 4. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. I metodi successivi producono soluzioni approssimate ma con un tempo di esecuzione molto piu basso.
+\begin{table}
+\centering
+\caption{\label{borda}Esempio di aggregazione con Kemedy-Young.}
+\label{borda}
+\begin{tabular}{|l|l|l|l|l|} 
+\hline
+   & MC  & PAI & CC  & Final Ranking  \\ 
+\hline
+M1 & 1   & 0.5 & 0.7 & 0.784          \\ 
+\hline
+M2 & 0.8 & 0.6 & 0.7 & 0.742          \\ 
+\hline
+M3 & 0.6 & 0.7 & 0.8 & 0.930          \\ 
+\hline
+M4 & 0.5 & 0.8 & 0.5 & 0.696          \\
+\hline
+\end{tabular}
+\end{table}
+
 \subsubsection{Borda}
 I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto sara' in posizione 1. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e cosi via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. A questo punto vengono effettuati i calcoli per ognuna delle 3 metriche surrogate ed il punteggio finale, per ogni modello, sara' la media dei 3 valori ottenuti.
 
@@ -138,10 +157,10 @@ I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni mo
     \begin{tabular}{|l|l|l|l|l|l|l|l|}
     	\hline
     	   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
-    	M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
+    	M1 & 1 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
     	M2 & 0.8 & 0.6 & 0.7 & 3     & 2      & 2.5   & 2.5           \\ \hline
-    	M3 & 0.7 & 0.7 & 0.8 & 2     & 3      & 4     & 3             \\ \hline
-    	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
+    	M3 & 0.6 & 0.7 & 0.8 & 2     & 3      & 4     & 3             \\ \hline
+    	M4 & 0.5 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
     \end{tabular}
     \caption{\label{borda}Esempio di aggregazione con Borda.}
 \end{table}
@@ -149,23 +168,24 @@ I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni mo
 
 Nella tabella \ref{borda}, viene proposto un esempio di Ranking Aggregation con Borda. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate. Le seconde 3 colonne invece rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto e' stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
 \subsubsection{Robust Borda}
-E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking.
+E' una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking. 
 
 \begin{table}
 
     \centering
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
 	\hline
-	   & MC  & PAI & CC  & B(MC) & B(PAI) & B(CC) & Final Ranking \\ \hline
-	M1 & 0.9 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
+	   & MC  & PAI & CC  & rB(MC) & rB(PAI) & rB(CC) & Final Ranking \\ \hline
+	M1 & 1 & 0.5 & 0.7 & 4     & 1      & 2.5   & 2.5           \\ \hline
 	M2 & 0.8 & 0.6 & 0.7 & 3     & 1      & 2.5   & 2.16          \\ \hline
-	M3 & 0.7 & 0.7 & 0.8 & 1     & 3      & 4     & 2.66          \\ \hline
-	M4 & 0.6 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
+	M3 & 0.6 & 0.7 & 0.8 & 1     & 3      & 4     & 2.66          \\ \hline
+	M4 & 0.5 & 0.8 & 0.5 & 1     & 4      & 1     & 2             \\ \hline
 \end{tabular}
 \caption{\label{rborda}Esempio di aggregazione con Robust Borda.}
 \end{table}
 
-Riproponendo in tabella \ref{rborda} l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi. Questo produce poi punteggi finali differenti.
+Riproponendo in tabella \ref{rborda} l'esempio di prima e assumendo il parametro \(k=2\), i punteggi di Borda per Model Centrality e Performance on Anomalies Injection cambiano rispettivamente per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi andando a penalizzare il loro score finale. M3 e' sempre quello con score piu alto ma in questo caso la differenza con M1 si e' fatta piu piccola.
+
 \subsubsection{Score}
 Questo metodo e' il piu semplice dei 3 in quanto viene semplicemente fatta una media degli score dei 3 ranking per ogni modello, per poi ordinare in ordine decrescente e quindi ottenere un ranking finale.
 Utilizzando questo metodo e sempre considerando gli stessi score degli esempi precedenti, in tabella \ref{score} si puo notare come questa volta il modello migliore sia M2 e non piu M3.
@@ -175,11 +195,11 @@ Utilizzando questo metodo e sempre considerando gli stessi score degli esempi pr
     \centering
 \begin{tabular}{|l|l|l|l|l|}
 	\hline
-	   & MC  & PAI & CC  & Final Ranking \\ \hline
-	M1 & 0.9 & 0.5 & 0.7 & 0.7           \\ \hline
-	M2 & 0.8 & 0.6 & 0.7 & 0.76          \\ \hline
-	M3 & 0.7 & 0.7 & 0.8 & 0.73          \\ \hline
-	M4 & 0.6 & 0.8 & 0.5 & 0.63          \\ \hline
+	   & MC  & PAI & CC  & Final Ranking(avg) \\ \hline
+	M1 & 1 & 0.5 & 0.7 & 0.73           \\ \hline
+	M2 & 0.8 & 0.6 & 0.7 & 0.7          \\ \hline
+	M3 & 0.6 & 0.7 & 0.8 & 0.7          \\ \hline
+	M4 & 0.5 & 0.8 & 0.5 & 0.6          \\ \hline
 \end{tabular}
 \caption{\label{score}Esempio di aggregazione con Score.}
 \end{table}
@@ -188,6 +208,19 @@ Utilizzando questo metodo e sempre considerando gli stessi score degli esempi pr
 
 Chiaramente il processo di Ranking Aggregation aggiunge complessita e variabilita al processo di Model Selection, un'analisi sui risultati di ognuno dei metodi appena proposti e' riportata nella sezione successiva. Il generale pero, il metodo ottimale di Kemeny-Young risultera il migliore e sara' poi quello utilizzato su SKF.
 
+
+\subsection{Valutazione}
+Per confrontare i risultati ottenuti dalle metriche surrogate si e' deciso di adottare le misure di correlazione tra rank o tra gli score dei rankings rispetto a quelli ottenuti usando le labels. Per questi ultimi, la metrica scelta e' F1 Score.
+Quindi, utilizzando l'algoritmo di Model Selection, vengono prodotti rankings contententi gli score di ogni modello per ogni metrica surrogata piu un ranking per ogni tecnica di aggregazione. Confrontare ogni singola metrica surrogata e non soltanto l'aggregazione finale permette di avere una panoramica completa delle performance di ognuno.
+Questi vengono confrontato con il ranking prodotto  da una valutazione usando le labels ground-truth dei dataset di bencharmk con F1 Score.
+Gli algoritmi di calcolo per il coefficiente di correlazione sono Kendall e Spearman per il rank correlation e Pearson per lo score correlation. Tutte e tre i coefficienti hanno un range compreso tra $[-1,1]$ dove un coefficiente di -1 indica una correlazione negativa, 0 nessuna correlazione mentre 1 una correlazione positiva. 
+Dato che questi coefficienti hanno caratteristiche diverse e' necessario andare a trattare separatamente il calcolo:
+\begin{itemize}
+\item Rank Correlation: Kendall e Spearman utilizzando dei rank di posizione per calcolare il coefficiente di correlazione. Questo vuol dire che bisogna andare a trasformare tutti i rankings con gli score in rakings di posizione in cui il modello con score piu alto avra' come posizione 1 ed i restanti a seguire.
+\item Score Correlation: Pearson invece necessita di valori continui di conseguenza per questo coefficiente non si effettua nessuna trasformazione e si usano i rankings con gli score cosi come sono prodotti dal Model Selection
+\end{itemize}
+
+ 
 
 \newpage
 \section{Benchmark Results}
@@ -286,11 +319,7 @@ Il fattore di contaminazione passato ad ogni modello corrisponde esattamente all
 	}
 \end{table}
 
-\subsection{Valutazione}
-Per confrontare i risultati ottenuti dalle metriche surrogate si e' deciso di adottare le misure di correlazione tra rank o tra gli score dei rankings rispetto a quelli ottenuti usando le labels. Per questi ultimi, la metrica scelta e' F1 Score.
-Quindi, utilizzando l'algoritmo di Model Selection si produce un ranking finale senza l'utilizzo di labels. Questo viene confrontato con il ranking prodotto  da una valutazione usando le labels ground-truth dei dataset di bencharmk con F1 Score.
-Gli algoritmi di calcolo per il coefficiente di correlazione sono Kendall e Spearman per il rank correlation e Pearson per lo score correlation. Tutte e tre i coefficienti hanno un range compreso tra $[-1,1]$ dove un coefficiente di -1 indica una correlazione negativa, 0 nessuna correlazione mentre 1 una correlazione positiva.
-Questi indici di correlazione verranno computati sia per ogni ranking prodotto da ogni singola metrica surrogata, sia dai diversi metodi di rank aggregation. Questo permette di avere una panoramica completa delle performance di ognuno.
+
 
 
 
@@ -422,8 +451,33 @@ Per Machine-1-4, invece, le performance di correlazione sono migliori e possiamo
 
 \newpage
 \subsubsection{Performance on Synthethic Anomaly Injection}
-Passando alla metrica surrogata usante le pseudo-label dopo l'iniezione di anomalie, possiamo notare in tabella \ref{pai-results} come generamente le performance siano inferiori rispetto alla tecnica del Model Centrality. I motivi di cio possono ricondursi agli aspetti negativi introdotti precedentemente che riguardano questo approccio: come le anomalie vengono generate ed il fatto che le anomalie vere vengano ignorate. Il primo punto non e' banale, avere una conoscenza forte dal dataset di riferimento permette di creare anomalie che possano risultare realistiche ma spesso la cio non e' possibile. Attraverso metodi statistici si possono estrarre informazioni riguardanti l'andamento e l'evoluzione dei dati ma spesso le anomalie non seguono un pattern preciso rendendo quindi la generazione di queste un problema non triviale. Il secondo punto puo inpattare negativemente i risultati in quanto e' possibile che il modello vada a labellare le anomalie reali come positive, nonostante abbiamo delle pseudo-label negative. Una soluzione a questo problema potrebbe essere quello di ricercare una finestra temporale del dataset che sia il piu pulita possibile dalla anomalie per poi andare ad effettuare le anomaly injection.
-Anche in questo caso ci troviamo di fronte a tre metodi con performance simili con un quarto, in questo caso wander, meno performante.
+Passando alla metrica surrogata usante le pseudo-label dopo l'iniezione di anomalie, possiamo notare in tabella \ref{pai-results} come generamente le performance siano inferiori rispetto alla tecnica del Model Centrality. I motivi di cio possono ricondursi agli aspetti negativi introdotti precedentemente che riguardano questo approccio: 
+\begin{enumerate}
+\item come le anomalie vengono generate
+\item le anomalie reali vengano ignorate
+\end{enumerate}
+Il primo punto non e' banale, avere una conoscenza forte dal dataset di riferimento permette di creare anomalie che possano risultare realistiche ma spesso la cio non e' possibile. Attraverso metodi statistici si possono estrarre informazioni riguardanti l'andamento e l'evoluzione dei dati ma spesso le anomalie non seguono un pattern preciso rendendo quindi la generazione di queste un problema non triviale. 
+Vediamo ora alcuni esempi di come le performance variano in base al dataset ed al tipo di anomalia iniettata. Le perfoamance dell'anomia Spike sul dataset Shuttle sono buone e a conferma di cio si puo vedere in figura \ref{shuttle-inj} come le anomalie prevalenti siano proprio di tipo spike.
+Al contrario, Machine-3-5 ha performance basse per quanto riguarda wander, spike e mix, ma ottiene un punteggio di 0.84 su scale. La figura \ref{machine-3-5-inj} mostra come i punti anomali abbiamo intervalli con valori scalati verso l'alto. Infine, Machine-28 e' quello con le performance Mix piu alte, a riprova del fatto che nell'immagine \ref{machine-2-8-inj} si possono notare sia spike, sia intervalli anomali e sia valori crescenti nel tempo.
+Il secondo punto puo inpattare negativemente i risultati in quanto e' possibile che il modello vada a labellare le anomalie reali come positive, nonostante abbiamo delle pseudo-label negative. Una soluzione a questo problema potrebbe essere quello di ricercare una finestra temporale del dataset che sia il piu pulita possibile dalla anomalie per poi andare ad effettuare le anomaly injection.
+Anche in questo caso ci troviamo di fronte a tre metodi con performance simili con un quarto, in questo caso wander, generalmente meno performante.
+\begin{figure}[htp]% [H] is so declass\'e!
+\centering
+\begin{minipage}{0.5\textwidth}
+\includegraphics[width=\textwidth]{images/shuttle_good_inj_spike.png}
+\caption{Shuttle}
+\label{shuttle-inj}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+\includegraphics[width=\textwidth]{images/machine-3-5_bad_inj_good_scale.png}
+\caption{Machine-3-5}
+\label{machine-3-5-inj}
+\end{minipage}\par
+\vskip\floatsep% normal separation between figures
+\includegraphics[width=0.5\textwidth]{images/machine-2-8_good_inj_mix.png}
+\caption{Machine-2-8}
+\label{machine-2-8-inj}
+\end{figure}
 
 \begin{table}[]
     \caption{\label{pai-results}Risultati di correlazione per Performance on Anomaly Injection}
@@ -595,6 +649,8 @@ Al contrario il dataset Machine-1-7 ha una correlazione nulla e graficamente il 
 \newpage
 \subsubsection{Rank Aggregation}
 A questo punto ci si puo concetrare sulle varie tecniche di aggregazione. A primo impatto si puo vedere, in tabella \ref{agg-results}, come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati miglori rispetto al ranking supervisionato. 
+I valori medi rispetto ai dataset si aggirano intorno al range [0.4,0.6], in linea con le performance di Model Centrality e migliori rispetto a Performance on Synthetic Anomaly Injection e Clustering Cohesion.
+Questo tipo di aggregazione permette di avere risultati migliori quando non si ha la certezza che una sola metrica surrogata sia sufficiente. Potrebbe comunque essere utile un'analisi specifica per andare a prendere in considerazione soltanto quelle metriche surrogate, o piu nello specifico i metodi utilizzati al loro interno (rr, mv, samp, mix, scale, wander ecc), che potrebbero funzionare meglio per uno specifico dataset. 
 
 \begin{table}[]
     \caption{\label{agg-results}Risultati di correlazione per aggregazione}
