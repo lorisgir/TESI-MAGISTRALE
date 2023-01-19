@@ -8,16 +8,7 @@ E' un processo che può essere applicato sia a diversi tipi di modelli, ad esemp
 Model Selection risulta molto utile ed efficace quando si e' interessati nel sviluppare un modello di classificazione o regressione per un dataset, ma non si sa a priori quale modello funzioni meglio. Di conseguenza la soluzione e' quella di fare training e valutazione per ogni modello preso in considerazione.
 
 
-\subsubsection{Definizione del problema}
-Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e label di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) e' anomala. Le labels saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
 
-Sia \(M=\{A_i\}^N_{i=1}\) un set di N modelli candidati di anomaly detction dove ogni modello \(A_i\) e' una tupla (\(detector, iper-parametri\)) .
-I modelli di anomaly detection non necessitano labels per il training e di conseguenza la fase di train/test split puo essere ignorata.  Questi passaggi vengono comunque eseguiti e consideriamo quindi uno split \(\{x_t\}_{t=1}^{t_{test}-1}\),\(\{x_t\}^{T}_{t=t_{test}}\).
-
-Viene assunto che il modello allenato \(A_i\), quando applicato alle osservazioni \(\{x_t\}^{T}_{t=t_{test}}\) , produca degli score di anomalia \(\{s_t^i\}_{t=t_{test}}^T\),\(s^i_t\in\Re_{\geq0}\). Valori piu alti per gli score di anomalia indicano che l'osservazione e' piu probabile essere anomala.
-Le performance di un modello possono essere misurate usando una metrica supervisionata \(Q(\{s_t\}^T_{t=1},\{y_t\}^T_{t=1})\) come F1 Score.
-
-Possiamo ora definire il problema come: date le osservazioni \(X_{test}\) ed un set di modelli \(M=\{A_i\}^N_{i=1}\) allenato usando \(X_{train}\), selezionare un modello che massimizzi la misura di qualita' \(Q(A_i(X_{test}),Y_{test})\) senza utilizzo di label per la selezione.
 
 \section{Supervised Model Selection}
 Le metodologie di Model Selection supervisionato sono quelle classiche che di solito vengono applicate durante lo sviluppo di algoritmi di Machine o Deep Learning. Avendo a disposizione le labels, le scelte ricadono dunque su come partizionare il dataset in train/split e validation set, su come pesare la complessita di un modello e su quali metriche di valutazione adottare.
@@ -25,12 +16,12 @@ Le metodologie di Model Selection supervisionato sono quelle classiche che di so
 \subsection{Resampling Methods}
 I metodi di resampling, come suggerisce il nome, sono semplici tecniche di partizionamento dei dati e servono per valutare se il modello generalizza bene anche sull'insieme di test. Diversi tipi di split possono essere applicati:
 \begin{itemize}
-	\item \textbf{Random Split} genera in maniera casuale i tre insiemi di train, test e validazione. Il vantaggio di questo metodo è che c'è una buona probabilità che la popolazione originale sia ben rappresentata in tutti e tre gli insiemi, impedendo quindi un campionamento distorto dei dati.
-	\item \textbf{Time Based Split} viene applicato sulle serie temporali in cui non e' possibile effettuare una suddivisione casuale dei dati in quanto si andrebbe a perdere informazioni come trend o seasonality. 
-	      In questi casi, si utilizza una suddivisione temporale in cui, ad esempio, l'insieme di train può contenere i dati piu' vecchi, mentre quelli piu' recenti sono assegnati all'insieme di test. Per evitare l'overfitting introdotto da questo metodo, una variante a finestre di scorrimento e' preferibile: il modello viene allenato iterativamente piu' volte su una finestra temporale e valutato sulla parte restante dei dati, per poi allargare la finestra di training ad ogni iterazione (riducendo cosi quella di valutazione).
-	\item \textbf{K-Fold Cross Validation} genera in modo casuale $k$ gruppi di dati ed iterativamente vengono usati $k-1$ gruppi per il training ed un gruppo per la valutazione.
-	\item \textbf{Stratified K-Fold} e' simile al Cross Validation ma con la differenza che questo metodo tiene in considerazione la distribuzione delle classi dei dati, generando quindi gruppi con rateo simile al dataset originale.
+	\item \textbf{Random Split}
+	\item \textbf{Time Based Split} 
+	\item \textbf{K-Fold Cross Validation}
+	\item \textbf{Stratified K-Fold}
 \end{itemize}
+Un approfondimento di queste tecniche e' stato proposto nel capitolo TODO
 
 \subsection{Ottimizzazione degli iper-parametri}
 L'ottimizzazione degli iperparametri è il processo di ricerca del miglior insieme di iperparametri per un modello di machine learning. Gli iperparametri sono dei parametri che non vengono appresi dai dati durante l'addestramento, ma vengono impostati prima dell'inizio di questo. Esempi di iperparametri sono il learning rate di una rete neurale, il numero di alberi in una random forest o regularization factor di un modello lineare. Nell'ambito del model selection, l'obiettivo dell'ottimizzazione degli iperparametri è quello di trovare l'insieme di iperparametri che consente di ottenere le migliori prestazioni per il modello in analisi. Ciò può essere fatto utilizzando tecniche come grid search, random search o l'ottimizzazione bayesiana per esplorare lo spazio degli iperparametri e trovare l'insieme ottimale.
@@ -53,6 +44,17 @@ Per una descrizione delle metriche utilizzabili nel Model Selection, fare riferi
 \section{Unsupervised Model Selection}
 Tecniche e metriche sopra descritte hanno applicazione solamente quando si ha a disposizione ground truth labels. Spesso pero', e sopratutto nel dominio dell'Anomaly Detection, le labels non sono disponibili e bisogna quindi cambiare completamente approccio. 
 Unsupervised Outlier Model Selection, in breve UOMS, ha ricevuto fin'ora poca attenzione da parte dei ricercatori, tant'è' che solamente una manciata di lavori sono stati pubblicati. Queste proposte assumono diversi approcci al problema e possono essere divisi in due categorie: meta learning e metriche surrogate.
+
+\subsubsection{Definizione del problema}
+Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e label di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) e' anomala. Le labels saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
+
+Sia \(M=\{A_i\}^N_{i=1}\) un set di N modelli candidati di anomaly detction dove ogni modello \(A_i\) e' una tupla (\(detector, iper-parametri\)) .
+I modelli di anomaly detection non necessitano labels per il training e di conseguenza la fase di train/test split puo essere ignorata.  Questi passaggi vengono comunque eseguiti e consideriamo quindi uno split \(\{x_t\}_{t=1}^{t_{test}-1}\),\(\{x_t\}^{T}_{t=t_{test}}\).
+
+Viene assunto che il modello allenato \(A_i\), quando applicato alle osservazioni \(\{x_t\}^{T}_{t=t_{test}}\) , produca degli score di anomalia \(\{s_t^i\}_{t=t_{test}}^T\),\(s^i_t\in\Re_{\geq0}\). Valori piu alti per gli score di anomalia indicano che l'osservazione e' piu probabile essere anomala.
+Le performance di un modello possono essere misurate usando una metrica supervisionata \(Q(\{s_t\}^T_{t=1},\{y_t\}^T_{t=1})\) come F1 Score.
+
+Possiamo ora definire il problema come: date le osservazioni \(X_{test}\) ed un set di modelli \(M=\{A_i\}^N_{i=1}\) allenato usando \(X_{train}\), selezionare un modello che massimizzi la misura di qualita' \(Q(A_i(X_{test}),Y_{test})\) senza utilizzo di label per la selezione.
 
 \subsection{Meta Learning}
 Questo approccio mira ad identificare il modello migliore per un particolare dataset date le caratteristiche di questo come il numero di classi, attributi, istanze ecc. L'algoritmo si basa su una collezione di dataset storici di outlier detection in cui le labels sono presenti e sulle performance dei modelli su questi per imparare essenzialmente un mapping tra questi due elementi. 

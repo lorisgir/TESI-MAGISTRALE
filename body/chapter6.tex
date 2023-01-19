@@ -654,8 +654,9 @@ Al contrario il dataset Machine-1-7 ha una correlazione nulla e graficamente il 
 \newpage
 \subsubsection{Rank Aggregation}
 A questo punto ci si puo concetrare sulle varie tecniche di aggregazione. A primo impatto si puo vedere, in tabella \ref{agg-results}, come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati miglori rispetto al ranking supervisionato. 
-I valori medi rispetto ai dataset si aggirano intorno al range [0.4,0.6], in linea con le performance di Model Centrality e migliori rispetto a Performance on Synthetic Anomaly Injection e Clustering Cohesion.
+I valori medi rispetto ai dataset si aggirano intorno al range [0.4,0.6], in linea con le performance di Model Centrality e migliori rispetto a Performance on Synthetic Anomaly Injection e Clustering Cohesion. Questo vuol dire che i metodi di aggregazione riescono comunque a produrre buoni risultati nonostante le metriche surrogante non funzioni sempre bene. 
 Questo tipo di aggregazione permette di avere risultati migliori quando non si ha la certezza che una sola metrica surrogata sia sufficiente. Potrebbe comunque essere utile un'analisi specifica per andare a prendere in considerazione soltanto quelle metriche surrogate, o piu nello specifico i metodi utilizzati al loro interno (rr, mv, samp, mix, scale, wander ecc), che potrebbero funzionare meglio per uno specifico dataset. 
+
 
 \begin{table}[]
 	\caption{\label{agg-results}Risultati di correlazione per aggregazione}
