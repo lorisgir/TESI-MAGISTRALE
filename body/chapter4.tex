@@ -1,4 +1,5 @@
 \chapter{Model Selection}
+\label{chap:modelselection}
 
 \section{Introduzione}
 Model Selection è il processo di selezione di un modello finale, che sia di machine learning o deep learning, tra una serie di modelli candidati per uno specifico dataset.
@@ -21,7 +22,7 @@ I metodi di resampling, come suggerisce il nome, sono semplici tecniche di parti
 	\item \textbf{K-Fold Cross Validation}
 	\item \textbf{Stratified K-Fold}
 \end{itemize}
-Un approfondimento di queste tecniche e' stato proposto nel capitolo TODO
+Un approfondimento di queste tecniche e' stato proposto nel capitolo \ref{chap:methods}.
 
 \subsection{Ottimizzazione degli iper-parametri}
 L'ottimizzazione degli iperparametri è il processo di ricerca del miglior insieme di iperparametri per un modello di machine learning. Gli iperparametri sono dei parametri che non vengono appresi dai dati durante l'addestramento, ma vengono impostati prima dell'inizio di questo. Esempi di iperparametri sono il learning rate di una rete neurale, il numero di alberi in una random forest o regularization factor di un modello lineare. Nell'ambito del model selection, l'obiettivo dell'ottimizzazione degli iperparametri è quello di trovare l'insieme di iperparametri che consente di ottenere le migliori prestazioni per il modello in analisi. Ciò può essere fatto utilizzando tecniche come grid search, random search o l'ottimizzazione bayesiana per esplorare lo spazio degli iperparametri e trovare l'insieme ottimale.
@@ -39,7 +40,7 @@ Uno svantaggio, invece, risiede tuttavia nel fatto che i metodi probabilistici n
 
 \subsection{Metriche di valutazione}
 I modelli possono essere valutati utilizzando diverse metriche, tuttavia, la scelta di una metrica di valutazione consona è cruciale e spesso dipende dal problema da risolvere. Una chiara comprensione di un'ampia gamma di metriche può aiutare a trovare una corrispondenza appropriata tra la descrizione del problema ed una metrica.
-Per una descrizione delle metriche utilizzabili nel Model Selection, fare riferimento al capitolo TODO
+Per una descrizione delle metriche utilizzabili nel Model Selection, fare riferimento al capitolo \ref{chap:methods}.
 
 \section{Unsupervised Model Selection}
 Tecniche e metriche sopra descritte hanno applicazione solamente quando si ha a disposizione ground truth labels. Spesso pero', e sopratutto nel dominio dell'Anomaly Detection, le labels non sono disponibili e bisogna quindi cambiare completamente approccio. 
@@ -62,7 +63,7 @@ A questo punto l'algoritmo riceve in input il dataset su cui si vuole fare Model
 Questo metodo pero' richiede quindi la disponibilità di dataset storici con labels e inoltre fallisce se non ne esiste uno che sia sufficientemente rappresentativo del dataset target.
 \subsection{Metriche Surrogate}
 A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa e' la definizione di nuove metriche che non hanno bisogno di labels ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc), da qui il termine metriche surrogate.
-La definizione di queste metriche non e' triviale, data proprio la loro caratteristica di essere completamente non supervisionate e possono ricadere in categorie completamente differenti tra di loro. Qualche esempio sono: model centrality o performance on injected synthetic anomalies. Un approfondimento su queste metriche e' presente nel capitolo successivo.
+La definizione di queste metriche non e' triviale, data proprio la loro caratteristica di essere completamente non supervisionate e possono ricadere in categorie completamente differenti tra di loro. Qualche esempio sono: model centrality o performance on injected synthetic anomalies. Un approfondimento su queste metriche e' presente nel capitolo \ref{chap:impl}.
 
 
 \subsection{Rank Aggregation}

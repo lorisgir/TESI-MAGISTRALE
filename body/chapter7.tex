@@ -1,4 +1,6 @@
 \chapter{Deployment}
+\label{chap:deploy}
+
 Il modello di inferenza e' stato rilasciato attraverso la piattaforma Microsoft Azure e anche reso fruibile per gli operatori SKF utilizzando PowerBI.
 Microsoft Azure e' una piattaforma cloud che offre una suite completa di servizi e risorse per computing, storage, gestione dati, comunicazione ecc.
 All'interno di questo progetto, sono stati utilizzate le seguenti risorse:
@@ -49,7 +51,7 @@ A questo punto la pipeline e' completa e puo essere pubblicata su Azure Machine 
 In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
 \begin{enumerate}
 	\item La tabella Dataset contiene al suo interno le registrazioni dei sensori del macchinario E1 di SKF. La struttura dati, a questo punto del flusso di lavoro, e' ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
-	\item Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo 5. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
+	\item Il secondo step della pipeline, chiamato Prepare Data, si occupa di processare i dati come mostrato nel capitolo \ref{chap:skf}. Il nuovo Data Frame viene salvato su file per essere letto dal prossimo passaggio.
 	\item Il terzo step, Train Model, si occupa ovviamente del training del modello. Il modello viene recuperato dall'archivio di Azure Machine Learning, il quale contiene una lista di tutti i modelli registrati. In questo caso il modello registrato corrisponde al miglior modello ottenuto dal Model Selection non supervisionato che viene eseguito in locale. La scelta di non automatizzare anche il Model Selection risiede nel fatto che quest'algoritmo deve essere esguito solamente una volta in quanto i dati di uno specifico macchinario non cambiano particolarmente tanto nel tempo, salvo grossi interventi di manutenzione che implicano la sostituzione di tutti i sensori. Recuperato il modello dall'archivio e letto il dataset processato, si puo eseguire il training. A fine di questo passaggio, il modello trainato viene salvato su file per renderlo disponibile all'ultimo step.
 	\item Il quarto step, Publish Model as Endpoint, si occupa di andare a registrare il modello trainato nell'archivio di Azure Machine Learning, consentendo quindi di aggiornare la versione del modello corrente con una nuova. Infine viene anche pubblicato, oppure aggiornato, l'endpoint di inferenza con il nuovo modello.
 \end{enumerate}

@@ -1,4 +1,6 @@
 \chapter{Sperimentazione}
+\label{chap:impl}
+
 In questo capitolo viene discussa l'implementazione e l'applicazione delle metriche di Model Selection e delle tecniche di Rank Aggregation. Infine viene proposta una valutazione su dataset di benchmark e quello di SKF.
 
 Riassumendo, questo capitolo si dividerà in:
@@ -10,7 +12,7 @@ Riassumendo, questo capitolo si dividerà in:
 
 
 \section{Implementazione}
-Come introdotto nel capitolo 4, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione e' rappresentato in figura \ref{flow-scheme}.
+Come introdotto nel capitolo \ref{chap:modelselection}, il task da risolvere e' l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello o i modelli migliori dato un dataset. L'approccio scelto e' stato quello di definire delle metriche "surrogate" che siano correlate con le performance del modello e che non richiedano labels. Queste metriche sono indipendenti tra di loro ed e' necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione e' rappresentato in figura \ref{flow-scheme}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
@@ -126,11 +128,11 @@ Infine viene calcolato il silouette score su questi, tenendo anche in consideraz
 Infine questa procedura viene applicata su ogni modello per andare a produrre un ranking finale.
 Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale e' relativamente bassa e quindi i punti sono quasi indipendenti tra di loro. Le point anomalies cosi come le collective anomalies sono identificate con piu precisione rispetto alle contextual anomalies. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con piu probabilita nel cluster di punti normali.
 \subsection{Rank Aggregation}
-Nel capitolo 4 e' stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sara' svolta nelle sezioni successive.
+Nel capitolo \ref{chap:modelselection} e' stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sara' svolta nelle sezioni successive.
 Ognuno di questi metodi riceve in input un set di rankings, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un unico ranking finale.
 Nel caso delle metriche surrogate Model Centrality e Performance on Anomaly Injection, il ranking prodotto si basa sul F1 Score; mentre per Clustering Cohesion sul Silouette Score.
 \subsubsection{Kemeny-Young}
-E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo 4. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. Nella tabella \ref{kemeny-young}, viene proposto un esempio di Ranking Aggregation con questo metodo. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate mentre gli indici di riga corrispondono a 3 modelli.
+E' il metodo di Rank Aggregation ottimale in quanto ottimizza la funzione oggetto come definito nel capitolo \ref{chap:modelselection}. E' un problema NP-Hard ma la complessita temporale, dati solo 3 ranking, e' sufficientemente bassa da garantirne un utilizzo in tempo reale. Nella tabella \ref{kemeny-young}, viene proposto un esempio di Ranking Aggregation con questo metodo. Le prime tre colonne rappresentano i 3 rankings delle metriche surrogate mentre gli indici di riga corrispondono a 3 modelli.
 \begin{table}
 	\centering
 	\caption{\label{kemeny-young}Esempio di aggregazione con Kemedy-Young.}
@@ -269,13 +271,13 @@ Per una valutazione piu completa si e' deciso di utilizzare un alto numero di mo
 
 Gli algoritmi di machine learning considerano i sample in maniera indipendente, mentre quelli a rete neurale considerano una finestra temporale per per andare a fare sia training che prediction, risultando quindi time-aware, ovvero tengono in considerazione l'aspetto temporale dei dati. Il valore di questa finestra temporale viene passato come parametro e valorizzato manualmente.
 
-Come definito nel capitolo 4, questi modelli producono in output uno score per ogni sample utilizzato per la predizione dove uno score piu alto indica una probabilita maggiore che quel modello sia anomalo. Questi score vengono trasformati in labels \(\in \{0,1\}\) andando a specificare un fattore di contaminazione, ovvero la percentuale di punti anomali. I sample che rientrano nell'insieme costituito da un numero di elementi pari alla percentuale definita prima con lo score piu alto avranno una label che indicano che sono anomali.
+Come definito nel capitolo \ref{chap:modelselection}, questi modelli producono in output uno score per ogni sample utilizzato per la predizione dove uno score piu alto indica una probabilita maggiore che quel modello sia anomalo. Questi score vengono trasformati in labels \(\in \{0,1\}\) andando a specificare un fattore di contaminazione, ovvero la percentuale di punti anomali. I sample che rientrano nell'insieme costituito da un numero di elementi pari alla percentuale definita prima con lo score piu alto avranno una label che indicano che sono anomali.
 
 Ognuno di questi modelli e' stato allenato utilizzando sia i valori predefiniti per gli iper-parametri, sia variazioni di questi. 
 Per ogni algoritmo sono state considerate in media 3 versioni con parametri differenti, portando il totale dei modelli a 70.
 La scelta dei valori modificati agli iper-parametri e' stata fatta manualmente a priori, senza conoscere le performance del modello. Il focus della tesi si mantiene sul Model Selection, mentre un approfondimento sul tuning dei parametri puo essere lasciato a sviluppi futuri.
 
-Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione e' ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non e' possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non e' presente. Per risolvere questo problema si utilizzera un metodo di Tresholding come introdotto nel capitolo 3 che stima il fattore di contaminazione. Un fattore di contaminazione stimato male porta ovviamente a degradare le performance del Model Selection. Cosi come per la variazione degli iper-parametri, in sviluppi futuri potrebbe risultare utile un'analisi piu approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
+Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione e' ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non e' possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non e' presente. Per risolvere questo problema si utilizzera un metodo di Tresholding come introdotto nel capitolo \ref{chap:methods} che stima il fattore di contaminazione. Un fattore di contaminazione stimato male porta ovviamente a degradare le performance del Model Selection. Cosi come per la variazione degli iper-parametri, in sviluppi futuri potrebbe risultare utile un'analisi piu approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
 
 
 \begin{table}[]
@@ -297,6 +299,7 @@ Il fattore di contaminazione passato ad ogni modello corrisponde esattamente all
 			MCD            & Linear Model      & Minimum Covariance Determinant                                      \\ \hline
 			OCSVM          & Linear Model      & One-Class Support Vector Machines                                   \\ \hline
 			LMDD           & Linear Model      & Deviation-based Outlier Detection                                   \\ \hline
+   			AutoRegressive & Neural Networks   &                                                                     \\ \hline
 			LOF            & Proximity-Based   & Local Outlier Factor                                                \\ \hline
 			COF            & Proximity-Based   & Connectivity-Based Outlier Factor                                   \\ \hline
 			CBLOF          & Proximity-Based   & Clustering-Based Local Outlier Factor                               \\ \hline
@@ -309,15 +312,12 @@ Il fattore di contaminazione passato ad ogni modello corrisponde esattamente all
 			FB             & Outlier Ensembles & Feature Bagging                                                     \\ \hline
 			AutoEncoder    & Neural Networks   & Fully connected AutoEncoder                                         \\ \hline
 			VAE            & Neural Networks   & Variational AutoEncoder                                             \\ \hline
-			SO\_GAAL       & Neural Networks   & Single-Objective Generative Adversarial Active Learning             \\ \hline
 			DeepSVDD       & Neural Networks   & Deep One-Class Classification                                       \\ \hline
 			ALAD           & Neural Networks   & Adversarially learned anomaly detection                             \\ \hline
-			R-Graph        & Graph-based       & Outlier detection by R-graph                                        \\ \hline
 			LUNAR          & Graph-based       & Unifying Local Outlier Detection Methods via Graph Neural Networks  \\ \hline
 			DeepLog        & Neural Networks   &                                                                     \\ \hline
 			Telemanom      & Neural Networks   &                                                                     \\ \hline
 			LSTM           & Neural Networks   &                                                                     \\ \hline
-			AutoRegressive & Neural Networks   &                                                                     \\ \hline
 		\end{tabular}%
 	}
 \end{table}
@@ -811,7 +811,7 @@ Possiamo quindi concludere che mentre il model Selection non supervisionato non 
 
 \newpage
 \section{SKF Results}
-Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo 5 pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati CoMo e troppo bassa e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
+Il progetto di tesi e' nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima e' necessaria. Come introdotto nel capitolo \ref{chap:skf} pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati CoMo e troppo bassa e (3) la correlazione tra i valori dei sensori e la qualita finale non e' certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
 Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato sul dataset di uno specifico macchinario andando a produrre una lista di ranking e ottenendo cosi il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dato sempre dello stesso macchinario. Infine si utilizzano i dati di MVM per:
 \begin{itemize}
 	\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la soglia della banda A per la classe Q1 nell'intervallo di 10 minuti e paragonare questi numeri tra i time-step segnalati come anomali dal modello con i time-step segnalati come normali.
@@ -821,13 +821,13 @@ L'assunzione forte che e' stata fatta e' che situazione anomale di un macchinari
 
 
 \subsection{Dataset}
-I dataset di SKF sono stati introdotti e dettagliati nel capitolo 5. Per questa fase di valutazione vengono usati sia i dati di MVM, piu nello specifico viene usata la banda A riguardante gli errori geometrici, ovvero il gridining. Questo perche si e' deciso di concentrarsi esclusivamente sul un macchinario che, per motivi di privacy, chiameremo M1. Questo macchinario e' il primo nella linea di produzione ed effettua il grinding, quindi direttamente interessato alla banda A.
+I dataset di SKF sono stati introdotti e dettagliati nel capitolo \ref{chap:skf}. Per questa fase di valutazione vengono usati sia i dati di MVM, piu nello specifico viene usata la banda A riguardante gli errori geometrici, ovvero il gridining. Questo perche si e' deciso di concentrarsi esclusivamente sul un macchinario che, per motivi di privacy, chiameremo M1. Questo macchinario e' il primo nella linea di produzione ed effettua il grinding, quindi direttamente interessato alla banda A.
 Per la fase di training e' stato scelto il periodo che va da gennaio a marzo 2022 in quanto i dati in quel periodo risultavano i piu puliti ed i piu stabili da un punto di vista di oscillazioni o data change. Mentre per la fase di prediction viene usato come riferimento il periodo maggio-giugno 2022.
 
 
 
 \subsection{Thresholding}
-Prima di procedere al training del modello e' necessario avere un riferimento sulla percentuale di anomalie nel dataset. A questo scopo e' stato utilizzato il metodo GammaY introdotto nel capitolo 3.
+Prima di procedere al training del modello e' necessario avere un riferimento sulla percentuale di anomalie nel dataset. A questo scopo e' stato utilizzato il metodo GammaY introdotto nel capitolo \ref{chap:methods}.
 Questo algoritmo riceve in input la stessa lista di modelli candidati usati poi nel model selection, e dopo essere stati allenati sul dataset di training senza andare ad indicare il fattore di contaminazione sono stati usati gli output score prodotti da ognuno di questi per computare la distribuzione di probabilita multivariata delle anomalie.
 Il risultato prodotto da questa tecnica di trhesoldin e' 0.05, ovvero il 5\% di punti vengono considerati anomali. Un dato ragionevole confermato da un analisi manuale dei dati.
 

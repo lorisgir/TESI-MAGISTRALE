@@ -1,4 +1,5 @@
 \chapter{Metodi di Anomaly Detection}
+\label{chap:methods}
 
 \section{Learning Models}
 I learning models sono algoritmi che utilizzano dati per "imparare" come effettuare una determinata attività, come la classificazione o la previsione. Ci sono diverse categorie di modelli di apprendimento, tra cui:
@@ -32,7 +33,6 @@ Cambiando l'obiettivo della funzione da un numero relativamente piccolo di class
 a uno spazio di soluzioni infinito, l'algoritmo cercherà di stimare i valori associati a ciascun esempio nel modo più accurato possibile, il che porterà al problema dell'overfitting. Tenendo presente che è necessario accettare un equilibrio tra accuratezza e approssimazione delle delle soluzioni, è inevitabile, di fronte alle normali oscillazioni dei dati, che il modello non possa catturarle con precisione. Il vero scopo di un modello di regressione, se non può essere troppo preciso senza eccedere, è quello di approssimare l'andamento della funzione f nel miglior modo possibile. La Figura \ref{overfitting} mostra un esempio di problema di regressione.
 
 \begin{figure}[t]
-		
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/overfitting}
 	\caption{Overfitting}
@@ -117,28 +117,173 @@ A questo punto e' possibile introdurre tutte le misure di performance:
 \end{itemize}
 
 In generale non esiste una misura migliore e bisogna fare un'attenta valutazione su quale sia la preferibile rispetto al task da risolvere.
-Ad esempio bisogna tenere in considerazione se c'e' una prevalenza di punti di una classe. Accuracy e' preferibile quando ci si aspetta una distribuzione uguale delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision e' preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall e' la scelta corretta.
-F-Measure invece e' necessaria quando si cerca un bilanciamento tra precision e recall dando importanza a entrambi i falsi-positivi ed i falsi-negativi.
+Ad esempio bisogna tenere in considerazione se c'e' una prevalenza di punti di una classe. Accuracy e' preferibile quando ci si aspetta una distribuzione equa delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision e' preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall e' la scelta corretta.
+F-Measure invece e' necessaria quando si cerca un bilanciamento tra precision e recall dando importanza a entrambi i falsi-positivi ed i falsi-negativi. 
+All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente importanti da riconoscere e marcarle come negative, quindi falsi-negativi, potrebbe risultare in problemi alla linea di produzione. Ma allo stesso tempo un modello che produce molti più positivi di quanto deve risulterebbe in una perdita di fiducia da parte dell'operatore che inizierebbe semplicemente ad ignorare il feedback del modello in quanto produrrebbe soltanto falsi-positivi. Per questo motivo la scelta della metrica di valutazione e' ricaduta sulla F-Measure.
 
 
 
 \section{Machine Learning Models}
+In questa sezione vengono proposti diversi algoritmi e metodi di machine learning per l'Anomaly Detection, raggruppati per categoria.
+I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD o TODS.
+
 \subsection{Linear Models}
-pca, ocsvm, LMDD, autoregressive
+I modelli lineari sono un tipo di algoritmo di machine learning utilizzato per fare previsioni. Essi rappresentano la relazione tra le variabili indipendenti (chiamate anche caratteristiche) e la variabile dipendente (chiamata anche obiettivo) con una equazione lineare. La forma generale di un modello lineare è: 
+\[ Y = B_0 + B_1X_1 + B_2X_2 + ... + B_n*X_n\]
+dove $ Y $ è la variabile dipendente,  \(X_1, X_2, ..., X_n\)  sono le variabili indipendenti e \( B_0, B_1, B_2, ..., B_n\) sono i coefficienti del modello che vengono "appresi" dai dati.
+
+\subsubsection{PCA}
+La PCA è una riduzione lineare della dimensionalità che utilizza la Singular Value Decomposition dei dati per proiettarli in uno spazio dimensionale inferiore. Si tratta di spiegare la struttura di varianza-covarianza di una serie di variabili attraverso alcune nuove variabili che sono funzioni di quelle originali. Le componenti principali sono particolari combinazioni lineari delle \textit{p} variabili casuali  \(X1, X2, ..., Xp\) con tre importanti proprietà: (1) le componenti principali non sono correlate, (2) la prima componente principale ha la varianza più elevata, la seconda componente principale ha la seconda varianza più elevata e così via, e (3) la variazione totale in tutte le componenti principali combinate è uguale alla variazione totale delle variabili originali \(X1, X2, ..., Xp\). 
+Queste componenti principali sono ottenibili da un'analisi agli autogeni della matrice di covarianza o della matrice di correlazione di \(X1, X2, ..., Xp\).
+In questa procedura, la matrice di covarianza dei dati può essere decomposta in vettori ortogonali, detti autovettori, associati ad autovalori. Gli autovettori con alti autovalori catturano la maggior parte della varianza dei dati. Pertanto, un iperpiano a bassa dimensionalità costruito da \textit{k} autovettori può catturare la maggior parte della varianza dei dati. Tuttavia, gli outlier sono diversi dai punti di dati normali, cosa che è più evidente sull'iperpiano costruito dagli autovettori con autovalori piccoli.
+Di conseguenza, i punteggi degli outlier possono essere ottenuti come la somma della distanza proiettata di un campione su tutti gli autovalori.
+
+\subsubsection{K-PCA}
+Kernel PCA e' un'estensione non-lineare di PCA. I dati di input sono mappati in uno spazio infinitesimale da cui KPA estrae le componenti principali. I tipi di kernel usati possono essere: lineare, polinomiale, sigmoidale o radiale.
+\subsubsection{OCSVM}
+Il metodo One Class Support Vector Machine (OCSVM) e' una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'iper-sfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
+La figura \ref{ocsvm} mostra un esempio del funzionamneto di ocsvm.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/ocsvm}
+	\caption{OCSVM}
+	\label{ocsvm}
+\end{figure}
+
+
+\subsubsection{AutoRegressive}
+In un modello a regressione multipla viene fatto forecasting di una variabile di interesse attraverso una combinazione lineare di predittori. Un modello AutoRegressive, invece, viene fatto forecsting di questa variabile di interesse usand una combinazione lineare su \textit{valori passati} di questa variabile. Il termine auto-regressione indica una regressione della variabile fatta su se stessa.
+Di conseguenza, un modello auto-regressive di ordine \textit{p} puo essere scritto come:
+\[y_t=c+\phi_1 y_{t-1}+\phi_2 y_{t-2}+\cdots+\phi_p y_{t-p}+\varepsilon_t\]
+dove $\varepsilon_t$ e' rumore bianco. Puo essere visto come una regressione multipla ma con valori ritardati di $y_t$ come predittori. 
+La deviazione di un valore predetto rispetto a quello reale viene usato come outlier score.
+
+\subsubsection{MCD}
+\#TODO
+\subsubsection{LMDD}
+\#TODO
+
 \subsection{Distance Based Models}
-kmeans, dbscan, lof, 
+I modelli non supervisionati basati sulla distanza sono una categoria di algoritmi che utilizzano la distanza tra i dati per scoprire relazioni e strutture nel dataset.
+\subsubsection{KNN}
+K-Nearest Neighbors (KNN) è un algoritmo di apprendimento supervisionato utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini" o "neighbors") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è un parametro importante del modello e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
+Nel campo dell'Anomaly Detection, non e' di interessa assegnare la classe al punto in esame ma assegnare un punteggio di anomalia. Per un'osservazione, quindi, la sua distanza rispetto al \textit{k}-esimo punto piu vicino rappresenta lo questo score.
+\subsubsection{DBSCAN}
+BSCAN è un metodo di clustering che raggruppa i punti in aree ad alta densità e contrassegna i punti in regioni a bassa densità come anomali.
+DBSCAN classifica quindi i punti in tre categorie. I punti centrali sono punti
+contenenti almeno $minPts$ nel loro intorno definito da un parametro $\epsilon$. I border-point sono i punti che contengono almeno un punto centrale nel loro intorno, mentre gli altri punti sono considerati come rumore/anomalie. 
+Per gestire serie temporali multivariate, DBSCAN considera ogni finestra temporale come un punto e il punteggio di anomalia è la distanza del punto dal cluster più vicino.
+
+\subsubsection{LOF}
+Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei K-nearest, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti piu vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia. Questo metodo è stato è stato applicato a serie temporali multivariate, dimostrando la sua capacità di individuare anomalie in dati a lungo termine
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/lof}
+	\caption{LOF}
+	\label{lof}
+\end{figure}
+
+\subsubsection{COF}
+\#TODO
+\subsubsection{CBLOF}
+\#TODO
+\subsubsection{HBOS}
+\#TODO
+\subsubsection{SOD}
+\#TODO
+\subsubsection{ROD}
+\#TODO
+
+
 \subsection{Probabilistic Models}
-kde,gmm, sampling, abod, ecod, copod
+I modelli probabilistici non supervisionati sono una categoria di algoritmi che utilizzano la probabilità per descrivere e generare i dati. Essi utilizzano una distribuzione di probabilità per rappresentare la relazione tra le variabili del dataset.
+\subsubsection{KDE}
+Kernel Density Estimation (KDE) e' l'applicazione di un "kernel smoothing" per la stima della probabilita. 
+Siano $(X_1,...,x_n)$ osservazioni indipendenti e identicamente distribuite prese da una distribuzione univariata con una densita non conosciuta \textit{f} per qualasiasi punto \textit{x}. Siamo interessati nello stimare la forma di questa funzione \textit{f}. La funzione kernel di stima e':
+\[\widehat{f}_h(x)=\frac{1}{n} \sum_{i=1}^n K_h\left(x-x_i\right)=\frac{1}{n h} \sum_{i=1}^n K\left(\frac{x-x_i}{h}\right)\]
+
+Dove \textit{K} e' il kernel, una funzione non negativa, e $h>0$ e' un parametro di smoothing chiamato bandwidth. Un kernel con pedice $h$ e' chiamato \textit{kernel scalato} ed e' definito da: $Kh(x) = 1/h K(x/h)$. 
+Il valore di $k$ deve essere scelto tenendo conto del trade-off bias/variance.
+I kernel piu utilizzati sono: uniforme, triangolare, normale e altri.
+Le stime di densita con kernel sono fortemente correlate agli istrogrammi, ma sono dotati di proprieta di smoothing o di valori continui usando appunto questi kernel.
+La figura \ref{kde_model} mostra un confronto tra un istogramma con una funzione di stima di densita con kernel.
+L'applicazione di questo modello nell'Anomaly Detection avviene andando a generare, per un'osservazione, uno score di anomalia corrispondente al valore negativo del logaritmo della probabilita di densita.
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/kde_model}
+	\caption{KDE}
+	\label{kde_model}
+\end{figure}
+
+
+\subsubsection{GMM}
+I GMM sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Sono anche relativamente robusti agli outlier, il che significa che possono fornire risultati accurati anche se ci sono alcuni punti di dati che non si adattano perfettamente a nessuno dei cluster. Ciò rende i GMM uno strumento flessibile e potente per la clusterizzazione dei dati. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
+
+Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato cosi in quanto vengono alternate iterativamente due fasi: quella di excpectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questa valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
+
+E' possibile adottare questo modello nell'Anomaly Detection allenandolo rispetto ad un set di dati e poi assegnando un punteggio ai nuovi punti: quelli significativamente diversi dal resto dei dati verranno marcati come anomalia.
+
+\subsubsection{ABOD}
+Angle Based Outlier Detection (ABOD) si basa sull'idea di osservare l'angolo formato da un insieme di tre punti qualsiasi nello spazio delle feature multivariate. La varianza dell'ampiezza dell'apertura angolare risulta diversa per i punti anomali e per quelli normali: la varianza osservata è più alta per i punti inlier e piu bassa per gli outlier, quindi tale misura puo essere usata per separare punti normali da outlier. ABOD funziona abbastanza bene nello spazio ad alta densità, a differenza di altre misure basate sulla distanza che soffrono della "curse of dimensionality" in quanto gli angoli possono fornire una rappresentazione migliore della vicinanza.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/abod}
+	\caption{ABOD}
+	\label{abod}
+\end{figure}
+Un'esempio sull'idea alla base di ABOD e' presente in figura \ref{abod}.
+Considerando il punto rosso come pivot, viene calcolato l'angolo racchiuso tra questo punto e qualsiasi altro punto dello spazio e con molta probabilita si notera' un'altra varianza tra questi valori. Questo andamento indica che il punto pivot fa parte di un cluster ad alta coesione.
+Se si considera come pivot invece il punto verde e procedendo con gli stessi calcoli per ogni coppia di punti, la varianza angolare sara' molto piu bassa, indice che quel punto e' molto probabilmente un outlier.
+
+\subsubsection{ECOD}
+Empirical-Cumulative-distribution-based Outlier Detection (ECOD) e' un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilita che esista un punto almeno "estremo" come $x_i$.
+ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilita, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilita su tutte le dimensioni.
+
+\subsubsection{COPOD}
+\#TODO
+\subsubsection{SOS}
+\#TODO
+\subsubsection{Sampling}
+\#TODO
+
 \subsection{Ensemble Models}
-iforest, inne, feature bagging
+\subsubsection{I-Forest}
+\#TODO
+\subsubsection{INNE}
+\#TODO
+\subsubsection{Feature Bagging}
+\#TODO
 
 \section{Neural Network Models}
+\subsection{Deep}
+\subsubsection{DeepSVDD}
+\#TODO
 \subsection{Auto Encoders}
-auto, vae
+autoencoders
+\#TODO
+\subsubsection{Variational Autoencoders}
+\#TODO
 \subsection{LSTM}
-lstm, telemanom, DeepLog
-\subsection{Adversarial Networks}
-anogan
+lstm
+\subsubsection{telemanom}
+\#TODO
+\subsubsection{DeepLog}
+\#TODO
 
+\subsection{Adversarial Networks}
+\subsubsection{Anogan}
+\#TODO
+\subsubsection{ALAD}
+\#TODO
+
+\subsection{Graph Based}
+\subsubsection{LUNAR}
+\#TODO
 \section{Thresholding}
-iqr, z-score, o yGMM del tipo
+\subsection{IQR}
+\#TODO
+\subsection{Z-Score}
+\#TODO
+\subsection{yGMM}
+\#TODO
