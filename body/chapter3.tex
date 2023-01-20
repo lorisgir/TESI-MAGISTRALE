@@ -159,15 +159,20 @@ dove $\varepsilon_t$ e' rumore bianco. Puo essere visto come una regressione mul
 La deviazione di un valore predetto rispetto a quello reale viene usato come outlier score.
 
 \subsubsection{MCD}
-\#TODO
+Minimum Covariance Determinant (MCD) e' un metodo per stimare la media e la matrice di covarianza andando a minimizzare l'influenza delle anomalie. L'idea alla base e' quella di stimare questi valori andando a selezionare un sottoinsieme dei dati nel quale si spera non contengano anomalie.
+Immaginando un approccio brute-force, l'algoritmo itera su ogni possibile sottoinsieme dei dati di una dimensione specifica. Vengono poi stimati la media e la matrice di covarianza per ogni sottoinsieme e poi vengono mantenute soltanto i valori per il sottoinsieme che ha il determinante della matrice di covarianza piu piccolo. Il motivo di questo e' perche il determinante di una matrice di covarianza indica quanto e' larga una distribuzione. Di conseguenza MCD cerca di minimizzare questo andando a prendere la distribuzione piu compatta. Questo consente di escludere le anomalie che saranno situate lontane dal resto dei dati.
+
 \subsubsection{LMDD}
-\#TODO
+Linear Method for Deviation-based Outlier Detection (LMDD) impiega il concetto di Smoothing Factor il quale indica quanto puo essere ridotta la misura di dissimilarita andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarita puo essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc).
+I punti che rimossi riducono maggiormente questa misura di dissimilarita possono essere valutati come anomalie.
 
 \subsection{Distance Based Models}
 I modelli non supervisionati basati sulla distanza sono una categoria di algoritmi che utilizzano la distanza tra i dati per scoprire relazioni e strutture nel dataset.
+
 \subsubsection{KNN}
 K-Nearest Neighbors (KNN) è un algoritmo di apprendimento supervisionato utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini" o "neighbors") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è un parametro importante del modello e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
 Nel campo dell'Anomaly Detection, non e' di interessa assegnare la classe al punto in esame ma assegnare un punteggio di anomalia. Per un'osservazione, quindi, la sua distanza rispetto al \textit{k}-esimo punto piu vicino rappresenta lo questo score.
+
 \subsubsection{DBSCAN}
 BSCAN è un metodo di clustering che raggruppa i punti in aree ad alta densità e contrassegna i punti in regioni a bassa densità come anomali.
 DBSCAN classifica quindi i punti in tre categorie. I punti centrali sono punti
@@ -184,15 +189,21 @@ Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto
 \end{figure}
 
 \subsubsection{COF}
-\#TODO
+Connectivity Outlier Factor (COF) e' un'evoluzione di LOF. Si basa sull'idea di assegnare un grado di anomalia ad ognuno dei punti, chiamato connectivty outlier factor.
+Per ogni punto $x_i$, vengono selezionati i \textit{k} punti piu vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti piu vicini.
+
 \subsubsection{CBLOF}
-\#TODO
+Cluster-Based Local Outlier Factor (CBLOF) e' anchesso un evoluzione di LOF.
+Come primo step, CBLOF riceve in input i dati ed un algoritmo di clustering per andare a creare i cluster. Attraverso dei parametri va poi ha definire quale cluster viene considerato "grande" e quale viene considerato "piccolo". Vengono poi calcolati gli outlier score andando a considerare la dimensione del cluster a cui appartiene e la distanza piu vicina rispetto al centro di un cluster grande. Quindi piu un cluster di appartenenza e' piccolo e piu il punto e' lontano dal centro di un cluster grande, piu lo score di anomalia sara' alto. 
+
 \subsubsection{HBOS}
-\#TODO
+Histogram based outlier detection (HBOS) e' un algoritmo di outlier detection che si basa sugli istrogrammi e assumendo indipendenza tra le feature. Per ogni feature computa il rispettivo istrogramma. Successivamente itera su ogni punti, se il valore di una feature di uno specifico punto $x_i$ rientra nella coda dell'istrogramma, questo punto vede alzarsi lo score di anomalia. Questo passaggio viene ripetuto rispetto ad ogni feature e su tutti i punti.
+
 \subsubsection{SOD}
-\#TODO
+Subspace outlier detection (SOD) cerca di trovare gli outlier andando a considerare diversi sottoinsiemi dello spazio multidimensionale delle feature. Per ogni osservazione, SOD esplora il sottoinsieme delle dimensioni che si dirama parallalelamente dai punti vicini e determina quanto questa osservazione devia dai suoi vicini in questo sotto-spazio. 
+
 \subsubsection{ROD}
-\#TODO
+Rotation-based Outlier Detection (ROD),  è un algoritmo privo di parametri che non richiede conoscenza sulla distribuzione dei dati e funziona in modo intuitivo nello spazio tridimensionale, dove i vettori 3D, che rappresentano i punti, vengono ruotati attorno alla mediana geometrica due volte in senso antiorario utilizzando la formula di rotazione di Rodrigues. I risultati della rotazione sono parallelepipedi i cui volumi vengono analizzati matematicamente come funzioni di costo e utilizzati per calcolare le Deviazioni Assolute Mediane e ottenere così il punteggio di anomalia. Per dimensioni elevate > 3, il punteggio complessivo viene calcolato prendendo la media dei punteggi complessivi dei sottospazi 3D risultanti dalla scomposizione dello spazio dati originale.
 
 
 \subsection{Probabilistic Models}
@@ -241,11 +252,17 @@ Empirical-Cumulative-distribution-based Outlier Detection (ECOD) e' un modello p
 ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilita, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilita su tutte le dimensioni.
 
 \subsubsection{COPOD}
-\#TODO
+Copula Based Outlier Detection (COPOD) si ispira alla copula per modellare la distribuzione dei dati multivariati. Costruisce dapprima una copula empirica e la utilizza per predire la tail-probability di ogni punto per determinare il suo
+livello di "estremita". Intuitivamente, si puo pensare a questo come a calcolare
+un valore p-anomalo.
+
 \subsubsection{SOS}
-\#TODO
+Stochastic Outlier Selection (SOS) utilizza il concetto di affinità per quantificare la relazione tra un punto e un altro. L'affinità è proporzionale alla somiglianza tra due punti di dati. Quindi un punto ha poca affinità con un punto dati dissimile. 
+Un'osservazione viene classificata come outlier quando tutti gli altri punti hanno un'affinità insufficiente con esso.
+
 \subsubsection{Sampling}
-\#TODO
+Fast-KNN andando a scegliere a caso un sottoinsieme di punti per fare knn-distance. cosi non li computo tutti 
+https://pdfs.semanticscholar.org/6e3b/d9d74747af4c7ea0c98e339c0b488cac844d.pdf
 
 \subsection{Ensemble Models}
 \subsubsection{I-Forest}
