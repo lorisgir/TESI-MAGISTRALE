@@ -125,7 +125,7 @@ All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente im
 
 \section{Machine Learning Models}
 In questa sezione vengono proposti diversi algoritmi e metodi di machine learning per l'Anomaly Detection, raggruppati per categoria.
-I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD o TODS.
+I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD o TODS ed utilizzati nel processo di Model Selection discusso nei capitoli successivi.
 
 \subsection{Linear Models}
 I modelli lineari sono un tipo di algoritmo di machine learning utilizzato per fare previsioni. Essi rappresentano la relazione tra le variabili indipendenti (chiamate anche caratteristiche) e la variabile dipendente (chiamata anche obiettivo) con una equazione lineare. La forma generale di un modello lineare è: 
@@ -261,46 +261,166 @@ Stochastic Outlier Selection (SOS) utilizza il concetto di affinità per quantif
 Un'osservazione viene classificata come outlier quando tutti gli altri punti hanno un'affinità insufficiente con esso.
 
 \subsubsection{Sampling}
-Fast-KNN andando a scegliere a caso un sottoinsieme di punti per fare knn-distance. cosi non li computo tutti 
-https://pdfs.semanticscholar.org/6e3b/d9d74747af4c7ea0c98e339c0b488cac844d.pdf
+Sampling e' un algoritmo che cerca di approssimare, a favore di un tempo computazionale decisamente minore, KNN. Al posto di calcolare la distanza di un punto rispetto a tutti gli altri e prendere solamente i \textit{k} piu vicini, esegue prima una fase di sampling in cui estrare casualmente un sottoinsieme di punti per poi andare ad effettuare i calcoli sulla distanza in questo sottoinsieme.
 
 \subsection{Ensemble Models}
+Gli ensemble models sono una tecnica di apprendimento automatico che consiste nell'utilizzare più modelli per risolvere un problema specifico. Il risultato finale è ottenuto combinando i risultati di ciascun modello. Ci sono diverse tecniche per combinare i risultati dei modelli, come la media, la mediana o la maggioranza. Gli ensemble models sono spesso utilizzati per aumentare la precisione e la robustezza di un modello, poiché la combinazione di più modelli può ridurre l'effetto di eventuali errori o incertezze presenti in un singolo modello.
+
 \subsubsection{I-Forest}
-\#TODO
+Isolation Forest "isola" le osservazioni selezionando casualmente una feature per poi selezionare casualmente un valore di split tra i valori massimo e minimo della feature selezionata. 
+Poiché il partizionamento ricorsivo può essere rappresentato da una struttura ad albero, il numero di suddivisioni necessarie per isolare un campione è equivalente alla lunghezza del percorso dal nodo radice al nodo finale.
+Questa lunghezza del percorso, aggregata nella media rispetto ad una foresta di alberi casuali, è una misura di anomalia: la suddivisione casuale produce percorsi sensibilmente più brevi per le anomalie. Pertanto, quando una foresta di alberi casuali produce collettivamente percorsi più brevi per particolari punti, è altamente probabile che si tratti di anomalie.
+La figura \ref{iforest} mostra a sinistra un esempio di punto normale e a destra un esempio di punto anomalo.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/iforest}
+	\caption{I-Forest}
+	\label{iforest}
+\end{figure}
 \subsubsection{INNE}
-\#TODO
+l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest-neighbor (INNE) è un metodo per rilevare anomalie in cui un ensemble di nearest-neighbor viene addestrato sui dati normali per identificare i punti di dati che sono isolati dal resto dei dati, che vengono considerati anomalie.
+
+Il processo di solito funziona come segue:
+\begin{enumerate}
+\item Il set di dati viene diviso in un insieme di addestramento, che viene utilizzato per addestrare l'ensemble di nearest-neighbor, e un insieme di test, che viene utilizzato per valutare le prestazioni dell'ensemble.
+\item L'ensemble di nearest-neighbor viene addestrato sull'insieme di addestramento utilizzando una tecnica come k-NN o LOF.
+\item L'ensemble di nearest-neighbor viene quindi utilizzato per identificare i punti di dati isolati nell'insieme di test. Questi punti di dati isolati vengono considerati anomalie.
+\item Un punteggio di anomalia viene assegnato a ogni punto di dati, basato su quanto è isolato il punto dal resto dei dati. Più alto è il punteggio di anomalia, maggiore è la probabilità che il punto di dati sia un'anomalia.
+\end{enumerate}
+
 \subsubsection{Feature Bagging}
-\#TODO
+Fature Bagging è un meta-estimator che adatta una serie di predittori di base a vari sotto-insiemi del dataset ed utilizza la media o altri metodi di combinazione per migliorare l'accuratezza predittiva e controllare l'over-fitting.
+Le feature sono anch'esse campionate in modo casuale.
+Per impostazione predefinita, viene utilizzato LOF come predittore di base. Tuttavia, è possibile utilizzare qualsiasi stimatore di base, come kNN e ABOD.
+Il Feature Bagging costruisce innanzitutto \textit{n} sottoinsiemi selezionando casualmente un sottoinsieme di feature, il che induce la diversità dei predittori di base.
+Infine, il punteggio di predizione viene generato facendo la media o prendendo il massimo di tutti i predditori.
 
 \section{Neural Network Models}
-\subsection{Deep}
+I metodi basati sulle Neural Networks sono una sottocategoria di metodi di machine learning che si basano su reti neurali.
+Le reti neurali possono essere considerate come strutture che simulano il comportamento e il meccanismo del cervello umano. Come il cervello umano, l'unità di base della computazione è il neurone e questi sono collegati tra loro attraverso le sinapsi.  Il segnale propagato è proporzionale all'input ricevuto.
+In primo luogo, c'è una serie di neuroni che si trovano all'ingresso della rete: questi sono chiamati neuroni di ingresso, che hanno il compito di raccogliere le informazioni da elaborare all'interno della rete.
+Poi, c'è un neurone chiamato neurone di uscita, che ha il compito di restituire il risultato della computazione della rete. L'elaborazione avviene, in questo caso attraverso la somma ponderata degli ingressi. 
+Ad ogni segnale di ingresso viene associato un peso, che è un punto fondamentale delle reti neurali, in quanto è attraverso questi pesi viene restituito un risultato piuttosto che un altro. Inoltre, al neurone di uscita è associato un ulteriore input chiamato bias: esso rappresenta la tendenza del neurone ad attivarsi o meno. Ovviamente, maggiore è il bias, maggiore è la tendenza del neurone ad attivarsi, poiché aggiunge più informazioni alla somma ponderata. Per semplificare i calcoli, il bias viene trattato come un neurone di ingresso aggiuntivo con segnale di ingresso sempre uguale a 1 e peso associato pari al bias scelto. A questo punto, il risultato della somma ponderata passa attraverso una funzione di attivazione, che restituisce il risultato effettivo.
+Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. In generale, si considera una rete neurale profonda quando ha almeno tre strati nascosti, ovvero strati tra l'ingresso e l'uscita della rete. Un numero maggiore di strati consente alla rete di apprendere rappresentazioni piu complesse dei dati.
+
+Ci sono diversi tipi di reti neurali, tra cui:
+\begin{itemize}
+\item Reti feedforward: una semplice struttura di reti neurali in cui i dati scorrono in una direzione, dall'ingresso all'uscita.
+\item Reti ricorrenti: una struttura di reti neurali in cui i dati possono fluire in entrambe le direzioni, dall'ingresso all'uscita e viceversa.
+\item  Reti convolutional: una struttura di reti neurali utilizzata per lavorare con immagini e video, in cui vengono utilizzati filtri per estrarre caratteristiche dai dati di ingresso.
+\item Reti autoencoder: una struttura di reti neurali utilizzata per la riduzione della dimensionalità e l'apprendimento non supervisionato.
+\item Reti generative: una struttura di reti neurali utilizzata per generare nuovi dati, come ad esempio immagini, testo o suoni.
+\end{itemize}
+
+
+\subsection{Deep Neural Networks}
 \subsubsection{DeepSVDD}
-\#TODO
+Deep Support Vector Data Description (DeepSVDD) allena una rete neurale mentre minimizza il volume della iper-sfera che racchiude la rappresentazione della rete sui dati. Minimizzare il volume dell'iper-sfera forza la rete ad estrarre i fattori comuni di variazione dato che la rete deve mappare i punti dei daltaset al centro della sfera. 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/deepsvdd}
+	\caption{DeepSVDD}
+	\label{deepsvdd}
+\end{figure}
+
 \subsection{Auto Encoders}
-autoencoders
-\#TODO
+Un Auto-Encoder è una rete neurale artificiale che combina un encoder $E$ e un decoder $D$. L'encoder e' un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un'insieme di variabili latenzi $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder e' il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ e' chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder ha compiere errori nella fase di ricostruzione.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/ae}
+	\caption{AutoEncoder}
+	\label{ae}
+\end{figure}
 \subsubsection{Variational Autoencoders}
-\#TODO
+I Variational Autoencoders ereditano parte dell'architettura dei classici AutoEncoders ma hanno profonde differenze. VAE e' considerato un modello generativo e inoltre il suo encoder non solo produce una rappresentazione latente, ma anche una distribuzione di probabilità della rappresentazione latente $\mu$ e $\sigma$. Questo rende possibile generare nuovi sample semplicemente estraendo valori casuali dalla distribuzione di probabilità prodotta dall'encoder.
+Il modello viene allenato per minimizzare la divergenza Kullback-Leibler (KL) tra la distribuzione di probabilità prodotta dall'encoder e una distribuzione nota (spesso una distribuzione normale) e allo stesso tempo massimizzare la capacità del decoder di ricostruire l'immagine originale.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=10cm, scale=1]{images/vae}
+	\caption{VAE}
+	\label{vae}
+\end{figure}
+
 \subsection{LSTM}
-lstm
-\subsubsection{telemanom}
-\#TODO
-\subsubsection{DeepLog}
-\#TODO
+Le LSTM (Long Short-Term Memory) sono un tipo di rete neurale artificiale utilizzata in problemi di elaborazione del linguaggio e predizione dei dati temporali. Sono state progettate per gestire problemi di "vanishing gradient" presenti in modelli di rete neurale tradizionali, consentendo una memorizzazione a lungo termine dei dati. Ciò significa che le LSTM possono tenere traccia di eventi che accadono molto tempo prima, il che è utile per comprendere il contesto.
+Le reti LSTM sono composte da elementi detti \textit{unit} o \textit{celle} che a loro volta sono composte dei gates. Uno di ingresso, uno di uscita e uno detto \textit{forget gate}. La cella ricorda i valori su intervalli di tempo arbitrari e i tre gate regolano il flusso di informazioni in entrata e in uscita. Le forget gate decidono quali informazioni scartare da uno stato precedente assegnando a quest'ultimo, rispetto all'ingresso corrente, un valore compreso tra 0 e 1. Un valore vicino a 1 significa mantenere l'informazione, mentre un valore di 0 significa scartarla. Le porte di ingresso decidono quali nuove informazioni memorizzare nello stato corrente, utilizzando lo stesso sistema delle forget gate. Le porte di uscita controllano quali informazioni dello stato corrente devono essere emesse, assegnando un valore da 0 a 1 alle informazioni, tenendo conto degli stati precedente e attuale. L'emissione selettiva di informazioni rilevanti dallo stato corrente consente alla rete LSTM di mantenere dipendenze utili a lungo termine per fare previsioni, sia nel tempo corrente che in quello futuro.
+
+Le LSTM possono essere utilizzate per rilevare anomalie in dati temporali andando ad addestrare il modello sui dati "normali", per imparare una rappresentazione del comportamento normale dei dati. Quindi, quando nuovi dati vengono presentati al modello, possono essere utilizzati per generare una previsione e confrontare questa previsione con i dati effettivi. Se ci sono differenze significative tra la previsione e i dati effettivi, allora questi dati possono essere considerati anomali.
+
 
 \subsection{Adversarial Networks}
-\subsubsection{Anogan}
-\#TODO
+Le reti avversarie generative, o in breve GAN, sono un approccio alla modellazione generativa che utilizza metodi di apprendimento come le reti neurali convoluzionali.
+
+La modellazione generativa è un task dell'apprendimento non supervisionato che prevede la scoperta e l'apprendimento automatico delle relazioni o delle variabili latenti all'interno dei dati di input in modo tale che il modello possa essere utilizzato per generare o produrre nuovi esempi che potrebbero essere stati plausibilmente ricavati dal set di dati originale.
+
+Le GAN sono un modo di addestrare un modello generativo, strutturando il problema come un problema di apprendimento supervisionato con due sottomodelli: il modello generatore, che viene addestrato per generare nuovi esempi, e il modello discriminatore, che cerca di classificare gli esempi come reali (provenienti dal dominio) o falsi (generati). I due modelli vengono addestrati insieme in un gioco a somma zero (da qui adversarial), fino a quando il modello discriminatore viene ingannato circa la metà delle volte, il che significa che il modello generatore sta generando esempi plausibili.
+
+
+\subsubsection{AnoGAN}
+AnoGAN (Anomaly GAN) è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione densa dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
+
+Il modello AnoGAN è composto da tre componenti principali:
+
+\begin{enumerate}
+\item Il generatore GAN che impara a generare dati che seguono la distribuzione dei dati normali.
+\item Il discriminatore GAN che impara a distinguere i dati generati dai dati reali.
+\item La rete neurale di rilevamento di anomalie che utilizza la rappresentazione densa generata dal generatore GAN per distinguere i dati normali dalle anomalie.
+\end{enumerate}
+
+Durante il training, il generatore GAN impara a generare dati che sembrano provenire dalla distribuzione dei dati normali, mentre il discriminatore GAN impara a distinguere i dati generati dai dati reali. Dopo il training, la rete neurale di rilevamento di anomalie utilizza la rappresentazione densa generata dal generatore GAN per distinguere i dati normali dalle anomalie.
+
 \subsubsection{ALAD}
-\#TODO
+Adversarially Learned Anomaly Detection (ALAD)  e' una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza e' presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
 
 \subsection{Graph Based}
+#TODO intro
 \subsubsection{LUNAR}
-\#TODO
+LUNAR: Unifying Local Outlier Detection Methods via Graph Neural Networks è un metodo per la rilevazione di anomalie che utilizza le reti neurali su grafi per apprendere la struttura locale dei dati. Il metodo si basa sull'idea che i punti di dati normali saranno simili ai loro punti di dati vicini, mentre i punti di dati anomali saranno dissimili.
+Il processo di solito funziona come segue:
+\begin{enumerate}
+\item Viene costruito un grafo dai dati, dove ogni nodo rappresenta un punto di dati e gli archi vengono tracciati tra i punti di dati che vengono considerati simili.
+\item Una rete neurale su grafi viene addestrata sul grafo per apprendere la struttura locale dei dati.
+\item Dopo l'addestramento, la rete neurale su grafi viene utilizzata per calcolare un punteggio di outlier per ogni punto di dati. Il punteggio di outlier rappresenta quanto dissimile è il punto di dati dai suoi punti di dati vicini.
+\item I punti di dati con punteggi di outlier elevati vengono considerati anomalie.
+
+\end{enumerate}
+E' particolarmente utile per rilevare anomalie in dati che hanno una struttura complessa. Il metodo è in grado di modellare la struttura locale dei dati, il che lo rende efficace nel rilevare anomalie che potrebbero essere mancate da altri metodi.
+
+
+
+
 \section{Thresholding}
+Il problema del thresholding nella rilevazione di anomalie si riferisce alla sfida di determinare il valore di soglia appropriato che separa i punti di dati normali dai punti di dati anomali. Il valore di soglia viene solitamente utilizzato per assegnare una label di anomalia a ciascun punto di dati: i punti di dati con punteggi superiori alla soglia vengono considerati anomalie. Tuttavia, determinare il valore di soglia appropriato può essere difficile, poiché dipende dall'applicazione specifica e dall'insieme di dati.
+
+Una delle principali sfide del thresholding è che solitamente si basa su una conoscenza a priori dei dati, che potrebbe non essere disponibile o potrebbe essere inaccurata. Inoltre, la distribuzione dei punti di dati e il numero di punti di dati anomali possono variare notevolmente tra diversi set di dati, rendendo difficile determinare un valore di soglia appropriato per tutti i set di dati.
+
+Un'altra sfida del thresholding è che può essere difficile bilanciare il compromesso tra il numero di rilevamenti true-positive ed il numero di rilevamenti false-positive. Un valore di soglia troppo alto può causare molti falsi negativi, mentre un valore di soglia troppo basso può causare molti falsi positivi.
+Sono proposti ora due metodi classici di thresholding ed un terzo metodo novizio che verra' utilizzato nel Model Selection.
+
 \subsection{IQR}
-\#TODO
+Il metodo si basa sull'uso della deviazione interquartile (che è la differenza tra il terzo e il primo quartile) come base per determinare se un punto di dati è anomalo.
+
+Il processo di solito funziona come segue:
+\begin{enumerate}
+\item Calcolare il primo quartile (Q1) e il terzo quartile (Q3) dei dati
+\item Calcolare la deviazione interquartile (IQR) come Q3 - Q1
+\item Definire la soglia inferiore come Q1 - 1.5 x IQR e la soglia superiore come Q3 + 1.5 x IQR
+\item I punti di dati che si trovano al di fuori del range tra la soglia inferiore e la soglia superiore vengono considerati anomalie.
+\end{enumerate}
+
+Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati, quindi è un metodo semplice ed efficiente per determinare i valori di soglia. Tuttavia, questo metodo è sensibile ai valori estremi, quindi potrebbe non essere adatto per i dati con molti valori estremi.
+
 \subsection{Z-Score}
-\#TODO
+Il punteggio Z (z-score) è una misura della distanza di un punto di dati dalla media dei dati in termini di deviazione standard. I punti di dati con punteggi Z troppo alti o troppo bassi vengono considerati anomalie.
+l processo di solito funziona come segue:
+\begin{enumerate}
+\item Calcolare la media e la deviazione standard dei dati
+\item Calcolare il punteggio Z per ogni punto di dati utilizzando la formula (valore del punto di dati - media) / deviazione standard
+\item Definire una soglia per i punteggi Z, ad esempio 3 o -3 (che rappresentano rispettivamente 3 deviazioni standard sopra o sotto la media)
+\item I punti di dati con punteggi Z al di fuori della soglia vengono considerati anomalie.
+\end{enumerate}
+Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati. Tuttavia, questo metodo presuppone che i dati seguano una distribuzione normale, quindi potrebbe non essere adatto per i dati non normalmente distribuiti. Inoltre, il valore della soglia deve essere scelto con attenzione in quanto può avere un impatto significativo sulle prestazioni del metodo.
+
+
 \subsection{yGMM}
 \#TODO
