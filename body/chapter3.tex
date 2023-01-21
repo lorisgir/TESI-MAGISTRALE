@@ -301,7 +301,6 @@ Le reti neurali possono essere considerate come strutture che simulano il compor
 In primo luogo, c'è una serie di neuroni che si trovano all'ingresso della rete: questi sono chiamati neuroni di ingresso, che hanno il compito di raccogliere le informazioni da elaborare all'interno della rete.
 Poi, c'è un neurone chiamato neurone di uscita, che ha il compito di restituire il risultato della computazione della rete. L'elaborazione avviene, in questo caso attraverso la somma ponderata degli ingressi. 
 Ad ogni segnale di ingresso viene associato un peso, che è un punto fondamentale delle reti neurali, in quanto è attraverso questi pesi viene restituito un risultato piuttosto che un altro. Inoltre, al neurone di uscita è associato un ulteriore input chiamato bias: esso rappresenta la tendenza del neurone ad attivarsi o meno. Ovviamente, maggiore è il bias, maggiore è la tendenza del neurone ad attivarsi, poiché aggiunge più informazioni alla somma ponderata. Per semplificare i calcoli, il bias viene trattato come un neurone di ingresso aggiuntivo con segnale di ingresso sempre uguale a 1 e peso associato pari al bias scelto. A questo punto, il risultato della somma ponderata passa attraverso una funzione di attivazione, che restituisce il risultato effettivo.
-Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. In generale, si considera una rete neurale profonda quando ha almeno tre strati nascosti, ovvero strati tra l'ingresso e l'uscita della rete. Un numero maggiore di strati consente alla rete di apprendere rappresentazioni piu complesse dei dati.
 
 Ci sono diversi tipi di reti neurali, tra cui:
 \begin{itemize}
@@ -314,14 +313,16 @@ Ci sono diversi tipi di reti neurali, tra cui:
 
 
 \subsection{Deep Neural Networks}
+Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. In generale, si considera una rete neurale profonda quando ha almeno tre strati nascosti, ovvero strati tra l'ingresso e l'uscita della rete. Un numero maggiore di strati consente alla rete di apprendere rappresentazioni piu complesse dei dati.
 \subsubsection{DeepSVDD}
-Deep Support Vector Data Description (DeepSVDD) allena una rete neurale mentre minimizza il volume della iper-sfera che racchiude la rappresentazione della rete sui dati. Minimizzare il volume dell'iper-sfera forza la rete ad estrarre i fattori comuni di variazione dato che la rete deve mappare i punti dei daltaset al centro della sfera. 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/deepsvdd}
 	\caption{DeepSVDD}
 	\label{deepsvdd}
 \end{figure}
+
+Deep Support Vector Data Description (DeepSVDD) e' una rete neurale profonda che durante la fase di training punta a minimizzare il volume della iper-sfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'iper-sfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti dei daltaset al centro della sfera. 
 
 \subsection{Auto Encoders}
 Un Auto-Encoder è una rete neurale artificiale che combina un encoder $E$ e un decoder $D$. L'encoder e' un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un'insieme di variabili latenzi $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder e' il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ e' chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder ha compiere errori nella fase di ricostruzione.
@@ -373,7 +374,8 @@ Durante il training, il generatore GAN impara a generare dati che sembrano prove
 Adversarially Learned Anomaly Detection (ALAD)  e' una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza e' presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
 
 \subsection{Graph Based}
-#TODO intro
+Le reti neurali basate su grafi (o GNN, Graph Neural Networks) sono una classe di modelli di apprendimento automatico che utilizzano strutture di dati a forma di grafo per rappresentare i dati. In questi modelli, i nodi del grafo rappresentano i sample e gli archi rappresentano le relazioni tra questi. Le GNN utilizzano un algoritmo di propagazione per aggiornare i valori dei nodi del grafo in base alle informazioni che si trovano sui nodi adiacenti.
+
 \subsubsection{LUNAR}
 LUNAR: Unifying Local Outlier Detection Methods via Graph Neural Networks è un metodo per la rilevazione di anomalie che utilizza le reti neurali su grafi per apprendere la struttura locale dei dati. Il metodo si basa sull'idea che i punti di dati normali saranno simili ai loro punti di dati vicini, mentre i punti di dati anomali saranno dissimili.
 Il processo di solito funziona come segue:
