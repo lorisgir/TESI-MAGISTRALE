@@ -424,5 +424,38 @@ l processo di solito funziona come segue:
 Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati. Tuttavia, questo metodo presuppone che i dati seguano una distribuzione normale, quindi potrebbe non essere adatto per i dati non normalmente distribuiti. Inoltre, il valore della soglia deve essere scelto con attenzione in quanto può avere un impatto significativo sulle prestazioni del metodo.
 
 
-\subsection{yGMM}
-\#TODO
+\subsection{$\gamma$GMM}
+ESTIMATING THE CONTAMINATION FACTOR’S DISTRIBUTION IN UNSUPERVISED ANOMALY DETECTION e' un paper pubblicato da Lorenzo Perini, ricercatore al dipartimento di KU Leuven.
+Il problema trattato in questo paper consiste nella stima della distribuzione del fattore di contaminazione ($\gamma$) in un insieme di dati non etichettato utilizzando un insieme di M rilevatori di anomalie non supervisionati. 
+
+Per affrontare questo problema, in questo paper viene proposto $\gamma$GMM, un approccio innovativo che utilizza un metodo bayesiano per stimare la distribuzione del fattore di contaminazione.
+L'approccio $\gamma$GMM si compone di quattro fasi:
+\begin{enumerate}
+\item La prima fase consiste nella mappatura dei dati in uno spazio di anomalie a M dimensioni, dove le dimensioni corrispondono ai punteggi di anomalia assegnati dai M rilevatori di anomalie. In questo spazio, il pattern evidente è che "più alto è il punteggio, più anomalo è il dato".
+\item La seconda fase consiste nel modellare i dati in questo spazio utilizzando un modello di miscela di Gaussiane con processo di Dirichlet (DPGMM). Si assume che ognuno dei tanti componenti di miscela contenga solo dati normali o solo dati anomali. Se si conoscesse quali componenti contengono anomalie, sarebbe possibile derivare facilmente la distribuzione posteriore di $\gamma$ come somma delle proporzioni di miscela dei componenti anomali. Tuttavia, in questo setting tale informazione non è disponibile.
+\item La terza fase consiste nella stima della probabilità che i k componenti più estremi siano anomalie. Ciò presenta tre sfide: (a) rappresentare ogni componente in uno spazio M-dimensionale utilizzando un unico valore per ordinarli dal più anomalo al meno anomalo, (b) calcolare la probabilità che il k-esimo componente sia anomalo dato che il (k-1)-esimo è tale, (c) derivare la probabilità obiettivo che esattamente k componenti siano anomalie congiuntamente.
+\item La quarta e ultima fase consiste nella stima della distribuzione posteriore del fattore di contaminazione ($\gamma$) utilizzando la probabilità congiunta e le proporzioni di miscela dei componenti.
+
+\end{enumerate}
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=14cm, scale=1]{images/ygmm1}
+	\caption{$\gamma$GMM}
+	\label{ygmm1}
+\end{figure}
+
+In generale, l'approccio $\gamma$GMM fornisce una stima della distribuzione del fattore di contaminazione ($\gamma$) che può essere utilizzata per quantificare la probabilità che un dato campione sia anomalo rispetto a una distribuzione di dati normali. Inoltre, utilizzando un metodo bayesiano per la stima della distribuzione di $\gamma$, l'approccio $\gamma$GMM tiene conto delle incertezze nei parametri del modello. Ciò consente di ottenere una stima più precisa e robusta del fattore di contaminazione rispetto ai metodi tradizionali.
+La formula utilizzata per la stima della distribuzione di $\gamma$ è la seguente:
+
+\[p(\gamma | X) = \sum_{k=1}^{\infty} p(k | X) \sum_{i_1 < i_2 <...< i_k}^{m} p(\gamma | z_{i_1}, z_{i_2},..., z_{i_k}) p(z_{i_1}, z_{i_2},..., z_{i_k} | X)\]
+
+dove X è l'insieme di dati, $\gamma$ è il fattore di contaminazione, k è il numero di componenti anomali, z è il vettore di appartenenza ai componenti di miscela e m è il numero di componenti di miscela.
+
+All'interno del paper sono presenti anche i risultati degli esperimenti in cui il metodo $\gamma$GMM viene confrontanto con numerosi metodi di thresholding tra cui IQR o Z-Score. I risultati sono incoraggianti e non solo ottiene il punteggio di MAE piu basso (rispetto al true $\gamma$), ma la degradazione di una metrica supervisionata, come F-Measure, di un rilevatore di anomalie a cui e' stato passato come fattore di contaminazione quanto generato dall'alagoritmo di $\gamma$GMM e' la piu bassa rispetto a tutti gli altri metodi di thresholding. 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=14cm, scale=1]{images/ygmm2}
+	\caption{$\gamma$GMM}
+	\label{ygmm2}
+\end{figure}
+Per questo motivo, si e' deciso di utilizzare questo metodo per la stima di contaminazione dei dati di SKF. Valore che poi e' stato utilizzato come parametro ai modelli di Anomaly Detection utilizzato nel Model Selection.
