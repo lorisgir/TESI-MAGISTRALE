@@ -2,7 +2,7 @@
 \label{chap:skf}
 
 \section{Introduzione}
-SKF e' un'azienda multinazionale specializzata nella produzione di cuscinetti a sfera. A seguito della formalizzazione del progetto Beat 4.0 portato avanti da SKF e Alten Italia e' iniziato un progetto di digitalizzazione degli impianti di produzione attraverso l'installazione di sensori all'interno dei macchinari lungo la catena di montaggio.
+SKF é un'azienda multinazionale specializzata nella produzione di cuscinetti a sfera. A seguito della formalizzazione del progetto Beat 4.0 portato avanti da SKF e Alten Italia é iniziato un progetto di digitalizzazione degli impianti di produzione attraverso l'installazione di sensori all'interno dei macchinari lungo la catena di montaggio.
 Il processo di produzione è composto da varie fasi e parte da due anelli grezzi che costituiranno le parti interne ed esterne del prodotto finale. Entrambi gli anelli vengono raffinati
 in parallelo attraverso due operazioni sequenziali: la rettifica e la levigatura. 
 I due anelli vengono poi assemblati insieme ad altri componenti come la gabbia e gli elementi di rotolamento. In seguito, attraverso l'analisi di frequenza, vengono valutate alcune qualità del cuscinetto.
@@ -13,7 +13,7 @@ I dati prodotti dai macchinari sono quindi divisi in due categorie:
 	\item \textbf{MVM}: sono i dati prodotti dai macchinari di controllo qualità sul prodotto finito.
 \end{itemize}
 
-Lo scopo di questo progetto e di questa tesi e' quello di applicare tecniche non supervisionate di rilevamento anomalie utilizzando i dati a disposizione prodotti dai sensori installati sui macchinari.
+Lo scopo di questo progetto e di questa tesi é quello di applicare tecniche non supervisionate di rilevamento anomalie utilizzando i dati a disposizione prodotti dai sensori installati sui macchinari.
 
 \section{Descrizione del dataset}
 Poiché i dati sono di proprietà della SKF, la descrizione è ridotta al minimo, e i nomi delle misure e delle macchine sono fittizi.
@@ -21,7 +21,7 @@ Poiché i dati sono di proprietà della SKF, la descrizione è ridotta al minimo
 
 \subsection{CoMo}
 I dati includono le misurazioni di differenti caratteristiche di alcune delle macchine della catena di produzione. Per ogni macchina monitorata, sono incluse le velocità radiali e assiali, gli inviluppi radiali e assiali, la temperatura, pressione e vibrazione.
-Poiché non tutte le macchine dell'impianto sono monitorate vengono persi dettagli e completezza nei dati, ma nonostante questo il dataset a disposizione e' ricco di informazioni.
+Poiché non tutte le macchine dell'impianto sono monitorate vengono persi dettagli e completezza nei dati, ma nonostante questo il dataset a disposizione é ricco di informazioni.
 All'inizio, i dati CoMo sono stati registrati ogni dieci minuti.
 Per l'ultima porzione di dati accessibili ad ALTEN, la frequenza è stata abbassata a un minuto.
 Considerando la natura di serie temporale dei dati, la grande variabilità di alcune caratteristiche e la velocità di produzione, questo rappresenta un grande aumento della qualità dei dati. Tuttavia, per per evitare la perdita di troppe osservazioni, si è deciso di adattare tutti i dati alla frequenza di 10 minuti.
@@ -59,7 +59,7 @@ La tabella \ref{mvm-soglie} mostra come le classi di qualita vengano definite.
 \end{table}
 
 Valori di banda piu bassi indicano una qualita maggiore, di conseguenza la classe Q1 rappresenta i prodotti migliori mentre la classe Q4 rappresenta gli scarti. 
-Per passare da una classe alla successiva e' necessario che solamente una delle 4 bande superi il valore di soglia. 
+Per passare da una classe alla successiva é necessario che solamente una delle 4 bande superi il valore di soglia. 
 La tabella \ref{mvm-esempio} mostra un esempio di come le classi vengano computate.
 
 \begin{table}
@@ -80,7 +80,7 @@ La tabella CoMo invece contiene le misure del Condition Monitoring e delle strut
 
 Considerando il formato grezzo dei dati, è necessario eseguire diverse trasformazioni per produrre dati pronti al processamento da parte di algoritmi di machine learning. 
 
-Prima di entrare nel dettaglio e' pero' necessario condividere alcune osservazioni sulle proprietà dei dati.
+Prima di entrare nel dettaglio é però necessario condividere alcune osservazioni sulle proprietà dei dati.
 
 \subsection{Proprietà}
 
@@ -102,22 +102,22 @@ lungo l'intervallo di tempo considerato. In particolare, poiché ci sono due mac
 
 Il motivo principale per cui la velocità media di produzione è interessante è che può essere utilizzata come indicatore del fatto che il canale è stato inattivo lungo nell'intervallo di dieci minuti considerato. In particolare, se la velocità media di produzione di un intervallo è significativamente più piccola del solito, indicherà che la produzione è stata interrotta nel periodo considerato. Le possibili cause di tale sospensione possono essere un malfunzionamento, la manutenzione o anche la chiusura programmata del canale.
 Per quanto riguarda la quantità di cuscinetti analizzati dalla macchina di qualità monitorata, è vero che, se il processo di produzione è stato sospeso, questa quantità sarà bassa, ma non si può dire con certezza l'opposto.
-Questa misura fornisce comunque alcuni indizi sull'attività del canale. Per esempio, esplorando il set di dati, si può notare che la quantità menzionata va a zero quasi ogni domenica dalle 12:00 alle 22:00 circa, conseguenza del fatto che in quel periodo di tempo c'e' stato un turno di riposo. Questo viene confermato anche analizzando i dati CoMo nello stesso periodo temporale: numerosi sensori che non producono valori a 0 oppure non li producono affatto, mentre quelli della temperatura iniziano a declinare. 
+Questa misura fornisce comunque alcuni indizi sull'attività del canale. Per esempio, esplorando il set di dati, si può notare che la quantità menzionata va a zero quasi ogni domenica dalle 12:00 alle 22:00 circa, conseguenza del fatto che in quel periodo di tempo c'é stato un turno di riposo. Questo viene confermato anche analizzando i dati CoMo nello stesso periodo temporale: numerosi sensori che non producono valori a 0 oppure non li producono affatto, mentre quelli della temperatura iniziano a declinare. 
 
-Queste osservazioni possono essere utilizzate per rilevare i turni di riposo e potenzialmente anche per le fasi di manutenzione, anche se per questi ultimi la rilevazione e' di fatto impossibile. In particolare, le manutenzioni sono state registrate su carta, per cui non è possibile sfruttare questi dati come risposta e di conseguenza non è possibile convalidare statisticamente alcuna ipotesi.
+Queste osservazioni possono essere utilizzate per rilevare i turni di riposo e potenzialmente anche per le fasi di manutenzione, anche se per questi ultimi la rilevazione é di fatto impossibile. In particolare, le manutenzioni sono state registrate su carta, per cui non è possibile sfruttare questi dati come risposta e di conseguenza non è possibile convalidare statisticamente alcuna ipotesi.
 Inoltre, la maggior parte delle manutenzioni dura meno di 10 minuti e
 non disponendo di dati ad alta frequenza, è quasi sempre impossibile
 osservare qualsiasi cambiamento nel comportamento della serie temporale. 
 
 \subsubsection{Missing Data}
-Per alcuni sensori sono disponibili solo poche settimane di dati e di conseguenza devono essere scartati. Per la parte restante dei dati, escludendo i tempi di inattività, in media il 15\% dei sensori è mancante in un dato momento e ogni misura è mancante in media il 17\% delle volte. Considerato anche quanto detto nel paragrafo precedente, esistono diverse cause possibili per cui un sensore non registra alcun valore in un dato momento. Per esempio, un errore nella configurazione dei sensori, e' in corso il turno di riposo ed è possibile che lo stesso accada anche durante le manutenzioni o i crash della macchina.
+Per alcuni sensori sono disponibili solo poche settimane di dati e di conseguenza devono essere scartati. Per la parte restante dei dati, escludendo i tempi di inattività, in media il 15\% dei sensori è mancante in un dato momento e ogni misura è mancante in media il 17\% delle volte. Considerato anche quanto detto nel paragrafo precedente, esistono diverse cause possibili per cui un sensore non registra alcun valore in un dato momento. Per esempio, un errore nella configurazione dei sensori, é in corso il turno di riposo ed è possibile che lo stesso accada anche durante le manutenzioni o i crash della macchina.
 In generale, non è chiaro come questi eventi possano influenzare l'attività dei sensori. D'altra parte, i sensori potrebbero essere semplicemente malfunzionanti o instabili, così come ci potrebbero essere problematiche nella memorizzazione dei dati all'interno del server locale. 
 In conclusione, riuscire a decodificare le reali motivazioni per cui si ha una mancata registrazione potrebbe migliorare in maniera significativa le performance di algoritmi di machine learning. Purtroppo a causa della bassa frequenza di registrazione e data la non possibilità di interagire o comunicare con i tecnici dell'impianto di produzione, sono state messe in atto solamente delle semplici operazioni di processamento.
 
 \subsubsection{Andamento Serie Temporali}
-Le series temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in figura \ref{sensors_plot}, elementi di seasonality non sono presenti e non vi e' presenza di trend e quindi le serie possono riferirsi stazionarie.
+Le series temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in figura \ref{sensors_plot}, elementi di seasonality non sono presenti e non vi é presenza di trend e quindi le serie possono riferirsi stazionarie.
 Per questo motivo, nelle fasi di processamento, operazioni di decomposizione delle serie temporali non sono state fatte.
-E' possibile comunque notare un'alta variabilita dei dati all'interno della singola serie temporale, con fluttuazioni piu o meno visibili.
+é possibile comunque notare un'alta variabilita dei dati all'interno della singola serie temporale, con fluttuazioni piu o meno visibili.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/sensors_plot}
@@ -129,21 +129,21 @@ E' possibile comunque notare un'alta variabilita dei dati all'interno della sing
 \subsection{Processamento}
 Evitando i dettagli per questione di privacy, in questa sezione vengono presentati i passaggi principali eseguiti per produrre i set di serie temporali dai dati grezzi ricevuti da SKF. 
 Per creare una tabella contente una colonna per ogni sensore e con un indice temporale è necessario appiattire i timestamp fino a raggiungere una granularità di 10 minuti, in modo che il tempo possa essere utilizzato come chiave per l'unione. A questo punto ogni riga del del dataset corrisponde a un'istantanea di un particolare sensore anche se questa è chiaramente un'approssimazione: in pratica, le registrazioni di misure CoMo diverse non avvengono nello stesso istante, ma la maggior parte di esse si concentra in un intervallo di un minuto circa. 
-D'altra parte, i dati sulla qualità sono raccolti in tempo reale quando viene analizzato ogni cuscinetto. In questo caso e' quindi necessario aggregare questi dati secondo una qualche misura ed e' stata scelta l'operazione di media.
+D'altra parte, i dati sulla qualità sono raccolti in tempo reale quando viene analizzato ogni cuscinetto. In questo caso é quindi necessario aggregare questi dati secondo una qualche misura ed é stata scelta l'operazione di media.
 Chiaramente, i dati MVM forniscono informazioni sull'intero intervallo di tempo mentre dati CoMo forniscono invece un'istantanea all'interno dell'intervallo di tempo.
 Nell'unire queste misure si è ipotizzato che l'istantanea sia rappresentativa dell'intervallo di tempo ma a causa dell'alta variabilità della maggior parte delle serie temporali, questa ipotesi è lontana dalla realtà.
-Questa condizione e' molto distante da una situazione ottimale, per questo motivo si sta cercando per spingere a portare la frequenza di registrazione ad uno al minuto. Frequenze più alte consentiranno all'ipotesi sopra descritta di essere valida.
+Questa condizione é molto distante da una situazione ottimale, per questo motivo si sta cercando per spingere a portare la frequenza di registrazione ad uno al minuto. Frequenze più alte consentiranno all'ipotesi sopra descritta di essere valida.
 
-Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all'interno dei dati CoMo che più record dello stesso sensore possano ricadere nello stesso intervallo di tempo. In questo, per ogni tipologia di sensore è stata scelta una funzione di aggregazione tra massimo, minimo e media. La scelta è stata fatta pensando a quali sono i valori più informativi per la caratteristica. Ad esempio, le pressioni sono state sono state aggregate con la funzione di massimo, poiché è probabile che le anomalie siano dei valori elevati; mentre per i flussi e' stata scelta la funzione di minimo. Nei casi dubbi, l'aggregazione è stata effettuata attraverso la funzione di media.
+Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all'interno dei dati CoMo che più record dello stesso sensore possano ricadere nello stesso intervallo di tempo. In questo, per ogni tipologia di sensore è stata scelta una funzione di aggregazione tra massimo, minimo e media. La scelta è stata fatta pensando a quali sono i valori più informativi per la caratteristica. Ad esempio, le pressioni sono state sono state aggregate con la funzione di massimo, poiché è probabile che le anomalie siano dei valori elevati; mentre per i flussi é stata scelta la funzione di minimo. Nei casi dubbi, l'aggregazione è stata effettuata attraverso la funzione di media.
 
 Dopo i passaggi precedenti, è possibile fare il pivoting della tabella CoMo  prendendo il timestamp come indice di riga. Il risultato è una tabella in cui ogni colonna corrisponde a una serie temporale. 
 Come passo finale è necessario trattare i valori mancanti:
 \begin{itemize}
-	\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo e' quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non e' di nostro interesse rilevare anomalie in quei intervalli di tempo.
+	\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo é quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non é di nostro interesse rilevare anomalie in quei intervalli di tempo.
 	\item Tutti gli altri valori nulli vengono interpolati linearmente.
 \end{itemize}
 A questo punto i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.
-Come ultimo passaggio si e' deciso di andare a normalizzare i valori utilizzando un MinMaxScaler. Questa tecnica permette di normalizzare i valori passando un range come input, in questo caso [0,1], secondo la seguente formula:
+Come ultimo passaggio si é deciso di andare a normalizzare i valori utilizzando un MinMaxScaler. Questa tecnica permette di normalizzare i valori passando un range come input, in questo caso [0,1], secondo la seguente formula:
 \[X_{scaled} = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))\]
 
 Il valore originario massimo assumera valore 1, quello minimo 0 e tutti gli altri un valore compreso.
