@@ -355,7 +355,12 @@ Le reti avversarie generative, o in breve GAN, sono un approccio alla modellazio
 La modellazione generativa è un task dell'apprendimento non supervisionato che prevede la scoperta e l'apprendimento automatico delle relazioni o delle variabili latenti all'interno dei dati di input in modo tale che il modello possa essere utilizzato per generare o produrre nuovi esempi che potrebbero essere stati plausibilmente ricavati dal set di dati originale.
 
 Le GAN sono un modo di addestrare un modello generativo, strutturando il problema come un problema di apprendimento supervisionato con due sottomodelli: il modello generatore, che viene addestrato per generare nuovi esempi, e il modello discriminatore, che cerca di classificare gli esempi come reali (provenienti dal dominio) o falsi (generati). I due modelli vengono addestrati insieme in un gioco a somma zero (da qui adversarial), fino a quando il modello discriminatore viene ingannato circa la metà delle volte, il che significa che il modello generatore sta generando esempi plausibili.
-
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=12cm, scale=1]{images/gan}
+	\caption{GAN}
+	\label{gan}
+\end{figure}
 
 \subsubsection{AnoGAN}
 AnoGAN (Anomaly GAN) è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione densa dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
@@ -452,10 +457,12 @@ La formula utilizzata per la stima della distribuzione di $\gamma$ è la seguent
 dove X è l'insieme di dati, $\gamma$ è il fattore di contaminazione, k è il numero di componenti anomali, z è il vettore di appartenenza ai componenti di miscela e m è il numero di componenti di miscela.
 
 All'interno del paper sono presenti anche i risultati degli esperimenti in cui il metodo $\gamma$GMM viene confrontanto con numerosi metodi di thresholding tra cui IQR o Z-Score. I risultati sono incoraggianti e non solo ottiene il punteggio di MAE piu basso (rispetto al true $\gamma$), ma la degradazione di una metrica supervisionata, come F-Measure, di un rilevatore di anomalie a cui e' stato passato come fattore di contaminazione quanto generato dall'alagoritmo di $\gamma$GMM e' la piu bassa rispetto a tutti gli altri metodi di thresholding. 
+
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/ygmm2}
 	\caption{$\gamma$GMM}
 	\label{ygmm2}
 \end{figure}
+
 Per questo motivo, si e' deciso di utilizzare questo metodo per la stima di contaminazione dei dati di SKF. Valore che poi e' stato utilizzato come parametro ai modelli di Anomaly Detection utilizzato nel Model Selection.
