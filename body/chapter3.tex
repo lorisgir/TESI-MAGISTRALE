@@ -16,21 +16,22 @@ I modelli di apprendimento supervisionato sono una categoria di algoritmi di app
 \subsubsection{Classificazione}
 La classificazione é il problema di identificare a quale categoria o classe un'osservazione appartiene. Un classificatore, definito come \(\hat{c}\), é una funzione che mappa uno spazio di input \(X\), che definisce come i dati sono descritti, ad uno spazio di output \(C=\{C_1,...,C_k\}\) ovvero il set finito di etichette.
 \[\hat{c}: X \rightarrow C\]
-Nel dominio dell'apprendimento supervisionato, gli esempi sono accompagnati dalle etichette e sono dunque definiti come \((x,c(x))\in X\times C\) dove \(x \in X\) e \(c(x)\) é la corretta classe di \(x\). Il task di classificazione é quello di andare a costruire la funzione \(\hat{c}\) che meglio approssima la funzione reale \(c\) non solo nei dati di training ma nell'intero spazio \(X\). Questa é una condizione importante perche vogliamo che il classificatore generalizzi bene e non faccia over-fitting. Over-fitting si ha quando un classificatore ha performance molto alte sul training set ma molto basse sul validation set.
+Nel campo dell'apprendimento supervisionato gli esempi sono accompagnati dalle etichette e sono dunque definiti come \((x,c(x))\in X\times C\) dove \(x \in X\) e \(c(x)\) é la corretta classe di \(x\). Il task di classificazione é quello di andare a costruire la funzione \(\hat{c}\) che meglio approssima la funzione reale \(c\) non solo nei dati di training ma nell'intero spazio \(X\). Questa é una condizione importante perché vogliamo che il classificatore generalizzi bene e non faccia over-fitting. Over-fitting si ha quando un classificatore ha performance molto alte sui dati di training ma molto basse sui dati di test.
 Esistono 4 tipi di classificatori:
 \begin{enumerate}
-\item Classificatori binari: é il piu semplice in quanto l'insieme delle classi contiene solo due elementi: \(C=\{C_1,C_2\}\)
-\item Classificatori a score: sono delle funzioni che assegnano uno score alla predizione: \(\hat{s} = X\rightarrow R^k\) dove \(X\) rappresenta lo spazio di input mentre l'output é definito da un vettore di \(k\) numeri reali: \[(\hat{s}_1 (x),...,\hat{s}_k(x))\]In questo vettore, il componente i-esimo é lo scorso assegnati alla classe \(C_i\) per l'instanza \(x\). Generalizzando, per ogni istanza \(x\) esiste un vettore \(\hat{s}(x)\) contenente gli scores \(\hat{s}_i(x)\) per ognuna classe \(k\) di \(C\).
-\item Classificatori probabilistici: eredita delle caratteristiche dai classificatori a score con la differenza che il valore di ogni componente del vettore di output di una instanza \(x\) rappresenta la probabilita che quell'istanza ricada nella classe \(k\). Essendo probabolita, la somma totale di tutti i valori all'interno del vettore corrisponde a 1.
+\item Classificatori binari: é il più semplice in quanto l'insieme delle classi contiene solo due elementi: \(C=\{C_1,C_2\}\)
+\item Classificatori a score: sono delle funzioni che assegnano uno score alla predizione: \(\hat{s} = X\rightarrow R^k\) dove \(X\) rappresenta lo spazio di input mentre l'output é definito da un vettore di \(k\) numeri reali: 
+\[(\hat{s}_1 (x),...,\hat{s}_k(x))\]
+In questo vettore, il componente i-esimo é lo score assegnati alla classe \(C_i\) per l'istanza \(x\). Generalizzando, per ogni istanza \(x\) esiste un vettore \(\hat{s}(x)\) contenente i punteggi \(\hat{s}_i(x)\) per ogni classe \(k\) di \(C\).
+\item Classificatori probabilistici: eredita delle caratteristiche dai classificatori a score con la differenza che il valore di ogni componente del vettore di output di una istanza \(x\) rappresenta la probabilità che quell'istanza ricada nella classe \(k\). Essendo probabilità, la somma totale di tutti i valori all'interno del vettore corrisponde a 1.
 \item Classificatori multiclasse: sono un'estensione dei classificatori binari con un insieme delle classi maggiore di due elementi: \(C=\{C_1,...,C_k\}\). 
 \end{enumerate}
 
 \subsubsection{Regressione}
-All'interno del task di regressione siamo di fronte non piu ad un codominio finito, come nel caso della classificazione, ma un codominio rappresentanto dall'insieme dei numeri reali \(R\). I modelli di regressione sono quindi definiti da una funzione
+All'interno del task di regressione siamo di fronte non più ad un codominio finito, come nel caso della classificazione, ma un codominio rappresentato dall'insieme dei numeri reali \(R\). I modelli di regressione sono quindi definiti da una funzione
 \[\hat{f}: X \rightarrow R\]
 Il problema di apprendimento é anche qui quello di trovare la funzione \(\hat{f}\) che meglio approssima la funzione reale \(f: (x_i, f(x_i))\) per ogni \(x\in X\).
-Cambiando l'obiettivo della funzione da un numero relativamente piccolo di classi
-a uno spazio di soluzioni infinito, l'algoritmo cercherà di stimare i valori associati a ciascun esempio nel modo più accurato possibile, il che porterà al problema dell'overfitting. Tenendo presente che è necessario accettare un equilibrio tra accuratezza e approssimazione delle delle soluzioni, è inevitabile, di fronte alle normali oscillazioni dei dati, che il modello non possa catturarle con precisione. Il vero scopo di un modello di regressione, se non può essere troppo preciso senza eccedere, è quello di approssimare l'andamento della funzione f nel miglior modo possibile. La Figura \ref{overfitting} mostra un esempio di problema di regressione.
+Cambiando l'obiettivo della funzione da un numero relativamente piccolo di classi a uno spazio di soluzioni infinito, l'algoritmo cercherà di stimare i valori associati a ciascun esempio nel modo più accurato possibile, il che porterà al problema dell'overfitting. Tenendo presente che è necessario accettare un equilibrio tra accuratezza e approssimazione delle delle soluzioni, è inevitabile, di fronte alle normali oscillazioni dei dati, che il modello non possa catturarle con precisione. Il vero scopo di un modello di regressione è quello di approssimare l'andamento della funzione $f$ nel miglior modo possibile. La Figura \ref{overfitting} mostra un esempio di problema di regressione.
 
 \begin{figure}[t]
 	\centering
@@ -40,7 +41,7 @@ a uno spazio di soluzioni infinito, l'algoritmo cercherà di stimare i valori as
 \end{figure}
 
 
-\subsection{Unsupervised Models}
+\subsection{Modelli non Supervisionati}
 L'apprendimento non supervisionato è una categoria di algoritmi di apprendimento automatico che utilizzano dati non etichettati per "imparare" da essi. In contrasto con l'apprendimento supervisionato, dove ci sono dati etichettati con le risposte corrette, l'apprendimento non supervisionato non ha accesso alle risposte corrette, ma cerca di scoprire relazioni o strutture all'interno dei dati.
 
 Ci sono diverse tipologie di algoritmi di apprendimento non supervisionato, tra cui:
@@ -48,19 +49,18 @@ Ci sono diverse tipologie di algoritmi di apprendimento non supervisionato, tra 
 \item Clustering: utilizzato per raggruppare gli esempi in base alle loro similitudini.
 \item Riduzione della dimensionalità: utilizzato per ridurre la dimensionalità dei dati.
 \item Analisi di componenti principali (PCA): utilizzato per individuare le componenti principali dei dati.
-\item Apprendimento non supervisionato basato su reti neurali: utilizzato per apprendere rappresentazioni dei dati.
-\item Anomaly detection: utilizzato per identificare dati anomali o fuori dalla norma.
-\item Generative models: utilizzato per generare nuovi dati.
+\item Anomaly Detection: utilizzato per identificare dati anomali o fuori dalla norma.
+\item Modelli Generativi: utilizzati per generare nuovi dati.
 
 
 \end{itemize}
-Nel rilevamento supervisionato delle anomalie, se vogliamo che un modello sia in grado di rilevare le anomalie, bisogna allenare il sistema in modo molto preciso sia nell' identificare sia il comportamento normale che quello anomalo.
-Tuttavia, i comportamenti normali possono essere molteplici, così come i
-comportamenti in presenza di anomalie e questo porta con se la necessità di fornire una grande quantità di dati etichettati per catturare piu comportamenti possibili. Purtroppo non é sempre possibile in quanto le anomalie sono eventi rari e se il dataset di addestramento é relativamente piccolo, anche il numero di anomalie non sará sufficientemente grande, rendendo difficile la loro classificazione. 
-Pertanto, l'apprendimento non supervisionato si adatta perfettamente al problema del rilevamento delle anomalie, poiché non è necessario etichettare grandi insiemi di dati. Inoltre, una parte delle anomalie derivano da nuovi comportamenti del sistema e per definizione, questi comportamenti non possono essere classificati correttamente con i metodi di rilevamento delle anomalie supervisionati senza effettuare prima un re-training.
+Nel rilevamento supervisionato delle anomalie, se vogliamo che un modello sia in grado di rilevare le anomalie, bisogna allenare il sistema in modo molto preciso sia nell'identificare il comportamento normale che quello anomalo.
+Tuttavia, i comportamenti normali possono essere molteplici così come i
+comportamenti in presenza di anomalie e questo porta con se la necessità di fornire una grande quantità di dati etichettati per catturare più comportamenti possibili. Purtroppo non é sempre possibile in quanto le anomalie sono eventi rari e se il dataset di addestramento é relativamente piccolo, anche il numero di anomalie non sarà sufficientemente grande, rendendo difficile la loro classificazione. 
+Pertanto, l'apprendimento non supervisionato si adatta perfettamente al problema del rilevamento delle anomalie, poiché non è necessario etichettare grandi insiemi di dati. Inoltre, una parte delle anomalie derivano da nuovi comportamenti del sistema e per definizione questi comportamenti non possono essere classificati correttamente con i metodi di rilevamento delle anomalie supervisionati senza effettuare prima un re-training.
 
 
-\section{Model Evaluation}
+\section{Valutazione del Modello}
 La valutazione del modello è necessaria per quantificarne le prestazioni. La
 scelta delle metriche e delle tecniche di valutazione dipende dal task di apprendimento come la classificazione o la regressione. 
 In questa sezione ci si concentrerà sulle tecniche e sulle metriche più famose utilizzate per valutare la performance di un modello su un determinato compito.
@@ -76,16 +76,17 @@ In questa sezione ci si concentrerà sulle tecniche e sulle metriche più famose
 
 
 \subsubsection{Metriche}
-Alla base di tutte le metriche di valutazione vi é la tabella di contingenza. Questa tabella permette di valutare le performance di un modello andando a relazionare, in piu modi, le predizioni di un modello con i dati di ground-truth.
+Alla base di tutte le metriche di valutazione vi é la tabella di contingenza. Questa tabella permette di valutare le performance di un modello andando a relazionare, in più modi, le predizioni di un modello con le etichette reali.
+
 La tabella \ref{contigency-table} mostra la struttura della tabella di contingenza.  La prima colonna contiene il numero delle predizioni positive fatte da un modello divise se queste sono effettivamente positive o negative. La seconda colonna funziona allo stesso modo ma per le predizione negative dello stesso modello. La terza colonna invece rappresenta la somma dei punti che sono realmente positivi e realmente negativi.
 Riassumendo:
 \begin{itemize}
-\item True Positive: punti realmente positivi che sono predetti come tali
-\item False Positive: punti realmente positivi ma predetti come negativi
-\item False Negative: punti realmente negativi ma predetti come positivi
-\item True Negative: punti realmente negativi che sono predetti come tali
-\item Pos: Somma totale dei punti realmente positivi
-\item Neg: Somma totale dei punti realmente negativi
+\item True Positive: punti realmente positivi che sono predetti come tali.
+\item False Positive: punti realmente positivi ma predetti come negativi.
+\item False Negative: punti realmente negativi ma predetti come positivi.
+\item True Negative: punti realmente negativi che sono predetti come tali.
+\item Pos: Somma totale dei punti realmente positivi.
+\item Neg: Somma totale dei punti realmente negativi.
 \end{itemize}
 
 \begin{table}[]
@@ -95,53 +96,54 @@ Riassumendo:
 \begin{tabular}{|l|l|l|l|}
 \hline
                  & \textbf{Predizioni +} & \textbf{Predizioni -} & \textbf{Totale} \\ \hline
-\textbf{Reale +} & TP                    & FP                    & Positivi        \\ \hline
+\textbf{Reale +} & TP                    & FN                    & Positivi        \\ \hline
 \textbf{Reale -} & FP                    & TN                    & Negativi        \\ \hline
 \end{tabular}
 \end{table}
 
 A questo punto é possibile introdurre tutte le misure di performance:
 \begin{itemize}
-\item Accuracy: é il rapporto tra i punti correttamente classificati rispetto al totale dei punti 
+\item Accuracy: é il rapporto tra i punti correttamente classificati rispetto al totale dei punti.
 \[\frac{1}{|Te|} \sum_{x \in T_e} I[\hat{c}(x)=c(x)]\]
-\item Error Rate: é il rapporto tra i punti erroneamente classificati rispetto al totale dei punti, in breve \(1-accuracy\) 
+\item Error Rate: é il rapporto tra i punti erroneamente classificati rispetto al totale dei punti, in breve \(1-accuracy\).
 \[\frac{1}{|Te|} \sum_{x \in T_e} I[\hat{c}(x)\neq c(x)]\]
-\item True Negative Rate / Specificity: é il rapporto tra i punti classificati correttamente come negativi rispetto al numero totale di punti realmente negativi
+\item True Negative Rate / Specificity: é il rapporto tra i punti classificati correttamente come negativi rispetto al numero totale di punti realmente negativi.
 \[\frac{\sum_{x \in T_e} I[\hat{c}(x)=c(x)=-]}{\sum_{x \in T_e} I[c(x)=-]}\]
-\item True Positive Rate / Recall: é il rapporto tra i punti classificati correttamente come positivi rispetto al numero totale di punti realmente positivi
+\item True Positive Rate / Recall: é il rapporto tra i punti classificati correttamente come positivi rispetto al numero totale di punti realmente positivi.
 \[\frac{\sum_{x \in T e} I[\hat{c}(x)=c(x)=+]}{\sum_{x \in T_e} I[c(x)=+]}\]
-\item Precision: é il rapporto tra i punti correttamente classificati come positivi rispetto al numero di punti classificati come positivi
+\item Precision: é il rapporto tra i punti correttamente classificati come positivi rispetto al numero di punti classificati come positivi.
 \[\frac{\sum_{x \in T_c} I[\hat{c}(x)=c(x)=+]}{\sum_{x \in T e} I[\hat{c}(x)=+]}\]
-\item F-Measure Score: é la media armonica tra precision e recall
+\item F-Measure Score: é la media armonica tra precision e recall.
 \[F_\beta=\frac{\left(1+\beta^2\right) \cdot(\text { precision } \cdot \text { recall })}{\left(\beta^2 \cdot \text { precision }+\text { recall }\right)}\]
 \end{itemize}
 
 In generale non esiste una misura migliore e bisogna fare un'attenta valutazione su quale sia la preferibile rispetto al task da risolvere.
-Ad esempio bisogna tenere in considerazione se c'é una prevalenza di punti di una classe. Accuracy é preferibile quando ci si aspetta una distribuzione equa delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision é preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall é la scelta corretta.
+Ad esempio bisogna tenere in considerazione se c'è una prevalenza di punti di una classe. Accuracy é preferibile quando ci si aspetta una distribuzione equa delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision é preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall é la scelta corretta.
 F-Measure invece é necessaria quando si cerca un bilanciamento tra precision e recall dando importanza a entrambi i falsi-positivi ed i falsi-negativi. 
-All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente importanti da riconoscere e marcarle come negative, quindi falsi-negativi, potrebbe risultare in problemi alla linea di produzione. Ma allo stesso tempo un modello che produce molti più positivi di quanto deve risulterebbe in una perdita di fiducia da parte dell'operatore che inizierebbe semplicemente ad ignorare il feedback del modello in quanto produrrebbe soltanto falsi-positivi. Per questo motivo la scelta della metrica di valutazione é ricaduta sulla F-Measure.
+All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente importanti da riconoscere e marcarle come negative, quindi falsi-negativi, potrebbe risultare in problemi alla linea di produzione. Ma allo stesso tempo un modello che produce molti più positivi di quanto deve risulterebbe in una perdita di fiducia da parte dell'operatore che inizierebbe semplicemente ad ignorare il feedback del modello. Per questo motivo la scelta della metrica di valutazione é ricaduta sulla F-Measure.
 
 
 
-\section{Machine Learning Models}
-In questa sezione vengono proposti diversi algoritmi e metodi di machine learning per l'Anomaly Detection, raggruppati per categoria.
-I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD o TODS ed utilizzati nel processo di Model Selection discusso nei capitoli successivi.
+\section{Modelli di Apprendimento Automatico}
+In questa sezione vengono proposti diversi algoritmi e metodi di apprendimento automatico per l'Anomaly Detection, raggruppati per categoria.
+I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD e TODS ed utilizzati nel processo di Model Selection discusso nei capitoli successivi.
 
-\subsection{Linear Models}
-I modelli lineari sono un tipo di algoritmo di machine learning utilizzato per fare previsioni. Essi rappresentano la relazione tra le variabili indipendenti (chiamate anche caratteristiche) e la variabile dipendente (chiamata anche obiettivo) con una equazione lineare. La forma generale di un modello lineare è: 
+\subsection{Modelli Lineari}
+I modelli lineari sono un tipo di algoritmo di Machine Learning utilizzato per fare previsioni. Essi rappresentano la relazione tra le variabili indipendenti (chiamate anche features) e la variabile dipendente (chiamata anche obiettivo) con una equazione lineare. La forma generale di un modello lineare è: 
 \[ Y = B_0 + B_1X_1 + B_2X_2 + ... + B_n*X_n\]
 dove $ Y $ è la variabile dipendente,  \(X_1, X_2, ..., X_n\)  sono le variabili indipendenti e \( B_0, B_1, B_2, ..., B_n\) sono i coefficienti del modello che vengono "appresi" dai dati.
 
 \subsubsection{PCA}
 La PCA è una riduzione lineare della dimensionalità che utilizza la Singular Value Decomposition dei dati per proiettarli in uno spazio dimensionale inferiore. Si tratta di spiegare la struttura di varianza-covarianza di una serie di variabili attraverso alcune nuove variabili che sono funzioni di quelle originali. Le componenti principali sono particolari combinazioni lineari delle \textit{p} variabili casuali  \(X1, X2, ..., Xp\) con tre importanti proprietà: (1) le componenti principali non sono correlate, (2) la prima componente principale ha la varianza più elevata, la seconda componente principale ha la seconda varianza più elevata e così via, e (3) la variazione totale in tutte le componenti principali combinate è uguale alla variazione totale delle variabili originali \(X1, X2, ..., Xp\). 
-Queste componenti principali sono ottenibili da un'analisi agli autogeni della matrice di covarianza o della matrice di correlazione di \(X1, X2, ..., Xp\).
+Queste componenti principali sono ricavabili da un'analisi agli autovalori della matrice di covarianza o della matrice di correlazione di \(X1, X2, ..., Xp\).
 In questa procedura, la matrice di covarianza dei dati può essere decomposta in vettori ortogonali, detti autovettori, associati ad autovalori. Gli autovettori con alti autovalori catturano la maggior parte della varianza dei dati. Pertanto, un iperpiano a bassa dimensionalità costruito da \textit{k} autovettori può catturare la maggior parte della varianza dei dati. Tuttavia, gli outlier sono diversi dai punti di dati normali, cosa che è più evidente sull'iperpiano costruito dagli autovettori con autovalori piccoli.
 Di conseguenza, i punteggi degli outlier possono essere ottenuti come la somma della distanza proiettata di un campione su tutti gli autovalori.
 
 \subsubsection{K-PCA}
-Kernel PCA é un'estensione non-lineare di PCA. I dati di input sono mappati in uno spazio infinitesimale da cui KPA estrae le componenti principali. I tipi di kernel usati possono essere: lineare, polinomiale, sigmoidale o radiale.
+Kernel PCA é un'estensione non-lineare di PCA. I dati di input sono mappati in uno spazio infinitesimale da cui K-PCA estrae le componenti principali. I tipi di kernel usati possono essere: lineare, polinomiale, sigmoidale o radiale.
+
 \subsubsection{OCSVM}
-Il metodo One Class Support Vector Machine (OCSVM) é una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'iper-sfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
+Il metodo One Class Support Vector Machine (OCSVM) é una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'ipersfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
 La figura \ref{ocsvm} mostra un esempio del funzionamneto di ocsvm.
 \begin{figure}[t]
 	\centering
@@ -151,36 +153,36 @@ La figura \ref{ocsvm} mostra un esempio del funzionamneto di ocsvm.
 \end{figure}
 
 
-\subsubsection{AutoRegressive}
-In un modello a regressione multipla viene fatto forecasting di una variabile di interesse attraverso una combinazione lineare di predittori. Un modello AutoRegressive, invece, viene fatto forecsting di questa variabile di interesse usand una combinazione lineare su \textit{valori passati} di questa variabile. Il termine auto-regressione indica una regressione della variabile fatta su se stessa.
-Di conseguenza, un modello auto-regressive di ordine \textit{p} puo essere scritto come:
+\subsubsection{Auto Regressivo}
+In un modello a regressione multipla viene fatta previsione di una variabile di interesse attraverso una combinazione lineare di predittori. Un modello Auto Regressivo, invece, viene fa previsione di questa variabile di interesse usando una combinazione lineare su \textit{valori passati} di questa variabile. Il termine auto-regressione indica una regressione della variabile fatta su se stessa.
+Di conseguenza, un modello auto-regressivo di ordine \textit{p} puo essere scritto come:
 \[y_t=c+\phi_1 y_{t-1}+\phi_2 y_{t-2}+\cdots+\phi_p y_{t-p}+\varepsilon_t\]
-dove $\varepsilon_t$ é rumore bianco. Puo essere visto come una regressione multipla ma con valori ritardati di $y_t$ come predittori. 
+dove $\varepsilon_t$ é rumore bianco. Può essere visto come una regressione multipla ma con valori ritardati di $y_t$ come predittori. 
 La deviazione di un valore predetto rispetto a quello reale viene usato come outlier score.
 
 \subsubsection{MCD}
 Minimum Covariance Determinant (MCD) é un metodo per stimare la media e la matrice di covarianza andando a minimizzare l'influenza delle anomalie. L'idea alla base é quella di stimare questi valori andando a selezionare un sottoinsieme dei dati nel quale si spera non contengano anomalie.
-Immaginando un approccio brute-force, l'algoritmo itera su ogni possibile sottoinsieme dei dati di una dimensione specifica. Vengono poi stimati la media e la matrice di covarianza per ogni sottoinsieme e poi vengono mantenute soltanto i valori per il sottoinsieme che ha il determinante della matrice di covarianza piu piccolo. Il motivo di questo é perche il determinante di una matrice di covarianza indica quanto é larga una distribuzione. Di conseguenza MCD cerca di minimizzare questo andando a prendere la distribuzione piu compatta. Questo consente di escludere le anomalie che saranno situate lontane dal resto dei dati.
+Immaginando un approccio brute-force, l'algoritmo itera su ogni possibile sottoinsieme dei dati di una dimensione specifica. Vengono poi stimati la media e la matrice di covarianza per ogni sottoinsieme e poi vengono mantenuti soltanto i valori per il sottoinsieme che ha il determinante della matrice di covarianza più piccolo. Il motivo di questo é perché il determinante di una matrice di covarianza indica quanto é larga una distribuzione. Di conseguenza MCD cerca di minimizzare questo andando a prendere la distribuzione più compatta. Questo consente di escludere le anomalie che saranno situate lontane dal resto dei dati.
 
 \subsubsection{LMDD}
-Linear Method for Deviation-based Outlier Detection (LMDD) impiega il concetto di Smoothing Factor il quale indica quanto puo essere ridotta la misura di dissimilarita andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarita puo essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc).
-I punti che rimossi riducono maggiormente questa misura di dissimilarita possono essere valutati come anomalie.
+Linear Method for Deviation-based Outlier Detection (LMDD) impiega il concetto di Smoothing Factor il quale indica quanto può essere ridotta la misura di dissimilarità andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarità può essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc).
+I punti che rimossi riducono maggiormente questa misura di dissimilarità possono essere valutati come anomalie.
 
-\subsection{Distance Based Models}
+\subsection{Modelli a Distanza}
 I modelli non supervisionati basati sulla distanza sono una categoria di algoritmi che utilizzano la distanza tra i dati per scoprire relazioni e strutture nel dataset.
 
 \subsubsection{KNN}
-K-Nearest Neighbors (KNN) è un algoritmo di apprendimento supervisionato utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini" o "neighbors") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è un parametro importante del modello e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
-Nel campo dell'Anomaly Detection, non é di interessa assegnare la classe al punto in esame ma assegnare un punteggio di anomalia. Per un'osservazione, quindi, la sua distanza rispetto al \textit{k}-esimo punto piu vicino rappresenta lo questo score.
+K-Nearest Neighbors (KNN) è un algoritmo di apprendimento utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è importante e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
+Nel campo dell'Anomaly Detection non é di interesse assegnare la classe al punto in esame ma assegnare un punteggio di anomalia. Per un'osservazione, quindi, la sua distanza rispetto al \textit{k}-esimo punto più vicino rappresenta questo score.
 
 \subsubsection{DBSCAN}
-BSCAN è un metodo di clustering che raggruppa i punti in aree ad alta densità e contrassegna i punti in regioni a bassa densità come anomali.
+DBSCAN è un metodo di clustering che raggruppa i punti in aree ad alta densità e contrassegna i punti in regioni a bassa densità come anomali.
 DBSCAN classifica quindi i punti in tre categorie. I punti centrali sono punti
 contenenti almeno $minPts$ nel loro intorno definito da un parametro $\epsilon$. I border-point sono i punti che contengono almeno un punto centrale nel loro intorno, mentre gli altri punti sono considerati come rumore/anomalie. 
-Per gestire serie temporali multivariate, DBSCAN considera ogni finestra temporale come un punto e il punteggio di anomalia è la distanza del punto dal cluster più vicino.
+
 
 \subsubsection{LOF}
-Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei K-nearest, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti piu vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia. Questo metodo è stato è stato applicato a serie temporali multivariate, dimostrando la sua capacità di individuare anomalie in dati a lungo termine
+Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei KNN, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti più vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/lof}
@@ -190,35 +192,35 @@ Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto
 
 \subsubsection{COF}
 Connectivity Outlier Factor (COF) é un'evoluzione di LOF. Si basa sull'idea di assegnare un grado di anomalia ad ognuno dei punti, chiamato connectivty outlier factor.
-Per ogni punto $x_i$, vengono selezionati i \textit{k} punti piu vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti piu vicini.
+Per ogni punto $x_i$, vengono selezionati i \textit{k} punti più vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti più vicini.
 
 \subsubsection{CBLOF}
-Cluster-Based Local Outlier Factor (CBLOF) é anchesso un evoluzione di LOF.
-Come primo step, CBLOF riceve in input i dati ed un algoritmo di clustering per andare a creare i cluster. Attraverso dei parametri va poi ha definire quale cluster viene considerato "grande" e quale viene considerato "piccolo". Vengono poi calcolati gli outlier score andando a considerare la dimensione del cluster a cui appartiene e la distanza piu vicina rispetto al centro di un cluster grande. Quindi piu un cluster di appartenenza é piccolo e piu il punto é lontano dal centro di un cluster grande, piu lo score di anomalia sará alto. 
+Cluster-Based Local Outlier Factor (CBLOF) é anch'esso un evoluzione di LOF.
+Come primo step, CBLOF riceve in input i dati ed un algoritmo di clustering per andare a formare dei cluster. Attraverso dei parametri va poi a definire quale cluster viene considerato "grande" e quale viene considerato "piccolo". Vengono poi calcolati gli outlier score per tutti i punti andando a considerare la dimensione del cluster a cui un punto appartiene e la distanza più vicina rispetto al centro di un cluster grande. Quindi più un cluster di appartenenza é piccolo e più il punto é lontano dal centro di un cluster grande, più lo score di anomalia sarà alto. 
 
 \subsubsection{HBOS}
-Histogram based outlier detection (HBOS) é un algoritmo di outlier detection che si basa sugli istrogrammi e assumendo indipendenza tra le feature. Per ogni feature computa il rispettivo istrogramma. Successivamente itera su ogni punti, se il valore di una feature di uno specifico punto $x_i$ rientra nella coda dell'istrogramma, questo punto vede alzarsi lo score di anomalia. Questo passaggio viene ripetuto rispetto ad ogni feature e su tutti i punti.
+Histogram based outlier detection (HBOS) é un algoritmo di outlier detection che si basa sugli istogrammi assumendo indipendenza tra le features. Per ogni feature computa il rispettivo istogramma. Successivamente itera su ogni punto: se il valore di una feature di uno specifico punto $x_i$ rientra nella coda dell'istogramma, questo punto vede alzarsi lo score di anomalia. Questo passaggio viene ripetuto rispetto ad ogni feature e su tutti i punti.
 
 \subsubsection{SOD}
-Subspace outlier detection (SOD) cerca di trovare gli outlier andando a considerare diversi sottoinsiemi dello spazio multidimensionale delle feature. Per ogni osservazione, SOD esplora il sottoinsieme delle dimensioni che si dirama parallalelamente dai punti vicini e determina quanto questa osservazione devia dai suoi vicini in questo sotto-spazio. 
+Subspace outlier detection (SOD) cerca di trovare gli outlier andando a considerare diversi sottoinsiemi dello spazio multidimensionale delle feature. Per ogni osservazione, SOD esplora il sottoinsieme delle dimensioni che si dirama parallelamente dai punti vicini e determina quanto questa osservazione devia dai suoi vicini in questo sotto-spazio. 
 
 \subsubsection{ROD}
-Rotation-based Outlier Detection (ROD),  è un algoritmo privo di parametri che non richiede conoscenza sulla distribuzione dei dati e funziona in modo intuitivo nello spazio tridimensionale, dove i vettori 3D, che rappresentano i punti, vengono ruotati attorno alla mediana geometrica due volte in senso antiorario utilizzando la formula di rotazione di Rodrigues. I risultati della rotazione sono parallelepipedi i cui volumi vengono analizzati matematicamente come funzioni di costo e utilizzati per calcolare le Deviazioni Assolute Mediane e ottenere così il punteggio di anomalia. Per dimensioni elevate > 3, il punteggio complessivo viene calcolato prendendo la media dei punteggi complessivi dei sottospazi 3D risultanti dalla scomposizione dello spazio dati originale.
+Rotation-based Outlier Detection (ROD),  è un algoritmo privo di parametri che non richiede conoscenza sulla distribuzione dei dati e funziona in modo intuitivo nello spazio tridimensionale, dove i vettori 3D, che rappresentano i punti, vengono ruotati attorno alla mediana geometrica due volte in senso antiorario utilizzando la formula di rotazione di Rodrigues. I risultati della rotazione sono parallelepipedi i cui volumi vengono analizzati matematicamente come funzioni di costo e utilizzati per calcolare le Deviazioni Assolute Mediane e ottenere così il punteggio di anomalia. Per dimensioni elevate > 3, il punteggio complessivo viene calcolato prendendo la media dei punteggi complessivi dei sottospazi 3D risultanti dalla scomposizione dello spazio dei dati originali.
 
 
-\subsection{Probabilistic Models}
+\subsection{Modelli Probabilistici}
 I modelli probabilistici non supervisionati sono una categoria di algoritmi che utilizzano la probabilità per descrivere e generare i dati. Essi utilizzano una distribuzione di probabilità per rappresentare la relazione tra le variabili del dataset.
 \subsubsection{KDE}
-Kernel Density Estimation (KDE) é l'applicazione di un "kernel smoothing" per la stima della probabilita. 
-Siano $(X_1,...,x_n)$ osservazioni indipendenti e identicamente distribuite prese da una distribuzione univariata con una densita non conosciuta \textit{f} per qualasiasi punto \textit{x}. Siamo interessati nello stimare la forma di questa funzione \textit{f}. La funzione kernel di stima é:
+Kernel Density Estimation (KDE) é l'applicazione di un "kernel smoothing" per la stima della probabilità. 
+Siano $(X_1,...,x_n)$ osservazioni indipendenti e identicamente distribuite prese da una distribuzione univariata con una densità non conosciuta \textit{f} per qualsiasi punto \textit{x}. Siamo interessati nello stimare la forma di questa funzione \textit{f}. La funzione kernel di stima é:
 \[\widehat{f}_h(x)=\frac{1}{n} \sum_{i=1}^n K_h\left(x-x_i\right)=\frac{1}{n h} \sum_{i=1}^n K\left(\frac{x-x_i}{h}\right)\]
 
 Dove \textit{K} é il kernel, una funzione non negativa, e $h>0$ é un parametro di smoothing chiamato bandwidth. Un kernel con pedice $h$ é chiamato \textit{kernel scalato} ed é definito da: $Kh(x) = 1/h K(x/h)$. 
-Il valore di $k$ deve essere scelto tenendo conto del trade-off bias/variance.
-I kernel piu utilizzati sono: uniforme, triangolare, normale e altri.
-Le stime di densita con kernel sono fortemente correlate agli istrogrammi, ma sono dotati di proprieta di smoothing o di valori continui usando appunto questi kernel.
-La figura \ref{kde_model} mostra un confronto tra un istogramma con una funzione di stima di densita con kernel.
-L'applicazione di questo modello nell'Anomaly Detection avviene andando a generare, per un'osservazione, uno score di anomalia corrispondente al valore negativo del logaritmo della probabilita di densita.
+Il valore di $k$ deve essere scelto tenendo conto del trade-off bias/varianza.
+I kernel più utilizzati sono: uniforme, triangolare, normale e altri.
+Le stime di densità con kernel sono fortemente correlate agli istogrammi, ma sono dotati di proprietà di smoothing o di valori continui usando appunto questi kernel.
+La figura \ref{kde_model} mostra un confronto tra un istogramma con una funzione di stima di densità con kernel.
+L'applicazione di questo modello nell'Anomaly Detection avviene andando a generare, per un'osservazione, uno score di anomalia corrispondente al valore negativo del logaritmo della probabilità di densità.
 
 \begin{figure}[t]
 	\centering
@@ -229,31 +231,31 @@ L'applicazione di questo modello nell'Anomaly Detection avviene andando a genera
 
 
 \subsubsection{GMM}
-I GMM sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Sono anche relativamente robusti agli outlier, il che significa che possono fornire risultati accurati anche se ci sono alcuni punti di dati che non si adattano perfettamente a nessuno dei cluster. Ciò rende i GMM uno strumento flessibile e potente per la clusterizzazione dei dati. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
+I GMM sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
 
-Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato cosi in quanto vengono alternate iterativamente due fasi: quella di excpectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questa valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
+Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato così in quanto vengono alternate iterativamente due fasi: quella di expectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questa valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
 
-é possibile adottare questo modello nell'Anomaly Detection allenandolo rispetto ad un set di dati e poi assegnando un punteggio ai nuovi punti: quelli significativamente diversi dal resto dei dati verranno marcati come anomalia.
+È possibile adottare questo modello nell'Anomaly Detection allenandolo rispetto ad un set di dati e poi assegnando un punteggio ai nuovi punti: quelli significativamente diversi dal resto dei dati verranno marcati come anomalia.
 
 \subsubsection{ABOD}
-Angle Based Outlier Detection (ABOD) si basa sull'idea di osservare l'angolo formato da un insieme di tre punti qualsiasi nello spazio delle feature multivariate. La varianza dell'ampiezza dell'apertura angolare risulta diversa per i punti anomali e per quelli normali: la varianza osservata è più alta per i punti inlier e piu bassa per gli outlier, quindi tale misura puo essere usata per separare punti normali da outlier. ABOD funziona abbastanza bene nello spazio ad alta densità, a differenza di altre misure basate sulla distanza che soffrono della "curse of dimensionality" in quanto gli angoli possono fornire una rappresentazione migliore della vicinanza.
+Angle Based Outlier Detection (ABOD) si basa sull'idea di osservare l'angolo formato da un insieme di tre punti qualsiasi nello spazio delle feature multivariate. La varianza dell'ampiezza dell'apertura angolare risulta diversa per i punti anomali e per quelli normali: la varianza osservata è più alta per i punti inlier e più bassa per gli outlier, quindi tale misura puo essere usata per separare punti normali da anomalie. ABOD funziona abbastanza bene nello spazio ad alta densità, a differenza di altre misure basate sulla distanza che soffrono della "curse of dimensionality" in quanto gli angoli possono fornire una rappresentazione migliore della vicinanza.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/abod}
 	\caption{ABOD}
 	\label{abod}
 \end{figure}
-Un'esempio sull'idea alla base di ABOD é presente in figura \ref{abod}.
-Considerando il punto rosso come pivot, viene calcolato l'angolo racchiuso tra questo punto e qualsiasi altro punto dello spazio e con molta probabilita si noterá un'altra varianza tra questi valori. Questo andamento indica che il punto pivot fa parte di un cluster ad alta coesione.
-Se si considera come pivot invece il punto verde e procedendo con gli stessi calcoli per ogni coppia di punti, la varianza angolare sará molto piu bassa, indice che quel punto é molto probabilmente un outlier.
+Un esempio sull'idea alla base di ABOD é presente in figura \ref{abod}.
+Considerando il punto rosso come pivot, viene calcolato l'angolo racchiuso tra questo punto e qualsiasi altro punto dello spazio e con molta probabilità si noterà un'alta varianza tra questi valori. Questo andamento indica che il punto pivot fa parte di un cluster ad alta coesione.
+Se si considera come pivot invece il punto verde e procedendo con gli stessi calcoli per ogni coppia di punti, la varianza angolare sarà molto più bassa, indice che quel punto é molto probabilmente un outlier.
 
 \subsubsection{ECOD}
-Empirical-Cumulative-distribution-based Outlier Detection (ECOD) é un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilita che esista un punto almeno "estremo" come $x_i$.
-ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilita, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilita su tutte le dimensioni.
+Empirical-Cumulative-distribution-based Outlier Detection (ECOD) é un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilità che esista un punto almeno "estremo" come $x_i$.
+ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilità, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilità su tutte le dimensioni.
 
 \subsubsection{COPOD}
 Copula Based Outlier Detection (COPOD) si ispira alla copula per modellare la distribuzione dei dati multivariati. Costruisce dapprima una copula empirica e la utilizza per predire la tail-probability di ogni punto per determinare il suo
-livello di "estremita". Intuitivamente, si puo pensare a questo come a calcolare
+livello di "estremità". Intuitivamente, si puo pensare a questo come a calcolare
 un valore p-anomalo.
 
 \subsubsection{SOS}
@@ -261,9 +263,9 @@ Stochastic Outlier Selection (SOS) utilizza il concetto di affinità per quantif
 Un'osservazione viene classificata come outlier quando tutti gli altri punti hanno un'affinità insufficiente con esso.
 
 \subsubsection{Sampling}
-Sampling é un algoritmo che cerca di approssimare, a favore di un tempo computazionale decisamente minore, KNN. Al posto di calcolare la distanza di un punto rispetto a tutti gli altri e prendere solamente i \textit{k} piu vicini, esegue prima una fase di sampling in cui estrare casualmente un sottoinsieme di punti per poi andare ad effettuare i calcoli sulla distanza in questo sottoinsieme.
+Sampling é un algoritmo che cerca di approssimare, a favore di un tempo computazionale decisamente minore, KNN. Al posto di calcolare la distanza di un punto rispetto a tutti gli altri e prendere i \textit{k} più vicini, esegue prima una fase di sampling in cui estrae casualmente un sottoinsieme di punti per poi andare ad effettuare i calcoli sulla distanza in questo sottoinsieme.
 
-\subsection{Ensemble Models}
+\subsection{Modelli Ensemble}
 Gli ensemble models sono una tecnica di apprendimento automatico che consiste nell'utilizzare più modelli per risolvere un problema specifico. Il risultato finale è ottenuto combinando i risultati di ciascun modello. Ci sono diverse tecniche per combinare i risultati dei modelli, come la media, la mediana o la maggioranza. Gli ensemble models sono spesso utilizzati per aumentare la precisione e la robustezza di un modello, poiché la combinazione di più modelli può ridurre l'effetto di eventuali errori o incertezze presenti in un singolo modello.
 
 \subsubsection{I-Forest}
@@ -282,21 +284,21 @@ l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest
 
 Il processo di solito funziona come segue:
 \begin{enumerate}
-\item Il set di dati viene diviso in un insieme di addestramento, che viene utilizzato per addestrare l'ensemble di nearest-neighbor, e un insieme di test, che viene utilizzato per valutare le prestazioni dell'ensemble.
+\item Il set di dati viene diviso in un insieme di addestramento e di test.
 \item L'ensemble di nearest-neighbor viene addestrato sull'insieme di addestramento utilizzando una tecnica come k-NN o LOF.
 \item L'ensemble di nearest-neighbor viene quindi utilizzato per identificare i punti di dati isolati nell'insieme di test. Questi punti di dati isolati vengono considerati anomalie.
-\item Un punteggio di anomalia viene assegnato a ogni punto di dati, basato su quanto è isolato il punto dal resto dei dati. Più alto è il punteggio di anomalia, maggiore è la probabilità che il punto di dati sia un'anomalia.
+\item Un punteggio di anomalia viene assegnato a ogni punto di dati, basato su quanto è isolato il punto dal resto dei dati. più alto è il punteggio di anomalia, maggiore è la probabilità che il punto di dati sia un'anomalia.
 \end{enumerate}
 
 \subsubsection{Feature Bagging}
-Fature Bagging è un meta-estimator che adatta una serie di predittori di base a vari sotto-insiemi del dataset ed utilizza la media o altri metodi di combinazione per migliorare l'accuratezza predittiva e controllare l'over-fitting.
+Feature Bagging è un meta-estimator che adatta una serie di predittori di base a vari sotto-insiemi del dataset ed utilizza la media o altri metodi di combinazione per migliorare l'accuratezza predittiva e controllare l'over-fitting.
 Le feature sono anch'esse campionate in modo casuale.
-Per impostazione predefinita, viene utilizzato LOF come predittore di base. Tuttavia, è possibile utilizzare qualsiasi stimatore di base, come kNN e ABOD.
+Per impostazione predefinita, viene utilizzato LOF come predittore di base. Tuttavia, è possibile utilizzare qualsiasi modello, come KNN e ABOD.
 Il Feature Bagging costruisce innanzitutto \textit{n} sottoinsiemi selezionando casualmente un sottoinsieme di feature, il che induce la diversità dei predittori di base.
-Infine, il punteggio di predizione viene generato facendo la media o prendendo il massimo di tutti i predditori.
+Infine, il punteggio di predizione viene generato facendo la media o prendendo il massimo.
 
-\section{Neural Network Models}
-I metodi basati sulle Neural Networks sono una sottocategoria di metodi di machine learning che si basano su reti neurali.
+\section{Modelli a Rete Neurale}
+I metodi basati sulle reti neurali sono una sotto-categoria di metodi di Machine Learning che si basano su reti neurali.
 Le reti neurali possono essere considerate come strutture che simulano il comportamento e il meccanismo del cervello umano. Come il cervello umano, l'unità di base della computazione è il neurone e questi sono collegati tra loro attraverso le sinapsi.  Il segnale propagato è proporzionale all'input ricevuto.
 In primo luogo, c'è una serie di neuroni che si trovano all'ingresso della rete: questi sono chiamati neuroni di ingresso, che hanno il compito di raccogliere le informazioni da elaborare all'interno della rete.
 Poi, c'è un neurone chiamato neurone di uscita, che ha il compito di restituire il risultato della computazione della rete. L'elaborazione avviene, in questo caso attraverso la somma ponderata degli ingressi. 
@@ -304,16 +306,16 @@ Ad ogni segnale di ingresso viene associato un peso, che è un punto fondamental
 
 Ci sono diversi tipi di reti neurali, tra cui:
 \begin{itemize}
-\item Reti feedforward: una semplice struttura di reti neurali in cui i dati scorrono in una direzione, dall'ingresso all'uscita.
+\item Reti feed-forward: una semplice struttura di reti neurali in cui i dati scorrono in una direzione, dall'ingresso all'uscita.
 \item Reti ricorrenti: una struttura di reti neurali in cui i dati possono fluire in entrambe le direzioni, dall'ingresso all'uscita e viceversa.
-\item  Reti convolutional: una struttura di reti neurali utilizzata per lavorare con immagini e video, in cui vengono utilizzati filtri per estrarre caratteristiche dai dati di ingresso.
+\item  Reti convoluzionali: una struttura di reti neurali utilizzata per lavorare con immagini e video, in cui vengono utilizzati filtri per estrarre caratteristiche dai dati di ingresso.
 \item Reti autoencoder: una struttura di reti neurali utilizzata per la riduzione della dimensionalità e l'apprendimento non supervisionato.
 \item Reti generative: una struttura di reti neurali utilizzata per generare nuovi dati, come ad esempio immagini, testo o suoni.
 \end{itemize}
 
 
-\subsection{Deep Neural Networks}
-Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. In generale, si considera una rete neurale profonda quando ha almeno tre strati nascosti, ovvero strati tra l'ingresso e l'uscita della rete. Un numero maggiore di strati consente alla rete di apprendere rappresentazioni piu complesse dei dati.
+\subsection{Reti Neurali Profonde}
+Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. In generale, si considera una rete neurale profonda quando ha almeno tre strati nascosti, ovvero strati tra l'ingresso e l'uscita della rete. Un numero maggiore di strati consente alla rete di apprendere rappresentazioni più complesse dei dati.
 \subsubsection{DeepSVDD}
 \begin{figure}[t]
 	\centering
@@ -322,18 +324,18 @@ Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. 
 	\label{deepsvdd}
 \end{figure}
 
-Deep Support Vector Data Description (DeepSVDD) é una rete neurale profonda che durante la fase di training punta a minimizzare il volume della iper-sfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'iper-sfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti dei daltaset al centro della sfera.  La figura \ref{deepsvdd} mostra le trasformazioni di DeepSVDD.
+Deep Support Vector Data Description (DeepSVDD) é una rete neurale profonda che durante la fase di training punta a minimizzare il volume della ipersfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'ipersfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti del dataset al centro della sfera.  La figura \ref{deepsvdd} mostra le trasformazioni di DeepSVDD.
 
 \subsection{Auto Encoders}
-Un Auto-Encoder è una rete neurale artificiale che combina un encoder $E$ e un decoder $D$. L'encoder é un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un'insieme di variabili latenzi $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder é il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ é chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder ha compiere errori nella fase di ricostruzione. L'architettura di un AE é presente nella figura \ref{ae}.
+Un Auto-Encoder (AE) è una rete neurale che combina un encoder $E$ e un decoder $D$. L'encoder é un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un'insieme di variabili latenti $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder é il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ é chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder a compiere errori nella fase di ricostruzione. L'architettura di un auto-encoder é presente nella figura \ref{ae}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/ae}
-	\caption{AutoEncoder}
+	\caption{Auto-Encoder}
 	\label{ae}
 \end{figure}
 \subsubsection{Variational Autoencoders}
-I Variational Autoencoders ereditano parte dell'architettura dei classici AutoEncoders ma hanno profonde differenze. VAE é considerato un modello generativo e inoltre il suo encoder non solo produce una rappresentazione latente, ma anche una distribuzione di probabilità della rappresentazione latente $\mu$ e $\sigma$. Questo rende possibile generare nuovi sample semplicemente estraendo valori casuali dalla distribuzione di probabilità prodotta dall'encoder.
+I Variational Autoencoders (VAE) ereditano parte dell'architettura dei classici AutoEncoders ma hanno profonde differenze. VAE é considerato un modello generativo e inoltre il suo encoder non solo produce una rappresentazione latente, ma anche una distribuzione di probabilità della rappresentazione latente $\mu$ e $\sigma$. Questo rende possibile generare nuovi sample semplicemente estraendo valori casuali dalla distribuzione di probabilità prodotta dall'encoder.
 Il modello viene allenato per minimizzare la divergenza Kullback-Leibler (KL) tra la distribuzione di probabilità prodotta dall'encoder e una distribuzione nota (spesso una distribuzione normale) e allo stesso tempo massimizzare la capacità del decoder di ricostruire l'immagine originale (Figura \ref{vae}).
 \begin{figure}[t]
 	\centering
@@ -344,17 +346,17 @@ Il modello viene allenato per minimizzare la divergenza Kullback-Leibler (KL) tr
 
 \subsection{LSTM}
 Le LSTM (Long Short-Term Memory) sono un tipo di rete neurale artificiale utilizzata in problemi di elaborazione del linguaggio e predizione dei dati temporali. Sono state progettate per gestire problemi di "vanishing gradient" presenti in modelli di rete neurale tradizionali, consentendo una memorizzazione a lungo termine dei dati. Ciò significa che le LSTM possono tenere traccia di eventi che accadono molto tempo prima, il che è utile per comprendere il contesto.
-Le reti LSTM sono composte da elementi detti \textit{unit} o \textit{celle} che a loro volta sono composte dei gates. Uno di ingresso, uno di uscita e uno detto \textit{forget gate}. La cella ricorda i valori su intervalli di tempo arbitrari e i tre gate regolano il flusso di informazioni in entrata e in uscita. Le forget gate decidono quali informazioni scartare da uno stato precedente assegnando a quest'ultimo, rispetto all'ingresso corrente, un valore compreso tra 0 e 1. Un valore vicino a 1 significa mantenere l'informazione, mentre un valore di 0 significa scartarla. Le porte di ingresso decidono quali nuove informazioni memorizzare nello stato corrente, utilizzando lo stesso sistema delle forget gate. Le porte di uscita controllano quali informazioni dello stato corrente devono essere emesse, assegnando un valore da 0 a 1 alle informazioni, tenendo conto degli stati precedente e attuale. L'emissione selettiva di informazioni rilevanti dallo stato corrente consente alla rete LSTM di mantenere dipendenze utili a lungo termine per fare previsioni, sia nel tempo corrente che in quello futuro.
+Le reti LSTM sono composte da elementi detti \textit{unit} o \textit{celle} che a loro volta sono composte da dei \textit{gates}: uno di ingresso, uno di uscita e uno detto \textit{forget gate}. La cella ricorda i valori su intervalli di tempo arbitrari e i tre gate regolano il flusso di informazioni in entrata e in uscita. Le forget gate decidono quali informazioni scartare da uno stato precedente assegnando a quest'ultimo, rispetto all'ingresso corrente, un valore compreso tra 0 e 1. Un valore vicino a 1 significa mantenere l'informazione, mentre un valore di 0 significa scartarla. Le porte di ingresso decidono quali nuove informazioni memorizzare nello stato corrente, utilizzando lo stesso sistema delle forget gate. Le porte di uscita controllano quali informazioni dello stato corrente devono essere emesse, assegnando un valore da 0 a 1 alle informazioni, tenendo conto degli stati precedente e attuale. L'emissione selettiva di informazioni rilevanti dallo stato corrente consente alla rete LSTM di mantenere dipendenze utili a lungo termine per fare previsioni, sia nel tempo corrente che in quello futuro.
 
 Le LSTM possono essere utilizzate per rilevare anomalie in dati temporali andando ad addestrare il modello sui dati "normali", per imparare una rappresentazione del comportamento normale dei dati. Quindi, quando nuovi dati vengono presentati al modello, possono essere utilizzati per generare una previsione e confrontare questa previsione con i dati effettivi. Se ci sono differenze significative tra la previsione e i dati effettivi, allora questi dati possono essere considerati anomali.
 
 
-\subsection{Adversarial Networks}
+\subsection{Reti Avversarie Generative}
 Le reti avversarie generative, o in breve GAN, sono un approccio alla modellazione generativa che utilizza metodi di apprendimento come le reti neurali convoluzionali.
 
 La modellazione generativa è un task dell'apprendimento non supervisionato che prevede la scoperta e l'apprendimento automatico delle relazioni o delle variabili latenti all'interno dei dati di input in modo tale che il modello possa essere utilizzato per generare o produrre nuovi esempi che potrebbero essere stati plausibilmente ricavati dal set di dati originale.
 
-Le GAN sono un modo di addestrare un modello generativo, strutturando il problema come un problema di apprendimento supervisionato con due sottomodelli: il modello generatore, che viene addestrato per generare nuovi esempi, e il modello discriminatore, che cerca di classificare gli esempi come reali (provenienti dal dominio) o falsi (generati). I due modelli vengono addestrati insieme in un gioco a somma zero (da qui adversarial), fino a quando il modello discriminatore viene ingannato circa la metà delle volte, il che significa che il modello generatore sta generando esempi plausibili. Lo schema della rete é presente in figura \ref{gan}.
+Le GAN sono un modo di addestrare un modello generativo strutturando il problema in due parti: il modello generatore, che viene addestrato per generare nuovi esempi, e il modello discriminatore, che cerca di classificare gli esempi come reali (provenienti dal dominio) o falsi (generati). I due modelli vengono addestrati insieme in un gioco a somma zero (da qui adversarial), fino a quando il modello discriminatore viene ingannato circa la metà delle volte, il che significa che il modello generatore sta generando esempi plausibili. Lo schema della rete é presente in figura \ref{gan}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=12cm, scale=1]{images/gan}
@@ -363,22 +365,21 @@ Le GAN sono un modo di addestrare un modello generativo, strutturando il problem
 \end{figure}
 
 \subsubsection{AnoGAN}
-AnoGAN (Anomaly GAN) è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione densa dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
+AnoGAN (Anomaly GAN) è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
 
 Il modello AnoGAN è composto da tre componenti principali:
 
 \begin{enumerate}
 \item Il generatore GAN che impara a generare dati che seguono la distribuzione dei dati normali.
 \item Il discriminatore GAN che impara a distinguere i dati generati dai dati reali.
-\item La rete neurale di rilevamento di anomalie che utilizza la rappresentazione densa generata dal generatore GAN per distinguere i dati normali dalle anomalie.
+\item La rete neurale di rilevamento di anomalie che utilizza la rappresentazione generata dal generatore GAN per distinguere i dati normali dalle anomalie.
 \end{enumerate}
 
-Durante il training, il generatore GAN impara a generare dati che sembrano provenire dalla distribuzione dei dati normali, mentre il discriminatore GAN impara a distinguere i dati generati dai dati reali. Dopo il training, la rete neurale di rilevamento di anomalie utilizza la rappresentazione densa generata dal generatore GAN per distinguere i dati normali dalle anomalie.
 
 \subsubsection{ALAD}
-Adversarially Learned Anomaly Detection (ALAD)  é una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza é presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
+Adversarially Learned Anomaly Detection (ALAD) é una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza é presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
 
-\subsection{Graph Based}
+\subsection{Reti Neurali a Grafo}
 Le reti neurali basate su grafi (o GNN, Graph Neural Networks) sono una classe di modelli di apprendimento automatico che utilizzano strutture di dati a forma di grafo per rappresentare i dati. In questi modelli, i nodi del grafo rappresentano i sample e gli archi rappresentano le relazioni tra questi. Le GNN utilizzano un algoritmo di propagazione per aggiornare i valori dei nodi del grafo in base alle informazioni che si trovano sui nodi adiacenti.
 
 \subsubsection{LUNAR}
@@ -387,31 +388,31 @@ Il processo di solito funziona come segue:
 \begin{enumerate}
 \item Viene costruito un grafo dai dati, dove ogni nodo rappresenta un punto di dati e gli archi vengono tracciati tra i punti di dati che vengono considerati simili.
 \item Una rete neurale su grafi viene addestrata sul grafo per apprendere la struttura locale dei dati.
-\item Dopo l'addestramento, la rete neurale su grafi viene utilizzata per calcolare un punteggio di outlier per ogni punto di dati. Il punteggio di outlier rappresenta quanto dissimile è il punto di dati dai suoi punti di dati vicini.
+\item Dopo l'addestramento, la rete viene utilizzata per calcolare un punteggio di outlier per ogni punto di dati. Il punteggio di outlier rappresenta quanto dissimile è il punto di dati dai suoi punti di dati vicini.
 \item I punti di dati con punteggi di outlier elevati vengono considerati anomalie.
 
 \end{enumerate}
-é particolarmente utile per rilevare anomalie in dati che hanno una struttura complessa. Il metodo è in grado di modellare la struttura locale dei dati, il che lo rende efficace nel rilevare anomalie che potrebbero essere mancate da altri metodi.
+
+ È particolarmente utile per rilevare anomalie in dati che hanno una struttura complessa. Il metodo è in grado di modellare la struttura locale dei dati, il che lo rende efficace nel rilevare anomalie che potrebbero essere mancate da altri metodi.
 
 
 
 
 \section{Thresholding}
-Il problema del thresholding nella rilevazione di anomalie si riferisce alla sfida di determinare il valore di soglia appropriato che separa i punti di dati normali dai punti di dati anomali. Il valore di soglia viene solitamente utilizzato per assegnare una label di anomalia a ciascun punto di dati: i punti di dati con punteggi superiori alla soglia vengono considerati anomalie. Tuttavia, determinare il valore di soglia appropriato può essere difficile, poiché dipende dall'applicazione specifica e dall'insieme di dati.
+Il problema del thresholding nella rilevazione di anomalie si riferisce alla sfida di determinare il valore di soglia appropriato che separa i punti di dati normali dai punti di dati anomali. Il valore di soglia viene solitamente utilizzato per assegnare un'etichetta di anomalia a ciascun punto di dati: i punti di dati con score di anomalia superiori alla soglia vengono considerati anomalie. Tuttavia, determinare il valore di soglia appropriato può essere difficile, poiché dipende dall'applicazione specifica e dall'insieme di dati.
 
 Una delle principali sfide del thresholding è che solitamente si basa su una conoscenza a priori dei dati, che potrebbe non essere disponibile o potrebbe essere inaccurata. Inoltre, la distribuzione dei punti di dati e il numero di punti di dati anomali possono variare notevolmente tra diversi set di dati, rendendo difficile determinare un valore di soglia appropriato per tutti i set di dati.
 
 Un'altra sfida del thresholding è che può essere difficile bilanciare il compromesso tra il numero di rilevamenti true-positive ed il numero di rilevamenti false-positive. Un valore di soglia troppo alto può causare molti falsi negativi, mentre un valore di soglia troppo basso può causare molti falsi positivi.
-Sono proposti ora due metodi classici di thresholding ed un terzo metodo novizio che verrá utilizzato nel Model Selection.
+Sono proposti ora due metodi classici di thresholding ed un terzo metodo novizio che verrà utilizzato nel Model Selection.
 
 \subsection{IQR}
 Il metodo si basa sull'uso della deviazione interquartile (che è la differenza tra il terzo e il primo quartile) come base per determinare se un punto di dati è anomalo.
 
 Il processo di solito funziona come segue:
 \begin{enumerate}
-\item Calcolare il primo quartile (Q1) e il terzo quartile (Q3) dei dati
-\item Calcolare la deviazione interquartile (IQR) come Q3 - Q1
-\item Definire la soglia inferiore come Q1 - 1.5 x IQR e la soglia superiore come Q3 + 1.5 x IQR
+\item Viene calcolato il primo quartile (Q1), il terzo quartile (Q3) dei dati e la deviazione interquartile IQR dove $IQR = Q3-Q1$.
+\item Viene definita la soglia inferiore come $Q1 - 1.5 \cdot IQR$ e la soglia superiore come $Q3 + 1.5 \cdot IQR$
 \item I punti di dati che si trovano al di fuori del range tra la soglia inferiore e la soglia superiore vengono considerati anomalie.
 \end{enumerate}
 
@@ -421,17 +422,17 @@ Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna
 Il punteggio Z (z-score) è una misura della distanza di un punto di dati dalla media dei dati in termini di deviazione standard. I punti di dati con punteggi Z troppo alti o troppo bassi vengono considerati anomalie.
 l processo di solito funziona come segue:
 \begin{enumerate}
-\item Calcolare la media e la deviazione standard dei dati
-\item Calcolare il punteggio Z per ogni punto di dati utilizzando la formula (valore del punto di dati - media) / deviazione standard
-\item Definire una soglia per i punteggi Z, ad esempio 3 o -3 (che rappresentano rispettivamente 3 deviazioni standard sopra o sotto la media)
+\item Viene calcolata la media e la deviazione standard dei dati
+\item Viene calcolato il punteggio Z per ogni punto di dati utilizzando la formula $(x_i - avg) / std$
+\item Viene definita una soglia per i punteggi Z, ad esempio 3 o -3 (che rappresentano rispettivamente 3 deviazioni standard sopra o sotto la media)
 \item I punti di dati con punteggi Z al di fuori della soglia vengono considerati anomalie.
 \end{enumerate}
-Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati. Tuttavia, questo metodo presuppone che i dati seguano una distribuzione normale, quindi potrebbe non essere adatto per i dati non normalmente distribuiti. Inoltre, il valore della soglia deve essere scelto con attenzione in quanto può avere un impatto significativo sulle prestazioni del metodo.
+Anche questo metodo si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati. Tuttavia, questo metodo presuppone che i dati seguano una distribuzione normale, quindi potrebbe non essere adatto per i dati non normalmente distribuiti. Inoltre, il valore della soglia deve essere scelto con attenzione in quanto può avere un impatto significativo sulle prestazioni del metodo.
 
 
 \subsection{$\gamma$GMM}
-ESTIMATING THE CONTAMINATION FACTOR’S DISTRIBUTION IN UNSUPERVISED ANOMALY DETECTION é un paper pubblicato da Lorenzo Perini, ricercatore al dipartimento di KU Leuven.
-Il problema trattato in questo paper consiste nella stima della distribuzione del fattore di contaminazione ($\gamma$) in un insieme di dati non etichettato utilizzando un insieme di M rilevatori di anomalie non supervisionati. 
+"ESTIMATING THE CONTAMINATION FACTOR’S DISTRIBUTION IN UNSUPERVISED ANOMALY DETECTION" é un paper pubblicato da Lorenzo Perini, ricercatore al dipartimento di KU Leuven.
+Il problema trattato in questo paper consiste nella stima della distribuzione del fattore di contaminazione ($\gamma$) di un dataset non etichettato utilizzando un insieme di M rilevatori di anomalie non supervisionati. 
 
 Per affrontare questo problema, in questo paper viene proposto $\gamma$GMM, un approccio innovativo che utilizza un metodo bayesiano per stimare la distribuzione del fattore di contaminazione.
 L'approccio $\gamma$GMM si compone di quattro fasi:
@@ -457,12 +458,12 @@ La formula utilizzata per la stima della distribuzione di $\gamma$ è la seguent
 
 dove X è l'insieme di dati, $\gamma$ è il fattore di contaminazione, k è il numero di componenti anomali, z è il vettore di appartenenza ai componenti di miscela e m è il numero di componenti di miscela.
 
-All'interno del paper sono presenti anche i risultati degli esperimenti in cui il metodo $\gamma$GMM viene confrontanto con numerosi metodi di thresholding tra cui IQR o Z-Score. I risultati sono incoraggianti e non solo ottiene il punteggio di MAE piu basso (rispetto al true $\gamma$), ma la degradazione di una metrica supervisionata, come F-Measure, di un rilevatore di anomalie a cui é stato passato come fattore di contaminazione quanto generato dall'alagoritmo di $\gamma$GMM é la piu bassa rispetto a tutti gli altri metodi di thresholding (figura \ref{ygmm2}). 
+All'interno del paper sono presenti anche i risultati degli esperimenti in cui il metodo $\gamma$GMM viene confrontato con numerosi metodi di thresholding tra cui IQR o Z-Score. I risultati sono incoraggianti e non solo ottiene il punteggio di MAE più basso (rispetto al true $\gamma$), ma la degradazione di una metrica supervisionata, come F-Measure, di un rilevatore di anomalie a cui é stato passato come fattore di contaminazione quanto generato dall'algoritmo di $\gamma$GMM, é la più bassa rispetto a tutti gli altri metodi di thresholding (figura \ref{ygmm2}). 
 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/ygmm2}
-	\caption{Performance di $\gamma$GMM rispetto ad altre tecniche di trehsolding. A sinistra i valori di MAE mentre a destra la F1-Deterioration.}
+	\caption{Performance di $\gamma$GMM rispetto ad altre tecniche di thresholding. A sinistra i valori di MAE mentre a destra la F1-Deterioration.}
 	\label{ygmm2}
 \end{figure}
 
