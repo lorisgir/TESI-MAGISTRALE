@@ -75,7 +75,7 @@ In questa sezione sono definiti gli step della pipeline di inferenza.
 \begin{enumerate}
 	\item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 
 	\item Il secondo step richiama l'endpoint di inferenza pubblicato dalla pipeline di training. È una chiama POST nella quale al suo interno vengono inclusi i dati dello step 1.
-	\item Infine il terzo step si occupa si salvare su database SQL, attraverso il richiamo di una Stored Procedure, il risultato dell'inferenza. Rendendolo cosi disponibile a tutti quei client che ne necessitano l'utilizzo, come PowerBI
+	\item Infine il terzo step si occupa si salvare su database SQL, attraverso il richiamo di una Stored Procedure, il risultato dell'inferenza. Rendendolo così disponibile a tutti quei client che ne necessitano l'utilizzo, come PowerBI
 \end{enumerate}
 
 \begin{figure}[t]

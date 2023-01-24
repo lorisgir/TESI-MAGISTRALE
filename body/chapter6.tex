@@ -126,7 +126,7 @@ Applicando quindi DBSCAN si ottengono i clster per i punti anomali.
 Infine viene calcolato il silouette score su questi, tenendo anche in considerazione il cluster di punti normali originario.
 
 Infine questa procedura viene applicata su ogni modello per andare a produrre un ranking finale.
-Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale é relativamente bassa e quindi i punti sono quasi indipendenti tra di loro. Le point anomalies cosi come le collective anomalies sono identificate con piu precisione rispetto alle contextual anomalies. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con piu probabilita nel cluster di punti normali.
+Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale é relativamente bassa e quindi i punti sono quasi indipendenti tra di loro. Le point anomalies così come le collective anomalies sono identificate con piu precisione rispetto alle contextual anomalies. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con piu probabilita nel cluster di punti normali.
 \subsection{Rank Aggregation}
 Nel capitolo \ref{chap:modelselection} é stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sará svolta nelle sezioni successive.
 Ognuno di questi metodi riceve in input un set di rankings, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un unico ranking finale.
@@ -152,7 +152,7 @@ Nel caso delle metriche surrogate Model Centrality e Performance on Anomaly Inje
 \end{table}
 
 \subsubsection{Borda}
-I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto sará in posizione 1. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e cosi via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. A questo punto vengono effettuati i calcoli per ognuna delle 3 metriche surrogate ed il punteggio finale, per ogni modello, sará la media dei 3 valori ottenuti.
+I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score piu alto sará in posizione 1. Successivamente per ognuno dei tre ranking viene assegnato un punteggio al modello in base alla posizione in cui si trova: il modello piu in basso ricevera 1 punto, il secondo piu in basso 2 punti e così via. Il modello in prima posizione ricevera un numero di punti uguale al numero di modelli. A questo punto vengono effettuati i calcoli per ognuna delle 3 metriche surrogate ed il punteggio finale, per ogni modello, sará la media dei 3 valori ottenuti.
 
 \begin{table}
 	
@@ -171,7 +171,7 @@ I tre ranking prodotti dalle metriche surrogate contenenti gli score per ogni mo
 
 Nella tabella \ref{borda}, viene riproposto l'esempio precedente ma utilizzando Borda. Le prime 3 colonne sono gli stessi score delle metriche surrogate, invece le seconde 3 colonne rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score piu alto é stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
 \subsubsection{Robust Borda}
-é una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo cosi il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking. 
+é una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo così il punteggio minimo. Questo metodo cerca di migliorare le performance del metodo Borda classico andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking. 
 
 \begin{table}
 	
@@ -220,7 +220,7 @@ Gli algoritmi di calcolo per il coefficiente di correlazione sono Kendall e Spea
 Dato che questi coefficienti hanno caratteristiche diverse é necessario andare a trattare separatamente il calcolo:
 \begin{itemize}
 	\item Rank Correlation: Kendall e Spearman utilizzando dei rank di posizione per calcolare il coefficiente di correlazione. Questo vuol dire che bisogna andare a trasformare tutti i rankings con gli score in rakings di posizione in cui il modello con score piu alto avrá come posizione 1 ed i restanti a seguire.
-	\item Score Correlation: Pearson invece necessita di valori continui di conseguenza per questo coefficiente non si effettua nessuna trasformazione e si usano i rankings con gli score cosi come sono prodotti dal Model Selection
+	\item Score Correlation: Pearson invece necessita di valori continui di conseguenza per questo coefficiente non si effettua nessuna trasformazione e si usano i rankings con gli score così come sono prodotti dal Model Selection
 \end{itemize}
 
  
@@ -277,7 +277,7 @@ Ognuno di questi modelli é stato allenato utilizzando sia i valori predefiniti 
 Per ogni algoritmo sono state considerate in media 3 versioni con parametri differenti, portando il totale dei modelli a 70.
 La scelta dei valori modificati agli iper-parametri é stata fatta manualmente a priori, senza conoscere le performance del modello. Il focus della tesi si mantiene sul Model Selection, mentre un approfondimento sul tuning dei parametri puo essere lasciato a sviluppi futuri.
 
-Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione é ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non é possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non é presente. Per risolvere questo problema si utilizzera un metodo di Tresholding come introdotto nel capitolo \ref{chap:methods} che stima il fattore di contaminazione. Un fattore di contaminazione stimato male porta ovviamente a degradare le performance del Model Selection. Cosi come per la variazione degli iper-parametri, in sviluppi futuri potrebbe risultare utile un'analisi piu approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
+Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione é ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non é possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non é presente. Per risolvere questo problema si utilizzera un metodo di Tresholding come introdotto nel capitolo \ref{chap:methods} che stima il fattore di contaminazione. Un fattore di contaminazione stimato male porta ovviamente a degradare le performance del Model Selection. Così come per la variazione degli iper-parametri, in sviluppi futuri potrebbe risultare utile un'analisi piu approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
 
 
 \begin{table}[]
@@ -813,7 +813,7 @@ Possiamo quindi concludere che mentre il model Selection non supervisionato non 
 \newpage
 \section{SKF Results}
 Il progetto di tesi é nato da una collaborazione tra Alten e SKF quindi una parte dedicata a quest'ultima é necessaria. Come introdotto nel capitolo \ref{chap:skf} pero, i dati prodotti dai sensori installati sui macchinari della catena di montaggio non sono sufficientemente completi per riuscire a fornire una valutazione completa dell'algoritmo di Model Selection. La mancanza di labels e di uno storico delle manutenzioni effettuate in aggiunta al fatto che non tutte le macchine sono mappate dai sensori, rende complicato valutare i modelli di Anomaly Detection. La presenza dei dati MVM aiuta poco alla causa per tre motivi: (1) non tutte le macchine hanno sensori installati, (2) la frequenza con la quale vengono registrati i dati CoMo e troppo bassa e (3) la correlazione tra i valori dei sensori e la qualita finale non é certo da dare per scontata. Potrebbero esserci fattori aggiuntivi come la qualita del materiale utilizzato per la produzione oppure anche problemi ai macchinari che non vengono captati dai sensori. 
-Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato sul dataset di uno specifico macchinario andando a produrre una lista di ranking e ottenendo cosi il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dato sempre dello stesso macchinario. Infine si utilizzano i dati di MVM per:
+Nonostante cio, viene svolta una valutazione usando MVM come riferimento. Prima viene eseguito l'algoritmo di Model Selection non supervisionato sul dataset di uno specifico macchinario andando a produrre una lista di ranking e ottenendo così il modello in prima posizione, successivamente viene usato questo per andare a fare la prediction sui dato sempre dello stesso macchinario. Infine si utilizzano i dati di MVM per:
 \begin{itemize}
 	\item Calcolare il numero di volte in cui un cuscinetto a sfera supera la soglia della banda A per la classe Q1 nell'intervallo di 10 minuti e paragonare questi numeri tra i time-step segnalati come anomali dal modello con i time-step segnalati come normali.
 	\item Calcolare la qualita media per ogni intervallo di 10 minuti e misurare la correlazione tra la qualita con le label generate dal modello per ogni intervallo.
@@ -957,7 +957,7 @@ Puo essere utile un confronto tra le anomalie rilevate e la qualita registrata i
 \end{itemize}
 
 
-Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da un modello, in questo caso prima KDE poi Telemanom, e i punti registrati come bassa qualita. Le correlazioni sono cosi spiegate:
+Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da un modello, in questo caso prima KDE poi Telemanom, e i punti registrati come bassa qualita. Le correlazioni sono così spiegate:
 \begin{itemize}
 	\item \textit{true positive} indica che il punto é rilevato sia come anomalo che di bassa qualita
 	\item \textit{true negative} indica che il punto é rilevato sia come non anomalo che di qualita normale
@@ -965,7 +965,7 @@ Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma 
 	\item \textit{false positive} indica che il punto é rilevato come anomalo ma la qualita é normale
 \end{itemize}
 
-L' immagine \ref{kde_quality} rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, cosi come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
+L' immagine \ref{kde_quality} rappresenta lo scatter con KDE, la maggior parte dei punti del cluster di sinista viene correttamente identificato come true-negative ma sono presenti discreto numero di false negative non banale. Il cluster di destra, così come i punti sparsi nel mezzo, vengono identificati per circa meta come false positive e meta come true positive.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/correlation_ssb1_quality_plot.png}
@@ -1033,7 +1033,7 @@ Il numero medio di registrazioni che superano la soglia Q1 della banda A all'int
 Questo esperimento é stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
 
 Per quanto riguarda il secondo punto, ovvero il problema di considerare solamente un macchinario, si é pensato di andare a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le label per ogni timestep.
-In questo esperimento, i dati hanno bisogno di una fase di processing aggiuntiva, ovvero é necessario allineare le registrazioni di tutti i macchinari tenendo in considerazione il tempo che impiega il cuscinetto a sfera a spostarsi lungo la linea di montaggio. In un esempio, ipotizzando tre macchine di cui la terza é MVM ed un cuscinetto a sfera che parte dalla linea di montaggio a tempo $t$, la prima macchina esegue la registrazione su quel cuscinetto a sfera a tempo $t$, la seconda a tempo $t+1$ e la terza a tempo $t+2$. Per allineare le registrazioni viene quindi rimossa un'unita temporale dalle registrazioni del secondo macchinario e 2 unitá dalle registrazioni del terzo macchinario. Cosi facendo si crea un'istantanea delle registrazioni per ogni cuscinetto a sfera. Questo procedimento é simile a quello svolto per le valutazioni precedenti, con la differenza che in questo caso si aveva soltato il macchinario M1 ed MVM, di conseguenza solamente i dati MVM erano da traslare.
+In questo esperimento, i dati hanno bisogno di una fase di processing aggiuntiva, ovvero é necessario allineare le registrazioni di tutti i macchinari tenendo in considerazione il tempo che impiega il cuscinetto a sfera a spostarsi lungo la linea di montaggio. In un esempio, ipotizzando tre macchine di cui la terza é MVM ed un cuscinetto a sfera che parte dalla linea di montaggio a tempo $t$, la prima macchina esegue la registrazione su quel cuscinetto a sfera a tempo $t$, la seconda a tempo $t+1$ e la terza a tempo $t+2$. Per allineare le registrazioni viene quindi rimossa un'unita temporale dalle registrazioni del secondo macchinario e 2 unitá dalle registrazioni del terzo macchinario. Così facendo si crea un'istantanea delle registrazioni per ogni cuscinetto a sfera. Questo procedimento é simile a quello svolto per le valutazioni precedenti, con la differenza che in questo caso si aveva soltato il macchinario M1 ed MVM, di conseguenza solamente i dati MVM erano da traslare.
 Allineati i dati é necessario aggregare le label di ogni macchinario per ogni timestep. é stata scelto di applicare un approccio del tipo \textit{almeno uno}, ovvero se il modello di AD trova un'anomalia per un dato macchinario e per un dato timestep, quel timestep risultera anomalo. 
 Purtroppo però anche con questo approccio la corrispondenza tra anomalie e qualita é bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione e aggregando con il metodo \textit{almeno uno}, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter, figura \ref{quality_all_machines} che la confusion matrix, tabella \ref{cm_quality_all}, sono stati posti per visualizzazione.
 
