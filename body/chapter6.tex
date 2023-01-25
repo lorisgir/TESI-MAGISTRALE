@@ -526,7 +526,7 @@ Anche in questo caso ci troviamo di fronte a tre metodi con performance simili c
 			\hline
 			\multirow{2}{*}{} & \multicolumn{4}{c||}{PEARSON}           & \multicolumn{4}{c||}{KENDALL}  & \multicolumn{4}{c|}{SPEARMAN}   \\ 
 			\cline{2-13}
-			                & wander & spike & scale & mix   & wander & spike & scale & mix   & wander & spike        & scale & mix   \\ 
+			                & growing & spike & scale & mix   & growing & spike & scale & mix   & growing & spike        & scale & mix   \\ 
 			\hline
 			2\_annthyroid   & 0.111  & 0.272 & 0.331 & 0.196 & 0.267  & 0.440 & 0.465 & 0.408 & 0.281  & 0.487        & 0.414 & 0.457 \\ 
 			\hline
@@ -1019,7 +1019,7 @@ Con Telemanom, immagine \ref{worst_clf_quality} la situazione non é migliore, i
 	\label{worst_clf_quality}
 \end{figure}
 
-La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualità bassa:
+La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1} e \ref{mvm-confusion2}. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualità bassa
 
 
 
@@ -1033,7 +1033,7 @@ La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riesco
 				\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
 				\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
 			\end{tabular}
-			}\captionof{table}{KDE Confusion Matrix}
+			}\captionof{table}{KDE Confusion Matrix}\label{mvm-confusion1}
 	\end{minipage}
 	\begin{minipage}{.5\textwidth}
 		\centering
@@ -1043,7 +1043,7 @@ La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riesco
 				                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
 				\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
 				\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
-			\end{tabular}}\captionof{table}{Telemanom Confusion Matrix}
+			\end{tabular}}\captionof{table}{Telemanom Confusion Matrix}\label{mvm-confusion2}
 	\end{minipage}
 \end{table}
 
@@ -1051,22 +1051,42 @@ La conferma arriva dalle matrici di confusione. Sia KDE che Telemanom non riesco
 \subsubsection{Confronto Qualità - Alternative}
 Si potrebbe tentare di risolvere i due problemi elencati ad inizio paragrafo andando a cambiare approccio per l'analisi della correlazione.
 Per il primo di questi, ovvero il problema della media di tutte le registrazioni di qualità in un dato intervallo di 10 che va a nascondere eventuali registrazioni più rare in cui la qualità é bassa, si può andare a contare il numero di registrazioni, sempre all'interno di ogni intervallo, che superano la soglia Q1 per la banda A.
-I risultati ottenuti sono riportati nella tabella \ref{quality_count}.
+I risultati ottenuti sono riportati nelle tabelle \ref{count-sopra-soglia} e \ref{count-sopra-soglia-norm}.
 
-\begin{table}[]
-	\centering
-	\begin{tabular}{|l|ll|ll|}
-		\hline
-		\multirow{2}{*}{}       & \multicolumn{2}{l|}{\textbf{Punti Normali}} & \multicolumn{2}{l|}{\textbf{Punti Anomali}} \\ \cline{2-5} 
-		                        & \multicolumn{1}{l|}{Telenamom} & KDE & \multicolumn{1}{l|}{Telemanom} & KDE \\ \hline
-		\textbf{Banda A}        & \multicolumn{1}{l|}{19}        & 19  & \multicolumn{1}{l|}{14}        & 19  \\ \hline
-		\textbf{Tutte le bande} & \multicolumn{1}{l|}{87}        & 85  & \multicolumn{1}{l|}{72}        & 86  \\ \hline
-	\end{tabular}
-	\caption{\label{quality_count}Media MVM sopra-soglia per intervallo}
+
+
+Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 19.69, valore persino più alto rispetto agli intervalli anomali. Situazione simile anche facendo un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D). Questi risultati implicano che non c'è nessuna correlazione tra qualità bassa e punti anomali. 
+Questo esperimento é stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
+La tabella \ref{count-sopra-soglia-norm} mostra gli stessi conteggi ma rapportati rispetto al numero di registrazione per ogni intervallo. Può capitare che se ci sia un anomalia la frequenza di produzione si abbassi, andando quindi ad abbassare il numero di registrazioni MVM sopra-soglia. In questo caso calcolare la percentuale dei cuscinetti che superano la soglia rispetto al numero totale di cuscinetti registrati per intervallo può produrre risultati più corretti. 
+Nonostante i risultati producano valori più alti, utilizzando KDE, per gli intervalli anomali, la differenza rimane ancora troppo esigua per confermare una qualche correlazione. 
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|ll|ll|}
+\hline
+                & \multicolumn{2}{c|}{KDE}                                     & \multicolumn{2}{c|}{Telemanom}                               \\ \hline
+                & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali \\ \hline
+Banda A         & \multicolumn{1}{l|}{19.69}              & 19.3               & \multicolumn{1}{l|}{20}                 & 12                 \\ \hline
+Bande Combinate & \multicolumn{1}{l|}{86.82}              & 85                 & \multicolumn{1}{l|}{87.2}               & 77.54              \\ \hline
+\end{tabular}%
+}
+\caption{\label{count-sopra-soglia}Numero medio di cuscinetti sopra-soglia per intervallo}
 \end{table}
 
-Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 19, lo stesso per gli intervalli classificati come anomali. Facendo anche un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D), i risultati sono 85 per i punti normali e 86 per quelli anomali. Questi risultati implicano che non c'è nessuna correlazione tra qualità bassa e punti anomali. 
-Questo esperimento é stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|ll|ll|}
+\hline
+                & \multicolumn{2}{c|}{KDE}                                     & \multicolumn{2}{c|}{Telemanom}                               \\ \hline
+                & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali \\ \hline
+Banda A         & \multicolumn{1}{l|}{0.09}               & 0.09               & \multicolumn{1}{l|}{0.09}               & 0.06               \\ \hline
+Bande Combinate & \multicolumn{1}{l|}{0.40}               & 0.41               & \multicolumn{1}{l|}{0.40}               & 0.36               \\ \hline
+\end{tabular}%
+}
+\caption{\label{count-sopra-soglia-norm}Percentuale di cuscinetti sopra-soglia per intervallo}
+\end{table}
 
 Per quanto riguarda il secondo punto, ovvero il problema di considerare solamente un macchinario, si é pensato di andare a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le etichette per ogni punto temporale.
 In questo esperimento, i dati hanno bisogno di una fase di processamento aggiuntiva, ovvero é necessario allineare le registrazioni di tutti i macchinari tenendo in considerazione il tempo che impiega il cuscinetto a sfera a spostarsi lungo la linea di montaggio. In un esempio, ipotizzando tre macchine di cui la terza é MVM ed un cuscinetto a sfera che parte dalla linea di montaggio a tempo $t$, la prima macchina esegue la registrazione su quel cuscinetto a sfera a tempo $t$, la seconda a tempo $t+1$ e la terza a tempo $t+2$. Per allineare le registrazioni viene quindi rimossa un'unità temporale dalle registrazioni del secondo macchinario e 2 unità dalle registrazioni del terzo macchinario. Così facendo si crea un'istantanea delle registrazioni per ogni cuscinetto a sfera. Questo procedimento é simile a quello svolto per le valutazioni precedenti, con la differenza che in questo caso si aveva soltanto il macchinario M1 ed MVM, di conseguenza solamente i dati MVM erano da traslare.
