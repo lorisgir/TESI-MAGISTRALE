@@ -621,7 +621,6 @@ Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben
 
 \begin{table}[]
 	\caption{\label{cc-results}Risultati di correlazione per Clustering Cohesion}
-	\resizebox{\columnwidth}{!}{%
 		\begin{tabular}{|l|l|l|l|}
 			\hline
 			Dataset         & \multicolumn{1}{c|}{SCORE CORRELATION} & \multicolumn{2}{c|}{RANK CORRELATION}                         \\  \hline
@@ -668,7 +667,7 @@ Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben
 			AVG             & 0.269                        & 0.245                        & 0.217                         \\ \hline
 			STD             & 0.329                        & 0.218                        & 0.309                         \\ \hline
 		\end{tabular}%
-	}
+	
 \end{table}
 
 Alcuni dataset, come annthyroid, page blocks, shuttle e waveform hanno una distribuzione dei dati tale da essere facilmente clusterizzabile da metodi come DBSCAN, usato appunto in questa metrica surrogata. Questo permette quindi di favorire quei modelli che riescono a trovare questa separazione tra i punti normali ed i punti anomali.
@@ -1057,7 +1056,7 @@ I risultati ottenuti sono riportati nelle tabelle \ref{count-sopra-soglia} e \re
 
 Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 19.69, valore persino più alto rispetto agli intervalli anomali. Situazione simile anche facendo un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D). Questi risultati implicano che non c'è nessuna correlazione tra qualità bassa e punti anomali. 
 Questo esperimento é stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
-La tabella \ref{count-sopra-soglia-norm} mostra gli stessi conteggi ma rapportati rispetto al numero di registrazione per ogni intervallo. Può capitare che se ci sia un anomalia la frequenza di produzione si abbassi, andando quindi ad abbassare il numero di registrazioni MVM sopra-soglia. In questo caso calcolare la percentuale dei cuscinetti che superano la soglia rispetto al numero totale di cuscinetti registrati per intervallo può produrre risultati più corretti. 
+La tabella \ref{count-sopra-soglia-norm} mostra gli stessi conteggi ma rapportati rispetto al numero di registrazione per ogni intervallo. Può capitare che nel caso di problemi tecnici la frequenza di produzione si abbassi, andando quindi ad abbassare il numero di registrazioni MVM sopra-soglia. In questo caso calcolare la percentuale dei cuscinetti che superano la soglia rispetto al numero totale di cuscinetti registrati per intervallo può produrre risultati più corretti. 
 Nonostante i risultati producano valori più alti, utilizzando KDE, per gli intervalli anomali, la differenza rimane ancora troppo esigua per confermare una qualche correlazione. 
 
 \begin{table}[ht]
