@@ -109,7 +109,7 @@ In generale, non è chiaro come questi eventi possano influenzare l'attività de
 In conclusione, riuscire a decodificare le reali motivazioni per cui si ha una mancata registrazione potrebbe migliorare in maniera significativa le performance di algoritmi di Machine Learning. Purtroppo a causa della bassa frequenza di registrazione e data la non possibilità di interagire o comunicare con i tecnici dell'impianto di produzione, sono state messe in atto solamente delle semplici operazioni di processamento.
 
 \subsubsection{Andamento Serie Temporali}
-Le serie temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in figura \ref{sensors_plot}, elementi di stagionalità non sono presenti e non vi é presenza di trend e quindi le serie possono riferirsi stazionarie.
+Le serie temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in figura \ref{sensors_plot}, elementi di stagionalità non sono presenti e non vi é presenza di trend e quindi le serie possono riferirsi stazionarie. Ipotesi confermata anche dall'esecuzione del test Augmented Dickey-Fuller nel quale veniva rifiutata la Null Hypothesis (la Null Hypothesis affermava la NON stazionarietà dei dati).
 Per questo motivo, nelle fasi di processamento, operazioni di decomposizione delle serie temporali non sono state fatte.
 È possibile comunque notare un'alta variabilità dei dati all'interno della singola serie temporale, con fluttuazioni più o meno visibili.
 \begin{figure}[t]

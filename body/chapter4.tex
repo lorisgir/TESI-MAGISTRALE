@@ -68,7 +68,7 @@ La classificazione, nel senso di posizionamento ed in inglese \textit{ranking}, 
 Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. 
 L'obiettivo del Rank Aggregation è riassumere le informazioni delle singole classifiche di input e fornirne un'unica finale. 
 
-Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa é necessario definire una funzione oggetto. In questo contesto, vorremmo trovare una classifica finale che sia più vicina possibile a tutte le singole classifiche, contemporaneamente. In modo formale, si puo definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
+Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa é necessario definire una funzione oggetto. In questo contesto, vorremmo trovare una classifica finale che sia più vicina possibile a tutte le singole classifiche, contemporaneamente. In modo formale, si può definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
 dove $\delta$ é un ranking di lunghezza $k=|L_i|$, $w_i$ é il peso associato alla lista $L_i$, $d$ é una funzione di distanza e $L_i$ é la $i^{ma}$ lista ordinata.
 L'obiettivo é di trovare $\delta^*$ che minimizzi la distanza totale tra $\delta^*$ e gli $L_i$
 \[ \delta^* = arg min \sum_{i=1}^{m} w_id(\delta,L_i). \]

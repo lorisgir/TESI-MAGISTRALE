@@ -125,7 +125,7 @@ Applicando quindi DBSCAN si ottengono i cluster per i punti anomali come mostrat
 
 Infine viene calcolato il Silhouette Score su questi, tenendo anche in considerazione il cluster di punti normali originario. Questa procedura viene poi applicata su ogni modello per andare a produrre un ranking finale.
 
-Questa metrica surrogata puo funzionare particolarmente bene quando l'autocorrelazione di una serie temporale é relativamente bassa, quindi stazionaria, e quindi i punti sono quasi indipendenti tra di loro. Le anomalie a punto così come le anomalie collettive sono identificate con più precisione rispetto alle anomalie contestuali. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con più probabilità nel cluster di punti normali.
+Questa metrica surrogata può funzionare particolarmente bene quando una serie temporale é stazionaria e la sua autocorrelazione relativamente bassa, quindi vi é una forte indipendenza tra i punti temporali. Le anomalie a punto così come le anomalie collettive sono identificate con più precisione rispetto alle anomalie contestuali. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con più probabilità nel cluster di punti normali.
 \subsection{Rank Aggregation}
 Nel capitolo \ref{chap:modelselection} é stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sarà svolta nelle sezioni successive.
 Ognuno di questi metodi riceve in input un set di ranking, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un'unica classifica finale.
@@ -232,8 +232,7 @@ I dataset trattati sono diversi sia per struttura ma anche per tipologia: verran
 
 \subsubsection{ODDS}
 Outlier Detection DataSets é una collezione di dataset per l'Outlier Detection. Questo archivio é in continuo sviluppo dal 2016 da parte di numerosi ricercatori e comprende dataset di vari domini, dimensione, numero di features e percentuale di anomalie. 
-Sono presenti sia dataset multi-dimensionali a punto che dataset nella forma di serie temporali multivariate. Da questo archivio dati verranno presi in considerazione soltanto i dataset del primo tipo; in particolare, verranno trattati i seguenti dataset multi-dimensionali a punto.
-
+I dataset sono di tipo multi-dimensionale a punto, quindi senza una componente temporale associata.
 La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 
 \begin{table}
@@ -241,7 +240,7 @@ La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 	\centering
 	\begin{tabular}{|l|l|l|l|l|}
 		\hline
-		\textbf{Dataset} & \textbf{\#points} & \textbf{\#dim} & \textbf{\#outliers(\%)} & \textbf{domain} \\ \hline
+		\textbf{Dataset} & \textbf{\#punti} & \textbf{\#dim} & \textbf{\#anomalie(\%)} & \textbf{dominio} \\ \hline
 		annthyroid       & 7200              & 6              & 534 (7.42\%)            & Healthcare      \\ \hline
 		cardio           & 1831              & 21             & 176 (9.61\%)            & Healthcare      \\ \hline
 		cover            & 286048            & 10             & 2747 (0.96\%)           & Botany          \\ \hline
@@ -261,21 +260,46 @@ La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 Per questi dataset si é deciso di adottare uno split train/test costituito da 66\% per il train e 33\% per il test. I dataset di train contengono al loro interno anche una percentuale di anomalie. Potrebbe non essere la situazione ideale in quanto é consigliato per i modelli non supervisionati di essere allenati e quindi apprendere da dati il più puliti possibili. Ma é la situazione più realistica in quanto nella realtà la presenza di etichette non é sempre garantita.  
 
 \subsubsection{SMD}
-Server Machine Dataset é un dataset proveniente da una compagnia Internet, consiste in serie temporali multivariate della durata di 5 settimane in cui ogni osservazione é equamente distribuita da una frequenza di 1 minuto. SMD contiene tre gruppi di macchinari (denotati SMD-1, SMD-2 e SMD-3 rispettivamente) per un totale di 28 macchinari, ed ognuno di questi ha 38 features. Sono presenti approssimativamente 28000 time step e sono divisi in due parti della stessa lunghezza come train e test set. 
-La percentuale di anomalie al suo interno si attesta intorno al 4.16\% e si trovano tutte nelle ultime due settimane di dati. In questo caso, le prime tre settimane sono usate per fare il training dei modelli mentre le ultime due per la valutazione di questi.
-
+Server Machine Dataset é un dataset proveniente da una compagnia Internet, consiste in serie temporali multivariate della durata di 5 settimane in cui ogni osservazione é equamente distribuita da una frequenza di 1 minuto. SMD contiene tre gruppi di macchinari (denotati SMD-1, SMD-2 e SMD-3 rispettivamente) per un totale di 28 macchinari, ed ognuno di questi ha 38 features. Sono presenti approssimativamente 28000 time step, sia per i dati di train che quelli di test. 
+La percentuale di anomalie al suo interno si attesta intorno al 4.16\% e si trovano tutte nell'ultima metà dei dati (ultime due settimane circa). Per questi dataset, la prima metà dei dati viene quindi usata per il training dei modelli mentre il restante per la predizione.
+Le anomalie sono raggruppate in intervalli di varia lunghezza e sono anomalie a punto.
+\begin{table}
+\centering
+\caption{\label{smd}Caratteristiche di SMD}
+\begin{tabular}{|c|c|} 
+\hline
+\textbf{Proprietà} & \textbf{Valore}                              \\ 
+\hline
+\#dataset     & 28                                           \\ 
+\hline
+\#dim     & 38                                           \\ 
+\hline
+frequenza         & 1/minuto                                  
+                                   \\ 
+\hline
+\%anomalie & 4.16                                         \\ 
+\hline
+misure              & CPU load, network usage, memory usage, etc.  \\
+\hline
+\end{tabular}
+\end{table}
 
 
 \subsection{Modelli}
 Per una valutazione più completa si é deciso di utilizzare un alto numero di modelli ognuno con caratteristiche e proprietà differenti. Algoritmi di Machine Learning basati sulla distanza, probabilistici o lineari; ma anche Neural Network come Auto Encoders o LSTM. La tabella \ref{admodels} é comprensiva di tutti i modelli considerati.
 
 Gli algoritmi di Machine Learning considerano i sample in maniera indipendente, mentre quelli a rete neurale considerano una finestra temporale per per andare a fare sia training che prediction, risultando quindi time-aware, ovvero tengono in considerazione l'aspetto temporale dei dati. Il valore di questa finestra temporale viene passato come parametro e valorizzato manualmente.
+Questo implica che i metodi di Machine Learning non riusciranno a predire le anomalie contestuali, proprio per il fatto che non modellano l'informazione di contesto. 
+Sui i dataset di benchmark questo non é un problema, in quanto semplici dataset multidimensionali; e per SKF il discorso é simile: la bassa frequenza di registrazione (1/10 minuti) e la stazionarietà delle serie temporali rende difficile capire se anomalie contestuali possano essere presenti o meno. Per questo motivo si procederà con un'ampia gamma di modelli di Machine Learning.
+
 
 Come definito nel capitolo \ref{chap:modelselection}, questi modelli producono in output uno score per ogni sample utilizzato per la predizione dove uno score più alto indica una probabilità maggiore che quel modello sia anomalo. Questi score vengono trasformati in etichette \(\in \{0,1\}\) andando a specificare un fattore di contaminazione $c$, ovvero la percentuale di punti anomali. I top $c\%$ di sample con score più alto avranno un'etichetta di anomalia associata. 
 
 Ognuno di questi modelli é stato allenato utilizzando sia i valori predefiniti per gli iperparametri, sia variazioni di questi. 
 Per la maggior parte degli algoritmi sono state considerate in media 3 versioni con parametri differenti, alcuni invece sono algoritmi parameter-free e quindi viene considerata solamente una versione, portando il totale dei modelli a 70.
-La scelta dei valori modificati agli iperparametri é stata fatta manualmente a priori, senza conoscere le performance del modello. Il focus della tesi si mantiene sul Model Selection, mentre un approfondimento sul tuning dei parametri puo essere lasciato a sviluppi futuri.
+La scelta dei valori modificati agli iperparametri é stata fatta manualmente a priori, senza conoscere le performance del modello. Il focus della tesi si mantiene sul Model Selection, mentre un approfondimento sul tuning dei parametri può essere lasciato a sviluppi futuri.
+I modelli di Deep Learning contengono un parametro chiamato \textit{window\_len}, che come discusso prima serve per andare a specificare la finestra temporale che il modello deve considerare durante l'esecuzione di train e prediction. Per questo parametro sono stati scelti i valori 1 e 48, andando cosi a creare due modelli per tipologia di algoritmo. 
+Un valore di \textit{window\_len} a 1 significa che verrà trattato ogni sample in maniera indipendente, cosi come fanno i classici metodi di Machine Learning; mentre un valore di 48 consente ai modelli di andare a utilizzare l'informazione temporale per il training e predizione.
 
 Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione é ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non é possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non é presente. Per risolvere questo problema si utilizzerà un metodo di Thresholding chiamato ${\gamma}GMM$, come introdotto nel capitolo \ref{chap:methods}, che stima il fattore di contaminazione. Un fattore di contaminazione stimato erroneamente porta ovviamente a degradare le performance del Model Selection. Così come per la variazione degli iperparametri, in sviluppi futuri potrebbe risultare utile un'analisi più approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
 
@@ -990,7 +1014,7 @@ In questa sezione viene fatto un confronto tra le anomalie rilevate e la qualit�
 	\item Analizzando un solo macchinario non é possibile avere una situazione completa della linea di produzione, ma anche analizzando tutti i macchinari insieme non é certo che la qualità sia correlata al 100\% con i dati CoMo. Ci possono essere fattori come la qualità del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualità. Producendo quindi valori di qualità bassa nonostante registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualità.
 \end{itemize}
 
-Prima di proseguire è  necessario applicare una trasformazione hai dati. Il macchinario analizzato M1 e' il primo della linea di montaggio, mentre il macchinario di misura qualità MVM è  posto alla fine. Il cuscinetto a sfera dal momento che parte impiega un tempo ${\nabla}t$ ad arrivare ad MVM e quindi essere registrato per la misura di qualità. Per allineare quindi la registrazione CoMo di M1 con la registrazione di MVM e' necessario traslare di ${\nabla}t$ l'indice temporale della tabella MVM.
+Prima di proseguire è  necessario applicare una trasformazione hai dati. Il macchinario analizzato M1 é il primo della linea di montaggio, mentre il macchinario di misura qualità MVM è  posto alla fine. Il cuscinetto a sfera dal momento che parte impiega un tempo ${\nabla}t$ ad arrivare ad MVM e quindi essere registrato per la misura di qualità. Per allineare quindi la registrazione CoMo di M1 con la registrazione di MVM é necessario traslare di ${\nabla}t$ l'indice temporale della tabella MVM.
 
 Nelle prossime due immagini possiamo vedere lo stesso scatter plot di prima, ma andando a colorare i punti sulla base della correlazione tra punti rilevati come anomali da KDE e Telemanom, e i punti registrati come bassa qualità. Le correlazioni sono così spiegate:
 \begin{itemize}
