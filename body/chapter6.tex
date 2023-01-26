@@ -29,7 +29,7 @@ Di seguito viene analizzata ogni classe di metriche surrogate.
 
 \subsubsection{Model Centrality}
 \textit{Esiste una sola ground truth, quindi i modelli vicini a questa sono anch'essi vicini tra loro ed il modello più "centrale" è il migliore.}
-Metodi basati sulla centralità hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection\cite{DBLP:journals/corr/abs-2104-01422}. 
+Metodi basati sulla centralità hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection \cite{DBLP:journals/corr/abs-2104-01422}. 
 Per adottare quest'idea si è fatto uso di diverse tecniche che andassero a produrre delle classifiche nella quale i modelli con score più alto erano indicati come quelli più "centrali".
 Sono state proposti 4 metodi per computare lo score di Model Centrality. Ognuna di queste riceve come input un set di $K$ modelli a cui è stato fatto training non supervisionato su un dataset di riferimento. 
 \begin{itemize}
@@ -46,10 +46,10 @@ Nella parte della valutazione su dataset di benchmark verranno analizzate le per
 
 
 \subsubsection{Performance on Injected Synthetic Anomalies}
-\textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell' iniezione di anomalie sintetiche per addestrare modelli di rilevamento delle anomalie\cite{DBLP:journals/corr/abs-2107-07702}. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Dato un dataset di input senza etichette, vengono iniettate casualmente anomalie. La posizione dell'anomalia iniettata viene trattata come un'etichetta pseudo-positiva, mentre il resto dei punti sono trattati come punti pseudo-negativi. 
+\textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell' iniezione di anomalie sintetiche per addestrare modelli di rilevamento delle anomalie \cite{DBLP:journals/corr/abs-2107-07702}. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Dato un dataset di input senza etichette, vengono iniettate casualmente anomalie. La posizione dell'anomalia iniettata viene trattata come un'etichetta pseudo-positiva, mentre il resto dei punti sono trattati come punti pseudo-negativi. 
 Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-etichette.
 
-Invece di affidarsi a modelli generativi complessi\cite{DBLP:journals/corr/abs-2002-12478}, è stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
+Invece di affidarsi a modelli generativi complessi \cite{DBLP:journals/corr/abs-2002-12478}, è stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/anomalies}

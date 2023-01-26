@@ -41,7 +41,7 @@ Una descrizione delle metriche utilizzabili nel Model Selection è presente nel 
 
 \section{Model Selection Non Supervisionato}
 Tecniche e metriche sopra descritte hanno applicazione solamente quando si ha a disposizione le etichette. Spesso però, e sopratutto nel dominio dell'Anomaly Detection, queste non sono disponibili e bisogna quindi cambiare completamente approccio. 
-Unsupervised Outlier Model Selection, in breve UOMS, ha ricevuto fin'ora poca attenzione da parte dei ricercatori, tant'è che solamente una manciata di lavori sono stati pubblicati\cite{https://doi.org/10.48550/arxiv.2211.01834, https://doi.org/10.48550/arxiv.2210.01078, clei2022n,https://doi.org/10.48550/arxiv.1212.0960, https://doi.org/10.48550/arxiv.2009.10606}. Queste proposte assumono diversi approcci al problema e possono essere divisi in due categorie: meta learning e metriche surrogate.
+Unsupervised Outlier Model Selection, in breve UOMS, ha ricevuto fin'ora poca attenzione da parte dei ricercatori, tant'è che solamente una manciata di lavori sono stati pubblicati \cite{https://doi.org/10.48550/arxiv.2211.01834, https://doi.org/10.48550/arxiv.2210.01078, clei2022n,https://doi.org/10.48550/arxiv.1212.0960, https://doi.org/10.48550/arxiv.2009.10606}. Queste proposte assumono diversi approcci al problema e possono essere divisi in due categorie: meta learning e metriche surrogate.
 
 \subsubsection{Definizione del problema}
 Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e etichette di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) è anomala. Le etichette saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
@@ -59,13 +59,13 @@ Questo approccio mira ad identificare il modello migliore per un particolare dat
 A questo punto l'algoritmo riceve in input il dataset su cui si vuole fare Model Selection (in cui le etichette non sono presenti) ed il risultato di output sarà un modello che l'algoritmo ritiene come migliore sulla base di ciò che ha appreso nella fase di "training" sui dataset storici.
 Questo metodo però richiede quindi la disponibilità di dataset storici con etichette ed inoltre fallisce se non ne esiste uno che sia sufficientemente rappresentativo del dataset target.
 \subsection{Metriche Surrogate}
-A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa è la definizione di nuove metriche che non hanno bisogno di etichette ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc)\cite{DBLP:journals/corr/abs-2104-01422}, da qui il termine metriche surrogate.
+A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa è la definizione di nuove metriche che non hanno bisogno di etichette ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc) \cite{DBLP:journals/corr/abs-2104-01422}, da qui il termine metriche surrogate.
 La definizione di queste metriche non è triviale, data proprio la loro caratteristica di essere completamente non supervisionate. In questa tesi verranno proposte 3 metriche surrogate chiamate \textit{Model Centrality}, \textit{Clustering Coefficient} e \textit{Performance on Injected Synthetic Anomalies}. Un approfondimento su queste metriche è presente nel capitolo \ref{chap:impl}.
 
 
 \subsection{Rank Aggregation}
 La classificazione, nel senso di posizionamento ed in inglese \textit{ranking}, è alla base di centinaia di algoritmi come Netflix, Amazon e Google. 
-Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. Diversi studi hanno esplorato i benifici di questo tipo di aggregazione\cite{https://doi.org/10.48550/arxiv.2206.12088,https://doi.org/10.48550/arxiv.2202.05433}.
+Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. Diversi studi hanno esplorato i benifici di questo tipo di aggregazione \cite{https://doi.org/10.48550/arxiv.2206.12088,https://doi.org/10.48550/arxiv.2202.05433}.
 L'obiettivo del Rank Aggregation è riassumere le informazioni delle singole classifiche di input e fornirne un'unica finale. 
 
 Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa è necessario definire una funzione oggetto. In questo contesto, vorremmo trovare una classifica finale che sia più vicina possibile a tutte le singole classifiche, contemporaneamente. In modo formale, si può definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
@@ -79,7 +79,7 @@ Questa distanza può assumere valori compresi nell'intervallo $[0,n(n-1)/2]$ e n
 \[K_c=1-4K_d/(n(n-1)), K_d = (1-K_c)(n(n-1))/4\]
 Quindi quando $K_c=1$ il valore di $K_d$ è 0, al contrario quando $K_c=-1$ il valore di $K_d$ è massimo.
 
-Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young Problem"\cite{pmlr-v54-korba17a}. Purtroppo è un problema NP-Hard anche con un numero di ranking basso come 4\cite{inproceedingsrankagg}. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda\cite{borda}. Dettagli su questi metodi saranno esposti nei capitoli successivi.
+Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young Problem" \cite{pmlr-v54-korba17a}. Purtroppo è un problema NP-Hard anche con un numero di ranking basso come 4 \cite{inproceedingsrankagg}. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda \cite{borda}. Dettagli su questi metodi saranno esposti nei capitoli successivi.
 
 \subsubsection{Comparazione delle classifiche}
 L'algoritmo di Model Selection implementato andrà a generare una classifica per ogni metrica surrogata ed una finale che corrisponde all'aggregazione di queste. Ognuna di queste classifiche contiene una lista formata da tuple (\(m_i, score_i\)) dove $m_i \in M $ rappresenta un modello di Anomaly Detection e $score_i$ lo score associato al modello i-esimo.
