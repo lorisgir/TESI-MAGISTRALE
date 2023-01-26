@@ -3,20 +3,20 @@
 
 \section{Definizione del problema}
 
-L'Anomaly Detection, anche definita come Outlier Detection, é il processo di identificazione di eventi o osservazioni che hanno un comportamento anomalo. 
-La definizione del termine anomalo é specifica al caso d'uso ma quella più comune va a definire l'anomalia come un osservazione che devia in maniera significativa dalle altre.
+L'Anomaly Detection, anche definita come Outlier Detection, è il processo d'identificazione di eventi od osservazioni che hanno un comportamento anomalo. 
+La definizione del termine anomalo è specifica al caso d'uso ma quella più comune va a definire l'anomalia come un osservazione che devia in maniera significativa dalle altre.
 
-Le anomalie nelle serie temporali sono punti o sequenze di punti che non corrispondono ad un comportamento normale. Il concetto di comportamento normale è difficile da formalizzare, pertanto, un'altra possibile definizione di anomalie potrebbe essere un pattern di dati inaspettato mai stato visto prima.
+Le anomalie nelle serie temporali sono punti o sequenze di punti che non corrispondono a un comportamento normale. Il concetto di comportamento normale è difficile da formalizzare, pertanto, un'altra possibile definizione di anomalie potrebbe essere un pattern di dati inaspettato mai stato visto prima.
 
-Un presupposto implicito è che le anomalie siano eventi rari e non sono da non confondere con il rumore presente nei dati. Il rumore è un fenomeno che, a differenza delle anomalie, ha meno interesse ad essere analizzato.
+Un presupposto implicito è che le anomalie siano eventi rari e non sono da non confondere con il rumore presente nei dati. Il rumore è un fenomeno che, a differenza delle anomalie, ha meno interesse a essere analizzato.
 Tuttavia, le anomalie possono indicare un problema significativo in diverse applicazioni. Ad esempio, un'anomalia nei sistemi di controllo industriale può indicare un malfunzionamento, anomalie finanziarie possono essere il risultato di una frode oppure nel campo medico possono indicare malattie o complicazioni.
 
 \subsection{Tipi di anomalie}
 Le anomalie possono essere classificate in tre categorie:
 \begin{itemize}
 	\item \textbf{Anomalie a Punto}: quando un singola osservazione devia significativamente dal resto dei dati.
-	\item \textbf{Anomalie Contestuali}: quando una sequenza di punti é anomala rispettivamente al contesto in cui si trova ma é considerata normale rispetto ad altri contesti. Per esempio, una temperatura di 30 $\tccentigrade$ é normale in estate ma anomala in inverno. 
-	\item \textbf{Anomalie Collettive}: quando una sequenza di punti é considerata anomala rispetto al resto dei dati, ma i punti presi singolarmente non lo sono.
+	\item \textbf{Anomalie Contestuali}: quando una sequenza di punti è anomala rispettivamente al contesto in cui si trova ma è considerata normale rispetto ad altri contesti. Per esempio, una temperatura di 30 $\tccentigrade$ è normale in estate ma anomala in inverno. 
+	\item \textbf{Anomalie Collettive}: quando una sequenza di punti è considerata anomala rispetto al resto dei dati, ma i punti presi singolarmente non lo sono.
 \end{itemize}
 
 
@@ -30,14 +30,14 @@ L'Anomaly Detection può essere applicata in una vasta serie di domini i quali p
 \end{itemize}
 
 \subsection{Sfide}
-Uno degli aspetti più complessi da tenere in considerazione quando si applicano tecniche di Anomaly Detection é quello di andare a definire un "comportamento normale" da usare come riferimento. Purtroppo a volte riuscire a farlo é molto difficile per i seguenti motivi:
+Uno degli aspetti più complessi da tenere in considerazione quando si applicano tecniche di Anomaly Detection è quello di andare a definire un "comportamento normale" da usare come riferimento. Purtroppo a volte riuscire a farlo è molto difficile per i seguenti motivi:
 \begin{itemize}
-	\item Le anomalie solitamente sono eventi rari, la cui frequenza é molto bassa. Di conseguenza i dati a disposizione possono essere molto pochi.
+	\item Le anomalie solitamente sono eventi rari, la cui frequenza è molto bassa. Di conseguenza i dati a disposizione possono essere molto pochi.
 	\item Le anomalie possono avere una distribuzione di dati mai vista in precedenza, diventando così difficile distinguerle a priori.
 	\item Le anomalie variano in base al contesto o dominio in cui si opera, rendendo impossibile la generalizzazione di un singolo metodo.
 	\item Spesso non si hanno a disposizione etichette che identifichino anomalie all'interno di un dataset, oppure si ha solo una piccola porzione di etichette.
 \end{itemize}
-A causa di queste problematiche il rischio di avere un alto numero di falsi-positivi o falsi-negativi é molto alto. In questi casi é opportuno, tramite un trade-off, scegliere se preferire un numero di falsi allarmi più alto rispetto all'ignorare situazioni potenzialmente anomale.
+A causa di queste problematiche il rischio di avere un alto numero di falsi-positivi o falsi-negativi è molto alto. In questi casi è opportuno, tramite un trade-off, scegliere se preferire un numero di falsi allarmi più alto rispetto all'ignorare situazioni potenzialmente anomale.
 
 \section{Serie Temporali}
 Una serie temporale è definita come una sequenza ordinata di valori continui, che rappresenta l'evoluzione di una variabile numerica nel tempo. È la misurazione di un sistema che evolve nel tempo con attributi numerici: ad esempio, la temperatura di un computer/server, il valore delle azioni di un'azienda o l'attività elettrica del cuore (ECG). Una serie temporale è, quindi, qualsiasi sequenza di osservazioni indicizzate dal tempo. Una serie temporale contiene molte informazioni sul sistema misurato e queste possono essere utilizzate per garantire il corretto funzionamento del sistema.
@@ -51,7 +51,7 @@ ognuno dei quali è un'osservazione di un processo misurato in un momento specif
 \[\tau = \left\{ x_1, \ldots, x_T  \right\}, x \in \mathbb{R^n} \]
 
 \subsection{Decomposizione delle Serie Temporali}
-Una serie temporale é un'aggregazione di quattro componenti: trend, stagionalità, livello e rumore.
+Una serie temporale è un'aggregazione di quattro componenti: trend, stagionalità, livello e rumore.
 
 \subsubsection{Trend}
 Il trend rappresenta l'evoluzione a lungo termine della serie temporale in esame. Rifletta il comportamento "generico" della serie.
@@ -66,6 +66,6 @@ Il livello corrisponde al valore medio della serie temporale. Se questa ha trend
 Il rumore corrisponde a fluttuazioni irregolari di natura casuale.
 
 \subsection{Stazionarietà}
-La caratteristica della stazionarietà é rappresentata dalla capacità di un processo di essere de-correlato da un indice temporale. Una serie temporale $T$ é detta stazionaria quando il valore medio del processo é indipendente da $t$. 
+La caratteristica della stazionarietà è rappresentata dalla capacità di un processo di essere de-correlato da un indice temporale. Una serie temporale $T$ è detta stazionaria quando il valore medio del processo è indipendente da $t$. 
 
-La stazionarietà indica stabilità dove la distribuzione di $\left\{ x_1, \ldots, x_T  \right\}$ é identica alla distribuzione $\left\{ x_2, \ldots, x_{T+1}  \right\}$ in cui la serie oscilla intorno alla media con una varianza costante.
+La stazionarietà indica stabilità dove la distribuzione di $\left\{ x_1, \ldots, x_T  \right\}$ è identica alla distribuzione $\left\{ x_2, \ldots, x_{T+1}  \right\}$ in cui la serie oscilla intorno alla media con una varianza costante.

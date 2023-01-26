@@ -6,7 +6,7 @@ Model Selection è il processo di selezione di un modello di apprendimento tra u
 
 Può essere applicato sia a diversi tipi di modelli, ad esempio probabilistici, lineari, a rete profonda ecc...; sia a modelli dello stesso tipo ma con configurazioni di iperparametri differenti.
 
-Model Selection risulta molto utile ed efficace quando si é interessati nel sviluppare un modello di classificazione o regressione per un dataset, ma non si sa a priori quale funzioni meglio. Di conseguenza la soluzione é quella di fare training e valutazione per ogni modello preso in considerazione.
+Model Selection risulta molto utile ed efficace quando si è interessati nel sviluppare un modello di classificazione o regressione per un dataset, ma non si sa a priori quale funzioni meglio. Di conseguenza la soluzione è quella di fare training e valutazione per ogni modello preso in considerazione.
 
 \section{Model Selection Supervisionato}
 Le metodologie di Model Selection supervisionato sono quelle classiche che di solito vengono applicate durante lo sviluppo di algoritmi di Machine o Deep Learning. Avendo a disposizione le etichette, i metodi di selezione ricadono su (1) come partizionare il dataset per train/test, (2) sull'ottimizzazione degli iperparametri, (3) su come pesare la complessità di un modello e (4) su quali metriche di valutazione adottare.
@@ -19,7 +19,7 @@ I metodi di resampling, come suggerisce il nome, sono semplici tecniche di parti
 	\item \textbf{K-Fold Cross Validation}
 	\item \textbf{Stratified K-Fold}
 \end{itemize}
-Un approfondimento di queste tecniche é stato proposto nel capitolo \ref{chap:methods}.
+Un approfondimento di queste tecniche è stato proposto nel capitolo \ref{chap:methods}.
 
 \subsection{Ottimizzazione degli iperparametri}
 L'ottimizzazione degli iperparametri è il processo di ricerca del miglior insieme di iperparametri per un modello di Machine Learning. Gli iperparametri sono dei parametri che non vengono appresi dai dati durante l'addestramento, ma vengono impostati prima dell'inizio di questo. Esempi di iperparametri sono il \textit{learning rate} di una rete neurale, il numero di alberi in una Random Forest o il \textit{fattore di regolarizzazione} di un modello lineare. Nell'ambito del Model Selection, l'obiettivo dell'ottimizzazione degli iperparametri è quello di trovare l'insieme di iperparametri che consente di ottenere le migliori prestazioni per il modello in analisi. Ciò può essere fatto utilizzando tecniche come Grid Search, Random Search o l'ottimizzazione Bayesiana per esplorare lo spazio degli iperparametri e trovare l'insieme ottimale.
@@ -44,12 +44,12 @@ Tecniche e metriche sopra descritte hanno applicazione solamente quando si ha a 
 Unsupervised Outlier Model Selection, in breve UOMS, ha ricevuto fin'ora poca attenzione da parte dei ricercatori, tant'è che solamente una manciata di lavori sono stati pubblicati. \#TODO citations Queste proposte assumono diversi approcci al problema e possono essere divisi in due categorie: meta learning e metriche surrogate.
 
 \subsubsection{Definizione del problema}
-Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e etichette di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) é anomala. Le etichette saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
+Sia \({x_t,y_t}^T_{t=1}\) un dataset multidimensionale o una serie temporale multivariata con osservazioni (\(x_1,...,x_T\)), \(x_t\in\Re^d\) e etichette di anomalia (\(y_1,...,y_T\)), \(y_t \in \{0,1\}\), dove \(y_t=1\) indica che l'osservazione \(x_t\) è anomala. Le etichette saranno usate solamente per la fase di valutazione dei metodi proposti e non per la selezione del modello.
 
-Sia \(M=\{A_i\}^N_{i=1}\) un set di N modelli candidati di Anomaly Detection dove ogni modello \(A_i\) é una tupla (\(detector, iperparametri\)) .
+Sia \(M=\{A_i\}^N_{i=1}\) un set di N modelli candidati di Anomaly Detection dove ogni modello \(A_i\) è una tupla (\(detector, iperparametri\)).
 La divisione dei dati per train e test viene eseguita come \(\{x_t\}_{t=1}^{t_{test}-1}\),\(\{x_t\}^{T}_{t=t_{test}}\).
 
-Viene assunto che il modello allenato \(A_i\), quando applicato alle osservazioni \(\{x_t\}^{T}_{t=t_{test}}\) , produca degli score di anomalia \(\{s_t^i\}_{t=t_{test}}^T\),\(s^i_t\in\Re_{\geq0}\). Valori più alti per gli score di anomalia indicano che l'osservazione é più probabile essere anomala.
+Viene assunto che il modello allenato \(A_i\), quando applicato alle osservazioni \(\{x_t\}^{T}_{t=t_{test}}\), produca dei punteggi di anomalia \(\{s_t^i\}_{t=t_{test}}^T\),\(s^i_t\in\Re_{\geq0}\). Valori più alti per gli score di anomalia indicano che l'osservazione è più probabile essere anomala.
 Le performance di un modello possono essere misurate usando una metrica supervisionata \(Q(\{s_t\}^T_{t=1},\{y_t\}^T_{t=1})\) come F1 Score.
 
 Possiamo ora definire il problema come: date le osservazioni \(X_{test}\) ed un set di modelli \(M=\{A_i\}^N_{i=1}\) allenato usando \(X_{train}\), selezionare un modello che massimizzi la misura di qualità \(Q(A_i(X_{test}),Y_{test})\) senza utilizzo di etichette per la selezione.
@@ -59,8 +59,8 @@ Questo approccio mira ad identificare il modello migliore per un particolare dat
 A questo punto l'algoritmo riceve in input il dataset su cui si vuole fare Model Selection (in cui le etichette non sono presenti) ed il risultato di output sarà un modello che l'algoritmo ritiene come migliore sulla base di ciò che ha appreso nella fase di "training" sui dataset storici.
 Questo metodo però richiede quindi la disponibilità di dataset storici con etichette ed inoltre fallisce se non ne esiste uno che sia sufficientemente rappresentativo del dataset target.
 \subsection{Metriche Surrogate}
-A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa é la definizione di nuove metriche che non hanno bisogno di etichette ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc), da qui il termine metriche surrogate.
-La definizione di queste metriche non é triviale, data proprio la loro caratteristica di essere completamente non supervisionate. In questa tesi verranno proposte 3 metriche surrogate chiamate \textit{Model Centrality}, \textit{Clustering Coefficient} e \textit{Performance on Injected Synthetic Anomalies}. Un approfondimento su queste metriche é presente nel capitolo \ref{chap:impl}.
+A differenza del precedente, questo approccio non ha bisogno di dataset storici o di conoscenza pregressa. Ciò su cui si basa è la definizione di nuove metriche che non hanno bisogno di etichette ma che siano correlate con le più classiche metriche supervisionate (Accuracy, Precision, Recall ecc), da qui il termine metriche surrogate.
+La definizione di queste metriche non è triviale, data proprio la loro caratteristica di essere completamente non supervisionate. In questa tesi verranno proposte 3 metriche surrogate chiamate \textit{Model Centrality}, \textit{Clustering Coefficient} e \textit{Performance on Injected Synthetic Anomalies}. Un approfondimento su queste metriche è presente nel capitolo \ref{chap:impl}.
 
 
 \subsection{Rank Aggregation}
@@ -68,23 +68,23 @@ La classificazione, nel senso di posizionamento ed in inglese \textit{ranking}, 
 Ad esempio, il Search Index di Google, algoritmo per il ranking delle pagine web, combina centinaia di misure di ranking e la combinazione di tali misure avviene in genere con un metodo di Rank Aggregation. 
 L'obiettivo del Rank Aggregation è riassumere le informazioni delle singole classifiche di input e fornirne un'unica finale. 
 
-Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa é necessario definire una funzione oggetto. In questo contesto, vorremmo trovare una classifica finale che sia più vicina possibile a tutte le singole classifiche, contemporaneamente. In modo formale, si può definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
-dove $\delta$ é un ranking di lunghezza $k=|L_i|$, $w_i$ é il peso associato alla lista $L_i$, $d$ é una funzione di distanza e $L_i$ é la $i^{ma}$ lista ordinata.
-L'obiettivo é di trovare $\delta^*$ che minimizzi la distanza totale tra $\delta^*$ e gli $L_i$
+Se si dovesse formulare il task del Rank Aggregation come un problema di ottimizzazione, come prima cosa è necessario definire una funzione oggetto. In questo contesto, vorremmo trovare una classifica finale che sia più vicina possibile a tutte le singole classifiche, contemporaneamente. In modo formale, si può definire la funzione come: \[ \Phi(\delta) = \sum_{i=1}^{m} w_id(\delta,L_i), \]	
+dove $\delta$ è un ranking di lunghezza $k=|L_i|$, $w_i$ è il peso associato alla lista $L_i$, $d$ è una funzione di distanza e $L_i$ è la $i^{ma}$ lista ordinata.
+L'obiettivo è di trovare $\delta^*$ che minimizzi la distanza totale tra $\delta^*$ e gli $L_i$
 \[ \delta^* = arg min \sum_{i=1}^{m} w_id(\delta,L_i). \]
 
-Selezionare la funzione di distanza più appropriata é molto importante e la scelta di solito ricade alla distanza di Kendall.
+Selezionare la funzione di distanza più appropriata è molto importante e la scelta di solito ricade alla distanza di Kendall.
 Intuitivamente, la distanza di Kendall viene definita come la sommatoria, per ogni possibile coppia di elementi date due liste in input, della seguente penalità: se due elementi $t$ e $u$ hanno lo stesso ordinamento in entrambe le liste, allora nessuna penalità viene data. Altrimenti se $t$ precede $u$ in una lista e $u$ precede $t$ nell'altra, allora viene imposta una penalità di 1.
-Questa distanza puo assumere valori compresi nell'intervallo $[0,n(n-1)/2]$ e non é da confondere con il coefficiente di Kendall. Quest'ultimo, essendo un coefficiente, assume valori nell'intervallo $[-1,1]$ ed é prevalentemente usato in statistica. Sono due concetti differenti ma correlati da:
+Questa distanza può assumere valori compresi nell'intervallo $[0,n(n-1)/2]$ e non è da confondere con il coefficiente di Kendall. Quest'ultimo, essendo un coefficiente, assume valori nell'intervallo $[-1,1]$ ed è prevalentemente usato in statistica. Sono due concetti differenti ma correlati da:
 \[K_c=1-4K_d/(n(n-1)), K_d = (1-K_c)(n(n-1))/4\]
-Quindi quando $K_c=1$ il valore di $K_d$ é 0, al contrario quando $K_c=-1$ il valore di $K_d$ é massimo.
+Quindi quando $K_c=1$ il valore di $K_d$ è 0, al contrario quando $K_c=-1$ il valore di $K_d$ è massimo.
 
-Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young Problem". Purtroppo é un problema NP-Hard anche con un numero di ranking basso come 4. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda. Dettagli su questi metodi saranno esposti nei capitoli successivi.
+Il problema di Rank Aggregation come sopra definito viene anche chiamato "Kemeny-Young Problem". Purtroppo è un problema NP-Hard anche con un numero di ranking basso come 4. Per questo motivo, in questa tesi verranno presentati e usati anche metodi alternativi che approssimino la soluzione in modo più efficiente, come ad esempio Borda. Dettagli su questi metodi saranno esposti nei capitoli successivi.
 
 \subsubsection{Comparazione delle classifiche}
 L'algoritmo di Model Selection implementato andrà a generare una classifica per ogni metrica surrogata ed una finale che corrisponde all'aggregazione di queste. Ognuna di queste classifiche contiene una lista formata da tuple (\(m_i, score_i\)) dove $m_i \in M $ rappresenta un modello di Anomaly Detection e $score_i$ lo score associato al modello i-esimo.
 Queste classifiche possono essere semplificate andando a generare una classifica ordinata in modo decrescente rispetto agli score, formata da tuple (\(m_i, \sigma(m_i)\)) $\sigma(m_i)$ denota il rank del modello i-esimo.
-Per valutare le performance dell'algoritmo di Model Selection é necessario comparare i risultati prodotti rispetto ad una classifica di riferimento.
+Per valutare le performance dell'algoritmo di Model Selection è necessario comparare i risultati prodotti rispetto ad una classifica di riferimento.
 In questa tesi saranno usati tre indici differenti applicati o sulle classifiche con gli score o sulle classifiche di posizione:
 
 \begin{itemize}
