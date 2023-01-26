@@ -29,7 +29,7 @@ Di seguito viene analizzata ogni classe di metriche surrogate.
 
 \subsubsection{Model Centrality}
 \textit{Esiste una sola ground truth, quindi i modelli vicini a questa sono anch'essi vicini tra loro ed il modello più "centrale" è il migliore.}
-Metodi basati sulla centralità hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection. 
+Metodi basati sulla centralità hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection\cite{DBLP:journals/corr/abs-2104-01422}. 
 Per adottare quest'idea si è fatto uso di diverse tecniche che andassero a produrre delle classifiche nella quale i modelli con score più alto erano indicati come quelli più "centrali".
 Sono state proposti 4 metodi per computare lo score di Model Centrality. Ognuna di queste riceve come input un set di $K$ modelli a cui è stato fatto training non supervisionato su un dataset di riferimento. 
 \begin{itemize}
@@ -46,10 +46,10 @@ Nella parte della valutazione su dataset di benchmark verranno analizzate le per
 
 
 \subsubsection{Performance on Injected Synthetic Anomalies}
-\textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell'iniezione di anomalie sintetiche per addestrare modelli di rilevamento delle anomalie. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Dato un dataset di input senza etichette, vengono iniettate casualmente anomalie. La posizione dell'anomalia iniettata viene trattata come un'etichetta pseudo-positiva, mentre il resto dei punti sono trattati come punti pseudo-negativi. 
+\textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell' iniezione di anomalie sintetiche per addestrare modelli di rilevamento delle anomalie\cite{DBLP:journals/corr/abs-2107-07702}. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Dato un dataset di input senza etichette, vengono iniettate casualmente anomalie. La posizione dell'anomalia iniettata viene trattata come un'etichetta pseudo-positiva, mentre il resto dei punti sono trattati come punti pseudo-negativi. 
 Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-etichette.
 
-Invece di affidarsi a modelli generativi complessi, è stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
+Invece di affidarsi a modelli generativi complessi\cite{DBLP:journals/corr/abs-2002-12478}, è stato sviluppato un semplice algoritmo che inietta anomalie di diverso tipo andando prima ad analizzare il dataset ricevuto in input. I tipi di anomalie iniettate prese in considerazione sono 3 e sono visibili in figura \ref{tipi-anomalie}: 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/anomalies}
@@ -231,7 +231,7 @@ Dato che questi coefficienti hanno caratteristiche diverse è necessario andare 
 I dataset trattati sono diversi sia per struttura ma anche per tipologia: verranno dapprima introdotti semplici dataset multidimensionali a punto per poi passare a serie temporali multivariate. 
 
 \subsubsection{ODDS}
-Outlier Detection DataSets è una collezione di dataset per l'Outlier Detection. Questo archivio è in continuo sviluppo dal 2016 da parte di numerosi ricercatori e comprende dataset di vari domini, dimensione, numero di features e percentuale di anomalie. 
+Outlier Detection DataSets\footnote{ODDS: http://odds.cs.stonybrook.edu/} è una collezione di dataset per l'Outlier Detection. Questo archivio è in continuo sviluppo dal 2016 da parte di numerosi ricercatori e comprende dataset di vari domini, dimensione, numero di features e percentuale di anomalie. 
 I dataset sono di tipo multi-dimensionale a punto, quindi senza una componente temporale associata.
 La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 
@@ -260,7 +260,7 @@ La tabella \ref{odds} elenca tutti i dataset di ODDS utilizzati.
 Per questi dataset si è deciso di adottare uno split train/test costituito da 66\% per il train e 33\% per il test. I dataset di train contengono al loro interno anche una percentuale di anomalie. Potrebbe non essere la situazione ideale in quanto è consigliato per i modelli non supervisionati di essere allenati e quindi apprendere da dati il più puliti possibili. Ma è la situazione più realistica in quanto nella realtà la presenza di etichette non è sempre garantita.  
 
 \subsubsection{SMD}
-Server Machine Dataset è un dataset proveniente da una compagnia Internet, consiste in serie temporali multivariate della durata di 5 settimane in cui ogni osservazione è equamente distribuita da una frequenza di 1 minuto. SMD contiene tre gruppi di macchinari (denotati SMD-1, SMD-2 e SMD-3 rispettivamente) per un totale di 28 macchinari, ed ognuno di questi ha 38 features. Sono presenti approssimativamente 28000 time step, sia per i dati di train che quelli di test. 
+Server Machine Dataset\footnote{SMD: https://github.com/NetManAIOps/OmniAnomaly} è un dataset proveniente da una compagnia Internet, consiste in serie temporali multivariate della durata di 5 settimane in cui ogni osservazione è equamente distribuita da una frequenza di 1 minuto. SMD contiene tre gruppi di macchinari (denotati SMD-1, SMD-2 e SMD-3 rispettivamente) per un totale di 28 macchinari, ed ognuno di questi ha 38 features. Sono presenti approssimativamente 28000 time step, sia per i dati di train che quelli di test. 
 La percentuale di anomalie al suo interno si attesta intorno al 4.16\% e si trovano tutte nell'ultima metà dei dati (ultime due settimane circa). Per questi dataset, la prima metà dei dati viene quindi usata per il training dei modelli mentre il restante per la predizione.
 Le anomalie sono raggruppate in intervalli di varia lunghezza e sono anomalie a punto.
 \begin{table}
@@ -715,6 +715,7 @@ A questo punto ci si può concentrare sulle varie tecniche di aggregazione. L'ag
 Si può vedere, in tabella \ref{agg-results}, come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati migliori. 
 I valori medi rispetto ai dataset si aggirano intorno al range [0.4,0.6], in linea con le performance di Model Centrality e migliori rispetto a Performance on Injected Synthetic Anomalies e Clustering Cohesion. Questo vuol dire che i metodi di aggregazione riescono comunque a produrre buoni risultati nonostante le metriche surrogante non funzioni sempre bene. 
 Questo tipo di aggregazione permette di avere risultati migliori quando non si ha la certezza che una sola metrica surrogata sia sufficiente. Potrebbe comunque essere utile un'analisi specifica per andare a prendere in considerazione soltanto quelle metriche surrogate, o più nello specifico i metodi utilizzati al loro interno (Round Robin, Majority Vote, Sampling o Scale, Spike, Growing, Mix), che potrebbero funzionare meglio per uno specifico dataset. 
+Considerando le metriche surrogante singolarmente, quella più performante è Model Centrality. La motivazione di ciò può risiedere nel fatto che utilizzando le informazioni provenienti da tutti i modelli si riescono a ottenere risultati migliori a quelle metriche che trattano gli output dei modelli in maniera indipendente.
 
 
 \begin{table}[]

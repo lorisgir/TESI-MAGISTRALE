@@ -126,7 +126,9 @@ All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente im
 
 \section{Modelli di Apprendimento Automatico}
 In questa sezione vengono proposti diversi algoritmi e metodi di apprendimento automatico per l'Anomaly Detection, raggruppati per categoria.
-I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD e TODS ed utilizzati nel processo di Model Selection discusso nei capitoli successivi.
+I seguenti algoritmi sono implementati all'interno della libreria pubblica PyOD\footnote{Python Outlier Detection (PyOD): https://github.com/
+yzhao062/pyod} e TODS\footnote{Automated Time-series Outlier Detection System
+ (TODS): https://github.com/datamllab/tods} ed utilizzati nel processo di Model Selection discusso nei capitoli successivi.
 
 \subsection{Modelli Lineari}
 I modelli lineari sono un tipo di algoritmo di Machine Learning utilizzato per fare previsioni. Essi rappresentano la relazione tra le variabili indipendenti (chiamate anche feature) e la variabile dipendente (chiamata anche obiettivo) con una equazione lineare. La forma generale di un modello lineare è: 
@@ -134,16 +136,16 @@ I modelli lineari sono un tipo di algoritmo di Machine Learning utilizzato per f
 dove $ Y $ è la variabile dipendente,  \(X_1, X_2, ..., X_n\)  sono le variabili indipendenti e \( B_0, B_1, B_2, ..., B_n\) sono i coefficienti del modello che vengono "appresi" dai dati.
 
 \subsubsection{PCA}
-La PCA è una riduzione lineare della dimensionalità che utilizza la Singular Value Decomposition dei dati per proiettarli in uno spazio dimensionale inferiore. Si tratta di spiegare la struttura di varianza-covarianza di una serie di variabili attraverso alcune nuove variabili che sono funzioni di quelle originali. Le componenti principali sono particolari combinazioni lineari delle \textit{p} variabili casuali  \(X1, X2, ..., Xp\) con tre importanti proprietà: (1) le componenti principali non sono correlate, (2) la prima componente principale ha la varianza più elevata, la seconda componente principale ha la seconda varianza più elevata e così via, e (3) la variazione totale in tutte le componenti principali combinate è uguale alla variazione totale delle variabili originali \(X1, X2, ..., Xp\). 
+La PCA\cite{shyu2003novel} è una riduzione lineare della dimensionalità che utilizza la Singular Value Decomposition dei dati per proiettarli in uno spazio dimensionale inferiore. Si tratta di spiegare la struttura di varianza-covarianza di una serie di variabili attraverso alcune nuove variabili che sono funzioni di quelle originali. Le componenti principali sono particolari combinazioni lineari delle \textit{p} variabili casuali  \(X1, X2, ..., Xp\) con tre importanti proprietà: (1) le componenti principali non sono correlate, (2) la prima componente principale ha la varianza più elevata, la seconda componente principale ha la seconda varianza più elevata e così via, e (3) la variazione totale in tutte le componenti principali combinate è uguale alla variazione totale delle variabili originali \(X1, X2, ..., Xp\). 
 Queste componenti principali sono ricavabili da un'analisi agli autovalori della matrice di covarianza o della matrice di correlazione di \(X1, X2, ..., Xp\).
 In questa procedura, la matrice di covarianza dei dati può essere decomposta in vettori ortogonali, detti autovettori, associati ad autovalori. Gli autovettori con alti autovalori catturano la maggior parte della varianza dei dati. Pertanto, un iperpiano a bassa dimensionalità costruito da \textit{k} autovettori può catturare la maggior parte della varianza dei dati. Tuttavia, gli outlier sono diversi dai punti di dati normali, cosa che è più evidente sull'iperpiano costruito dagli autovettori con autovalori piccoli.
 Di conseguenza, i punteggi degli outlier possono essere ottenuti come la somma della distanza proiettata di un campione su tutti gli autovalori.
 
 \subsubsection{K-PCA}
-Kernel PCA è un'estensione non lineare di PCA. I dati di input sono mappati in uno spazio infinitesimale da cui K-PCA estrae le componenti principali. I tipi di kernel usati possono essere: lineare, polinomiale, sigmoidale o radiale.
+Kernel-PCA\cite{hoffmann2007kernel} è un'estensione non lineare di PCA. I dati di input sono mappati in uno spazio infinitesimale da cui K-PCA estrae le componenti principali. I tipi di kernel usati possono essere: lineare, polinomiale, sigmoidale o radiale.
 
 \subsubsection{OCSVM}
-Il metodo One Class Support Vector Machine (OCSVM) è una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'ipersfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
+Il metodo One Class Support Vector Machine (OCSVM)\cite{scholkopf2001estimating} è una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'ipersfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
 La figura \ref{ocsvm} mostra un esempio del funzionamento di OCSVM.
 \begin{figure}[t]
 	\centering
@@ -161,18 +163,18 @@ dove $\varepsilon_t$ è rumore bianco. Può essere visto come una regressione mu
 La deviazione di un valore predetto rispetto a quello reale viene usato come outlier score.
 
 \subsubsection{MCD}
-Minimum Covariance Determinant (MCD) è un metodo per stimare la media e la matrice di covarianza andando a minimizzare l'influenza delle anomalie. L'idea alla base è quella di stimare questi valori andando a selezionare un sottoinsieme dei dati nel quale si spera non contengano anomalie.
+Minimum Covariance Determinant (MCD)\cite{rousseeuw1999fast, hardin2004outlier} è un metodo per stimare la media e la matrice di covarianza andando a minimizzare l'influenza delle anomalie. L'idea alla base è quella di stimare questi valori andando a selezionare un sottoinsieme dei dati nel quale si spera non contengano anomalie.
 Immaginando un approccio brute-force, l'algoritmo itera su ogni possibile sottoinsieme dei dati di una dimensione specifica. Vengono poi stimati la media e la matrice di covarianza per ogni sottoinsieme e poi vengono mantenuti soltanto i valori per il sottoinsieme che ha il determinante della matrice di covarianza più piccolo. Il motivo di questo è perché il determinante di una matrice di covarianza indica quanto è larga una distribuzione. Di conseguenza MCD cerca di minimizzare questo andando a prendere la distribuzione più compatta. Questo consente di escludere le anomalie che saranno situate lontane dal resto dei dati.
 
 \subsubsection{LMDD}
-Linear Method for Deviation-based Outlier Detection (LMDD) impiega il concetto di Smoothing Factor il quale indica quanto può essere ridotta la misura di dissimilarità andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarità può essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc).
+Linear Method for Deviation-based Outlier Detection (LMDD)\cite{arning1996linear} impiega il concetto di Smoothing Factor il quale indica quanto può essere ridotta la misura di dissimilarità andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarità può essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc).
 I punti che rimossi riducono maggiormente questa misura di dissimilarità possono essere valutati come anomalie.
 
 \subsection{Modelli a Distanza}
 I modelli non supervisionati basati sulla distanza sono una categoria di algoritmi che utilizzano la distanza tra i dati per scoprire relazioni e strutture nel dataset.
 
 \subsubsection{KNN}
-K-Nearest Neighbors (KNN) è un algoritmo di apprendimento utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è importante e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
+K-Nearest Neighbors (KNN)\cite{ramaswamy2000efficient,angiulli2002fast} è un algoritmo di apprendimento utilizzato per classificare oggetti in base alle loro proprietà. Dato un nuovo punto, l'algoritmo cerca i \textit{k} punti più simili (detti "vicini") tra quelli già classificati e assegna all'oggetto in esame la classe più comune tra i \textit{k} vicini trovati. La scelta del valore di \textit{k} è importante e può influire sulla sua accuratezza. In generale, un valore più alto di \textit{k} tende a ridurre la varianza del modello ma aumenta la sua bias.
 Nel campo dell'Anomaly Detection non è di interesse assegnare la classe al punto in esame ma assegnare un punteggio di anomalia. Per un'osservazione, quindi, la sua distanza rispetto al \textit{k}-esimo punto più vicino rappresenta questo score.
 
 \subsubsection{DBSCAN}
@@ -182,7 +184,7 @@ contenenti almeno $minPts$ nel loro intorno definito da un parametro $\epsilon$.
 
 
 \subsubsection{LOF}
-Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei KNN, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti più vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia.
+Local Outlier Factor (LOF)\cite{breunig2000lof} misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei KNN, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti più vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/lof}
@@ -191,27 +193,27 @@ Local Outlier Factor (LOF) misura la deviazione locale di un dato punto rispetto
 \end{figure}
 
 \subsubsection{COF}
-Connectivity Outlier Factor (COF) è un'evoluzione di LOF. Si basa sull'idea di assegnare un grado di anomalia ad ognuno dei punti, chiamato connectivity outlier factor.
+Connectivity Outlier Factor (COF)\cite{tang2002enhancing} è un'evoluzione di LOF. Si basa sull'idea di assegnare un grado di anomalia ad ognuno dei punti, chiamato connectivity outlier factor.
 Per ogni punto $x_i$, vengono selezionati i \textit{k} punti più vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti più vicini.
 
 \subsubsection{CBLOF}
-Cluster-Based Local Outlier Factor (CBLOF) è anch'esso un evoluzione di LOF.
+Cluster-Based Local Outlier Factor (CBLOF)\cite{he2003discovering} è anch'esso un evoluzione di LOF.
 Come primo step, CBLOF riceve in input i dati ed un algoritmo di clustering per andare a formare dei cluster. Attraverso dei parametri va poi a definire quale cluster viene considerato "grande" e quale viene considerato "piccolo". Vengono poi calcolati gli outlier score per tutti i punti andando a considerare la dimensione del cluster a cui un punto appartiene e la distanza più vicina rispetto al centro di un cluster grande. Quindi più un cluster di appartenenza è piccolo e più il punto è lontano dal centro di un cluster grande, più lo score di anomalia sarà alto. 
 
 \subsubsection{HBOS}
-Histogram based outlier detection (HBOS) è un algoritmo di outlier detection che si basa sugli istogrammi assumendo indipendenza tra le features. Per ogni feature computa il rispettivo istogramma. Successivamente itera su ogni punto: se il valore di una feature di uno specifico punto $x_i$ rientra nella coda dell'istogramma, questo punto vede alzarsi lo score di anomalia. Questo passaggio viene ripetuto rispetto ad ogni feature e su tutti i punti.
+Histogram based outlier detection (HBOS)\cite{goldstein2012histogram} è un algoritmo di outlier detection che si basa sugli istogrammi assumendo indipendenza tra le features. Per ogni feature computa il rispettivo istogramma. Successivamente itera su ogni punto: se il valore di una feature di uno specifico punto $x_i$ rientra nella coda dell'istogramma, questo punto vede alzarsi lo score di anomalia. Questo passaggio viene ripetuto rispetto ad ogni feature e su tutti i punti.
 
 \subsubsection{SOD}
-Subspace outlier detection (SOD) cerca di trovare gli outlier andando a considerare diversi sottoinsiemi dello spazio multidimensionale delle feature. Per ogni osservazione, SOD esplora il sottoinsieme delle dimensioni che si dirama parallelamente dai punti vicini e determina quanto questa osservazione devia dai suoi vicini in questo sotto-spazio. 
+Subspace outlier detection (SOD)\cite{kriegel2009outlier} cerca di trovare gli outlier andando a considerare diversi sottoinsiemi dello spazio multidimensionale delle feature. Per ogni osservazione, SOD esplora il sottoinsieme delle dimensioni che si dirama parallelamente dai punti vicini e determina quanto questa osservazione devia dai suoi vicini in questo sotto-spazio. 
 
 \subsubsection{ROD}
-Rotation-based Outlier Detection (ROD),  è un algoritmo privo di parametri che non richiede conoscenza sulla distribuzione dei dati e funziona in modo intuitivo nello spazio tridimensionale, dove i vettori 3D, che rappresentano i punti, vengono ruotati attorno alla mediana geometrica due volte in senso antiorario utilizzando la formula di rotazione di Rodrigues. I risultati della rotazione sono parallelepipedi i cui volumi vengono analizzati matematicamente come funzioni di costo e utilizzati per calcolare le Deviazioni Assolute Mediane e ottenere così il punteggio di anomalia. Per dimensioni elevate > 3, il punteggio complessivo viene calcolato prendendo la media dei punteggi complessivi dei sottospazi 3D risultanti dalla scomposizione dello spazio dei dati originali.
+Rotation-based Outlier Detection (ROD)\cite{almardeny2020novel},  è un algoritmo privo di parametri che non richiede conoscenza sulla distribuzione dei dati e funziona in modo intuitivo nello spazio tridimensionale, dove i vettori 3D, che rappresentano i punti, vengono ruotati attorno alla mediana geometrica due volte in senso antiorario utilizzando la formula di rotazione di Rodrigues. I risultati della rotazione sono parallelepipedi i cui volumi vengono analizzati matematicamente come funzioni di costo e utilizzati per calcolare le Deviazioni Assolute Mediane e ottenere così il punteggio di anomalia. Per dimensioni elevate > 3, il punteggio complessivo viene calcolato prendendo la media dei punteggi complessivi dei sottospazi 3D risultanti dalla scomposizione dello spazio dei dati originali.
 
 
 \subsection{Modelli Probabilistici}
 I modelli probabilistici non supervisionati sono una categoria di algoritmi che utilizzano la probabilità per descrivere e generare i dati. Essi utilizzano una distribuzione di probabilità per rappresentare la relazione tra le variabili del dataset.
 \subsubsection{KDE}
-Kernel Density Estimation (KDE) è l'applicazione di un "kernel smoothing" per la stima della probabilità. 
+Kernel Density Estimation (KDE)\cite{latecki2007outlier} è l'applicazione di un "kernel smoothing" per la stima della probabilità. 
 Siano $(X_1,...,x_n)$ osservazioni indipendenti e identicamente distribuite prese da una distribuzione univariata con una densità non conosciuta \textit{f} per qualsiasi punto \textit{x}. Siamo interessati nello stimare la forma di questa funzione \textit{f}. La funzione kernel di stima è:
 \[\widehat{f}_h(x)=\frac{1}{n} \sum_{i=1}^n K_h\left(x-x_i\right)=\frac{1}{n h} \sum_{i=1}^n K\left(\frac{x-x_i}{h}\right)\]
 
@@ -231,14 +233,14 @@ L'applicazione di questo modello nell'Anomaly Detection avviene andando a genera
 
 
 \subsubsection{GMM}
-I GMM sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
+I GMM\cite{aggarwal2015outlier} sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
 
 Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato così in quanto vengono alternate iterativamente due fasi: quella di expectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questa valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
 
 È possibile adottare questo modello nell'Anomaly Detection allenandolo rispetto ad un set di dati e poi assegnando un punteggio ai nuovi punti: quelli significativamente diversi dal resto dei dati verranno marcati come anomalia.
 
 \subsubsection{ABOD}
-Angle Based Outlier Detection (ABOD) si basa sull'idea di osservare l'angolo formato da un insieme di tre punti qualsiasi nello spazio delle feature multivariate. La varianza dell'ampiezza dell'apertura angolare risulta diversa per i punti anomali e per quelli normali: la varianza osservata è più alta per i punti inlier e più bassa per gli outlier, quindi tale misura può essere usata per separare punti normali da anomalie. ABOD funziona abbastanza bene nello spazio ad alta densità, a differenza di altre misure basate sulla distanza che soffrono della "curse of dimensionality" in quanto gli angoli possono fornire una rappresentazione migliore della vicinanza.
+Angle Based Outlier Detection (ABOD)\cite{kriegel2008angle} si basa sull'idea di osservare l'angolo formato da un insieme di tre punti qualsiasi nello spazio delle feature multivariate. La varianza dell'ampiezza dell'apertura angolare risulta diversa per i punti anomali e per quelli normali: la varianza osservata è più alta per i punti inlier e più bassa per gli outlier, quindi tale misura può essere usata per separare punti normali da anomalie. ABOD funziona abbastanza bene nello spazio ad alta densità, a differenza di altre misure basate sulla distanza che soffrono della "curse of dimensionality" in quanto gli angoli possono fornire una rappresentazione migliore della vicinanza.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/abod}
@@ -250,26 +252,26 @@ Considerando il punto rosso come pivot, viene calcolato l'angolo racchiuso tra q
 Se si considera come pivot invece il punto verde e procedendo con gli stessi calcoli per ogni coppia di punti, la varianza angolare sarà molto più bassa, indice che quel punto è molto probabilmente un outlier.
 
 \subsubsection{ECOD}
-Empirical-Cumulative-distribution-based Outlier Detection (ECOD) è un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilità che esista un punto almeno "estremo" come $x_i$.
+Empirical-Cumulative-distribution-based Outlier Detection (ECOD)\cite{li2021ecod} è un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilità che esista un punto almeno "estremo" come $x_i$.
 ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilità, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilità su tutte le dimensioni.
 
 \subsubsection{COPOD}
-Copula Based Outlier Detection (COPOD) si ispira alla copula per modellare la distribuzione dei dati multivariati. Costruisce dapprima una copula empirica e la utilizza per predire la tail-probability di ogni punto per determinare il suo
+Copula Based Outlier Detection (COPOD)\cite{li2020copod} si ispira alla copula per modellare la distribuzione dei dati multivariati. Costruisce dapprima una copula empirica e la utilizza per predire la tail-probability di ogni punto per determinare il suo
 livello di "estremità". Intuitivamente, si può pensare a questo come a calcolare
 un valore p-anomalo.
 
 \subsubsection{SOS}
-Stochastic Outlier Selection (SOS) utilizza il concetto di affinità per quantificare la relazione tra un punto e un altro. L'affinità è proporzionale alla somiglianza tra due punti di dati. Quindi un punto ha poca affinità con un punto dati dissimile. 
+Stochastic Outlier Selection (SOS)\cite{janssens2012stochastic} utilizza il concetto di affinità per quantificare la relazione tra un punto e un altro. L'affinità è proporzionale alla somiglianza tra due punti di dati. Quindi un punto ha poca affinità con un punto dati dissimile. 
 Un'osservazione viene classificata come outlier quando tutti gli altri punti hanno un'affinità insufficiente con esso.
 
 \subsubsection{Sampling}
-Sampling è un algoritmo che cerca di approssimare, a favore di un tempo computazionale decisamente minore, KNN. Al posto di calcolare la distanza di un punto rispetto a tutti gli altri e prendere i \textit{k} più vicini, esegue prima una fase di sampling in cui estrae casualmente un sottoinsieme di punti per poi andare ad effettuare i calcoli sulla distanza in questo sottoinsieme.
+Sampling\cite{sugiyama2013rapid} è un algoritmo che cerca di approssimare, a favore di un tempo computazionale decisamente minore, KNN. Al posto di calcolare la distanza di un punto rispetto a tutti gli altri e prendere i \textit{k} più vicini, esegue prima una fase di sampling in cui estrae casualmente un sottoinsieme di punti per poi andare ad effettuare i calcoli sulla distanza in questo sottoinsieme.
 
 \subsection{Modelli Ensemble}
 Gli ensemble models sono una tecnica di apprendimento automatico che consiste nell'utilizzare più modelli per risolvere un problema specifico. Il risultato finale è ottenuto combinando i risultati di ciascun modello. Ci sono diverse tecniche per combinare i risultati dei modelli, come la media, la mediana o la maggioranza. Gli ensemble models sono spesso utilizzati per aumentare la precisione e la robustezza di un modello, poiché la combinazione di più modelli può ridurre l'effetto di eventuali errori o incertezze presenti in un singolo modello.
 
 \subsubsection{I-Forest}
-Isolation Forest "isola" le osservazioni selezionando casualmente una feature per poi selezionare casualmente un valore di split tra i valori massimo e minimo della feature selezionata. 
+Isolation Forest\cite{liu2008isolation, liu2012isolation} "isola" le osservazioni selezionando casualmente una feature per poi selezionare casualmente un valore di split tra i valori massimo e minimo della feature selezionata. 
 Poiché il partizionamento ricorsivo può essere rappresentato da una struttura ad albero, il numero di suddivisioni necessarie per isolare un campione è equivalente alla lunghezza del percorso dal nodo radice al nodo finale.
 Questa lunghezza del percorso, aggregata nella media rispetto ad una foresta di alberi casuali, è una misura di anomalia: la suddivisione casuale produce percorsi sensibilmente più brevi per le anomalie. Pertanto, quando una foresta di alberi casuali produce collettivamente percorsi più brevi per particolari punti, è altamente probabile che si tratti di anomalie.
 La figura \ref{iforest} mostra a sinistra un esempio di punto normale e a destra un esempio di punto anomalo.
@@ -280,7 +282,7 @@ La figura \ref{iforest} mostra a sinistra un esempio di punto normale e a destra
 	\label{iforest}
 \end{figure}
 \subsubsection{INNE}
-l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest-neighbor (INNE) è un metodo per rilevare anomalie in cui un ensemble di nearest-neighbor viene addestrato sui dati normali per identificare i punti di dati che sono isolati dal resto dei dati, che vengono considerati anomalie.
+l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest-neighbor (INNE)\cite{bandaragoda2018isolation} è un metodo per rilevare anomalie in cui un ensemble di nearest-neighbor viene addestrato sui dati normali per identificare i punti di dati che sono isolati dal resto dei dati, che vengono considerati anomalie.
 
 Il processo di solito funziona come segue:
 \begin{enumerate}
@@ -291,7 +293,7 @@ Il processo di solito funziona come segue:
 \end{enumerate}
 
 \subsubsection{Feature Bagging}
-Feature Bagging è un meta-estimator che adatta una serie di predittori di base a vari sotto-insiemi del dataset ed utilizza la media o altri metodi di combinazione per migliorare l'accuratezza predittiva e controllare l'over-fitting.
+Feature Bagging\cite{lazarevic2005feature} è un meta-estimator che adatta una serie di predittori di base a vari sotto-insiemi del dataset ed utilizza la media o altri metodi di combinazione per migliorare l'accuratezza predittiva e controllare l'over-fitting.
 Le feature sono anch'esse campionate in modo casuale.
 Per impostazione predefinita, viene utilizzato LOF come predittore di base. Tuttavia, è possibile utilizzare qualsiasi modello, come KNN e ABOD.
 Il Feature Bagging costruisce innanzitutto \textit{n} sottoinsiemi selezionando casualmente un sottoinsieme di feature, il che induce la diversità dei predittori di base.
@@ -324,10 +326,10 @@ Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. 
 	\label{deepsvdd}
 \end{figure}
 
-Deep Support Vector Data Description (DeepSVDD) è una rete neurale profonda che durante la fase di training punta a minimizzare il volume della ipersfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'ipersfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti del dataset al centro della sfera.  La figura \ref{deepsvdd} mostra le trasformazioni di DeepSVDD.
+Deep Support Vector Data Description (DeepSVDD)\cite{ruff2018deepsvdd} è una rete neurale profonda che durante la fase di training punta a minimizzare il volume della ipersfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'ipersfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti del dataset al centro della sfera.  La figura \ref{deepsvdd} mostra le trasformazioni di DeepSVDD.
 
 \subsection{Auto Encoders}
-Un Auto-Encoder (AE) è una rete neurale che combina un encoder $E$ e un decoder $D$. L'encoder è un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un insieme di variabili latenti $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder è il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ è chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder a compiere errori nella fase di ricostruzione. L'architettura di un auto-encoder è presente nella figura \ref{ae}.
+Un Auto-Encoder (AE)\cite{aggarwal2015outlier} è una rete neurale che combina un encoder $E$ e un decoder $D$. L'encoder è un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un insieme di variabili latenti $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder è il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ è chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder a compiere errori nella fase di ricostruzione. L'architettura di un auto-encoder è presente nella figura \ref{ae}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/ae}
@@ -335,7 +337,7 @@ Un Auto-Encoder (AE) è una rete neurale che combina un encoder $E$ e un decoder
 	\label{ae}
 \end{figure}
 \subsubsection{Variational Autoencoders}
-I Variational Autoencoders (VAE) ereditano parte dell'architettura dei classici AutoEncoders ma hanno profonde differenze. VAE è considerato un modello generativo e inoltre il suo encoder non solo produce una rappresentazione latente, ma anche una distribuzione di probabilità della rappresentazione latente $\mu$ e $\sigma$. Questo rende possibile generare nuovi sample semplicemente estraendo valori casuali dalla distribuzione di probabilità prodotta dall'encoder.
+I Variational Autoencoders (VAE)\cite{kingma2013auto} ereditano parte dell'architettura dei classici AutoEncoders ma hanno profonde differenze. VAE è considerato un modello generativo e inoltre il suo encoder non solo produce una rappresentazione latente, ma anche una distribuzione di probabilità della rappresentazione latente $\mu$ e $\sigma$. Questo rende possibile generare nuovi sample semplicemente estraendo valori casuali dalla distribuzione di probabilità prodotta dall'encoder.
 Il modello viene allenato per minimizzare la divergenza Kullback-Leibler (KL) tra la distribuzione di probabilità prodotta dall'encoder e una distribuzione nota (spesso una distribuzione normale) e allo stesso tempo massimizzare la capacità del decoder di ricostruire l'immagine originale (Figura \ref{vae}).
 \begin{figure}[t]
 	\centering
@@ -365,7 +367,7 @@ Le GAN sono un modo di addestrare un modello generativo strutturando il problema
 \end{figure}
 
 \subsubsection{AnoGAN}
-AnoGAN (Anomaly GAN) è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
+AnoGAN (Anomaly GAN)\cite{schlegl2017unsupervised} è una tecnica di rilevamento di anomalie basata su GAN. Il modello AnoGAN utilizza un generatore GAN per generare una rappresentazione dei dati normali e quindi utilizza una rete neurale di rilevamento di anomalie per distinguere i dati normali dalle anomalie.
 
 Il modello AnoGAN è composto da tre componenti principali:
 
@@ -377,13 +379,13 @@ Il modello AnoGAN è composto da tre componenti principali:
 
 
 \subsubsection{ALAD}
-Adversarially Learned Anomaly Detection (ALAD) è una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza è presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
+Adversarially Learned Anomaly Detection (ALAD)\cite{zenati2018adversarially} è una rete neurale che basa le sue fondamenta su AnoGAN. Ma a differenza di quest'ultima, include una GAN bi-direzionale e di conseguenza è presente un encoder al suo interno che mappa i dati di input in uno spazio latente ed utilizza l'errore di ricostruzione come score di anomalia.
 
 \subsection{Reti Neurali a Grafo}
 Le reti neurali basate su grafi (o GNN, Graph Neural Networks) sono una classe di modelli di apprendimento automatico che utilizzano strutture di dati a forma di grafo per rappresentare i dati. In questi modelli, i nodi del grafo rappresentano i sample e gli archi rappresentano le relazioni tra questi. Le GNN utilizzano un algoritmo di propagazione per aggiornare i valori dei nodi del grafo in base alle informazioni che si trovano sui nodi adiacenti.
 
 \subsubsection{LUNAR}
-LUNAR: Unifying Local Outlier Detection Methods via Graph Neural Networks è un metodo per la rilevazione di anomalie che utilizza le reti neurali su grafi per apprendere la struttura locale dei dati. Il metodo si basa sull'idea che i punti di dati normali saranno simili ai loro punti di dati vicini, mentre i punti di dati anomali saranno dissimili.
+LUNAR: Unifying Local Outlier Detection Methods via Graph Neural Networks\cite{goodge2022lunar} è un metodo per la rilevazione di anomalie che utilizza le reti neurali su grafi per apprendere la struttura locale dei dati. Il metodo si basa sull'idea che i punti di dati normali saranno simili ai loro punti di dati vicini, mentre i punti di dati anomali saranno dissimili.
 Il processo di solito funziona come segue:
 \begin{enumerate}
 \item Viene costruito un grafo dai dati, dove ogni nodo rappresenta un punto di dati e gli archi vengono tracciati tra i punti di dati che vengono considerati simili.
@@ -407,7 +409,7 @@ Un'altra sfida del thresholding è che può essere difficile bilanciare il compr
 Sono proposti ora due metodi classici di thresholding ed un terzo metodo novizio che verrà utilizzato nel Model Selection.
 
 \subsection{IQR}
-Il metodo si basa sull'uso della deviazione interquartile (che è la differenza tra il terzo e il primo quartile) come base per determinare se un punto di dati è anomalo.
+IQR\cite{https://doi.org/10.48550/arxiv.1509.02473} si basa sull'uso della deviazione interquartile (che è la differenza tra il terzo e il primo quartile) come base per determinare se un punto di dati è anomalo.
 
 Il processo di solito funziona come segue:
 \begin{enumerate}
@@ -419,7 +421,7 @@ Il processo di solito funziona come segue:
 Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati, quindi è un metodo semplice ed efficiente per determinare i valori di soglia. Tuttavia, questo metodo è sensibile ai valori estremi, quindi potrebbe non essere adatto per i dati con molti valori estremi.
 
 \subsection{Z-Score}
-Il punteggio Z (z-score) è una misura della distanza di un punto di dati dalla media dei dati in termini di deviazione standard. I punti di dati con punteggi Z troppo alti o troppo bassi vengono considerati anomalie.
+Il punteggio Z (z-score)\cite{Bagdonavi_ius_2020} è una misura della distanza di un punto di dati dalla media dei dati in termini di deviazione standard. I punti di dati con punteggi Z troppo alti o troppo bassi vengono considerati anomalie.
 l processo di solito funziona come segue:
 \begin{enumerate}
 \item Viene calcolata la media e la deviazione standard dei dati
@@ -431,7 +433,7 @@ Anche questo metodo si basa solo sui dati e non richiede alcuna conoscenza a pri
 
 
 \subsection{$\gamma$GMM}
-"ESTIMATING THE CONTAMINATION FACTOR’S DISTRIBUTION IN UNSUPERVISED ANOMALY DETECTION" è un paper pubblicato da Lorenzo Perini, ricercatore al dipartimento di KU Leuven.
+"ESTIMATING THE CONTAMINATION FACTOR’S DISTRIBUTION IN UNSUPERVISED ANOMALY DETECTION"\cite{https://doi.org/10.48550/arxiv.2210.10487} è un paper pubblicato da Lorenzo Perini, ricercatore al dipartimento di KU Leuven.
 Il problema trattato in questo paper consiste nella stima della distribuzione del fattore di contaminazione ($\gamma$) di un dataset non etichettato utilizzando un insieme di M rilevatori di anomalie non supervisionati. 
 
 Per affrontare questo problema, in questo paper viene proposto $\gamma$GMM, un approccio innovativo che utilizza un metodo bayesiano per stimare la distribuzione del fattore di contaminazione.
