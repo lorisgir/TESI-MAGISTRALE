@@ -37,7 +37,7 @@ Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione,
 
 \subsubsection{Qualità}
 I dati di qualità MVM vengono usati per definire la classe di qualità di appartenenza dei cuscinetti a sfera. Per fare ciò, sono state definite per ogni banda delle soglie alla quale il superamento di una porta il prodotto a ricevere una classificazione di qualità più bassa.
-La tabella \ref{mvm-soglie} mostra come le classi di qualità vengano definite.
+La tabella \ref{mvm-soglie} mostra come le classi di qualità vengano definite. Per questioni di riservatezza vengono mostrati dei valori di soglia modificati, andando a moltiplicare i valori reali per uno scalare.
 
 \begin{table}
 	\caption{\label{mvm-soglie}Soglie bande MVM.}
@@ -121,7 +121,7 @@ Per questo motivo, nelle fasi di processamento, operazioni di decomposizione del
 \end{figure}
 
 \subsection{Processamento}
-Evitando i dettagli per questione di privacy, in questa sezione vengono presentati i passaggi principali eseguiti per produrre i set di serie temporali dai dati grezzi ricevuti da SKF. 
+Evitando i dettagli per questione di riservatezza, in questa sezione vengono presentati i passaggi principali eseguiti per produrre i set di serie temporali dai dati grezzi ricevuti da SKF. 
 Per creare una tabella contente una colonna per ogni sensore e con un indice temporale è necessario appiattire i timestamp fino a raggiungere una granularità di 10 minuti, in modo che il tempo possa essere utilizzato come chiave per l'unione. A questo punto ogni riga del del dataset corrisponde a un'istantanea di un particolare sensore anche se questa è chiaramente un'approssimazione: in pratica, le registrazioni di misure CoMo diverse non avvengono nello stesso istante, ma la maggior parte di esse si concentra in un intervallo di un minuto circa. 
 D'altra parte, i dati sulla qualità sono raccolti in tempo reale quando viene analizzato ogni cuscinetto. In questo caso é quindi necessario aggregare questi dati secondo una qualche misura ed é stata scelta l'operazione di media.
 Chiaramente, i dati MVM forniscono informazioni sull'intero intervallo di tempo mentre dati CoMo forniscono invece un'istantanea all'interno dell'intervallo di tempo.

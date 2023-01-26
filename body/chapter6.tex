@@ -880,7 +880,7 @@ L'assunzione forte che é stata fatta é che situazione anomale di un macchinari
 Infine si compara il modello migliore secondo Model Selection con il modello in ultima posizione.
 
 \subsection{Dataset}
-I dataset di SKF sono stati introdotti e dettagliati nel capitolo \ref{chap:skf}. Per questa fase di valutazione vengono usati sia i dati di MVM, più nello specifico viene usata la banda A riguardante gli errori geometrici provenienti dalla fase di rettifica. Questo perché si é deciso di concentrarsi esclusivamente sul macchinario che, per motivi di privacy, chiameremo M1. Questo macchinario é il primo nella linea di produzione ed effettua la rettifica, quindi direttamente interessato alla banda A.
+I dataset di SKF sono stati introdotti e dettagliati nel capitolo \ref{chap:skf}. Per questa fase di valutazione vengono usati sia i dati di MVM, più nello specifico viene usata la banda A riguardante gli errori geometrici provenienti dalla fase di rettifica. Questo perché si é deciso di concentrarsi esclusivamente sul macchinario che, per motivi di riservatezza, chiameremo M1. Questo macchinario é il primo nella linea di produzione ed effettua la rettifica, quindi direttamente interessato alla banda A.
 Per la fase di training é stato scelto il periodo che va da gennaio a marzo 2022 in quanto i dati in quel periodo risultavano i più puliti ed i più stabili da un punto di vista di oscillazioni o data-change. Mentre per la fase di prediction viene usato come riferimento il periodo maggio-giugno 2022.
 
 
@@ -1042,7 +1042,7 @@ Con Telemanom, immagine \ref{worst_clf_quality} la situazione non é migliore, i
 	\label{worst_clf_quality}
 \end{figure}
 
-La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1} e \ref{mvm-confusion2}. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualità bassa
+La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1} e \ref{mvm-confusion2}. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualità bassa. Per motivi di riservatezza vengono lasciati soltanto i valori percentuali e rimossi i conteggi.
 
 
 
@@ -1053,8 +1053,8 @@ La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1
 			\begin{tabular}{|l|l|l|}
 				\hline
 				                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-				\textbf{Positive} & 238 (0.05)             & 372 (0.05)             \\ \hline
-				\textbf{Negative} & 4648 (0.95)            & 6885 (0.95)            \\ \hline
+				\textbf{Positive} &  0.05             &  0.05             \\ \hline
+				\textbf{Negative} &  0.95            &  0.95            \\ \hline
 			\end{tabular}
 			}\captionof{table}{KDE Confusion Matrix}\label{mvm-confusion1}
 	\end{minipage}
@@ -1064,8 +1064,8 @@ La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1
 			\begin{tabular}{|l|l|l|}
 				\hline
 				                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-				\textbf{Positive} & 177 (0.04)             & 430 (0.06)             \\ \hline
-				\textbf{Negative} & 4709(0.96)             & 6827 (0.94)            \\ \hline
+				\textbf{Positive} & 0.04             & 0.06             \\ \hline
+				\textbf{Negative} & 0.96             & 0.94            \\ \hline
 			\end{tabular}}\captionof{table}{Telemanom Confusion Matrix}\label{mvm-confusion2}
 	\end{minipage}
 \end{table}
@@ -1074,11 +1074,12 @@ La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1
 \subsubsection{Confronto Qualità - Alternative}
 Si potrebbe tentare di risolvere i due problemi elencati ad inizio paragrafo andando a cambiare approccio per l'analisi della correlazione.
 Per il primo di questi, ovvero il problema della media di tutte le registrazioni di qualità in un dato intervallo di 10 che va a nascondere eventuali registrazioni più rare in cui la qualità é bassa, si può andare a contare il numero di registrazioni, sempre all'interno di ogni intervallo, che superano la soglia Q1 per la banda A.
-I risultati ottenuti sono riportati nelle tabelle \ref{count-sopra-soglia} e \ref{count-sopra-soglia-norm}.
+I risultati ottenuti sono riportati nelle tabelle \ref{count-sopra-soglia} e \ref{count-sopra-soglia-norm}. Per questioni di riservatezza, i valori sono stati alterati andando a moltiplicarli per uno scalare comune. 
+Questa trasformazione non è un problema ai fini dell'analisi dei risultati in quanto i valori presi singolarmente non sono di particolare interesse, quello su cui ci si concentra è quanto differiscono i valori della colonna Intervalli Normali con quelli della colonna Intervalli Anomali.
 
 
 
-Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 19.69, valore persino più alto rispetto agli intervalli anomali. Situazione simile anche facendo un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D). Questi risultati implicano che non c'è nessuna correlazione tra qualità bassa e punti anomali. 
+Il numero medio di registrazioni che superano la soglia Q1 della banda A all'interno degli intervalli classificati come normali da KDE sono 27.56, valore persino più alto rispetto agli intervalli anomali. Situazione simile anche facendo un conteggio tenendo in considerazione tutte le registrazione che superano la soglia Q1 di qualsiasi banda (A,B,C e D). Questi risultati implicano che non c'è nessuna correlazione tra qualità bassa e punti anomali. 
 Questo esperimento é stato fatto anche usando Telemanom ed anche qui i risultati confermano il trend.
 La tabella \ref{count-sopra-soglia-norm} mostra gli stessi conteggi ma rapportati rispetto al numero di registrazione per ogni intervallo. Può capitare che nel caso di problemi tecnici la frequenza di produzione si abbassi, andando quindi ad abbassare il numero di registrazioni MVM sopra-soglia. In questo caso calcolare la percentuale dei cuscinetti che superano la soglia rispetto al numero totale di cuscinetti registrati per intervallo può produrre risultati più corretti. 
 Nonostante i risultati producano valori più alti, utilizzando KDE, per gli intervalli anomali, la differenza rimane ancora troppo esigua per confermare una qualche correlazione. 
@@ -1090,8 +1091,8 @@ Nonostante i risultati producano valori più alti, utilizzando KDE, per gli inte
 \hline
                 & \multicolumn{2}{c|}{KDE}                                     & \multicolumn{2}{c|}{Telemanom}                               \\ \hline
                 & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali \\ \hline
-Banda A         & \multicolumn{1}{l|}{19.69}              & 19.3               & \multicolumn{1}{l|}{20}                 & 12                 \\ \hline
-Bande Combinate & \multicolumn{1}{l|}{86.82}              & 85                 & \multicolumn{1}{l|}{87.2}               & 77.54              \\ \hline
+Banda A         & \multicolumn{1}{l|}{27.56}              & 27.02               & \multicolumn{1}{l|}{28}                 & 16.8                 \\ \hline
+Bande Combinate & \multicolumn{1}{l|}{121.54}              & 119                 & \multicolumn{1}{l|}{121.94}               & 108.55              \\ \hline
 \end{tabular}%
 }
 \caption{\label{count-sopra-soglia}Numero medio di cuscinetti sopra-soglia per intervallo}
@@ -1104,8 +1105,8 @@ Bande Combinate & \multicolumn{1}{l|}{86.82}              & 85                 &
 \hline
                 & \multicolumn{2}{c|}{KDE}                                     & \multicolumn{2}{c|}{Telemanom}                               \\ \hline
                 & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali & \multicolumn{1}{l|}{Intervalli Normali} & Intervalli Anomali \\ \hline
-Banda A         & \multicolumn{1}{l|}{0.09}               & 0.09               & \multicolumn{1}{l|}{0.09}               & 0.06               \\ \hline
-Bande Combinate & \multicolumn{1}{l|}{0.40}               & 0.41               & \multicolumn{1}{l|}{0.40}               & 0.36               \\ \hline
+Banda A         & \multicolumn{1}{l|}{0.12}               & 0.12               & \multicolumn{1}{l|}{0.12}               & 0.08               \\ \hline
+Bande Combinate & \multicolumn{1}{l|}{0.56}               & 0.57               & \multicolumn{1}{l|}{0.56}               & 0.50               \\ \hline
 \end{tabular}%
 }
 \caption{\label{count-sopra-soglia-norm}Percentuale di cuscinetti sopra-soglia per intervallo}
@@ -1114,7 +1115,7 @@ Bande Combinate & \multicolumn{1}{l|}{0.40}               & 0.41               &
 Per quanto riguarda il secondo punto, ovvero il problema di considerare solamente un macchinario, si é pensato di andare a eseguire l'algoritmo di Anomaly Detection su tutti i macchinari di cui si hanno i dati della linea di produzione e aggregare insieme le etichette per ogni punto temporale.
 In questo esperimento, i dati hanno bisogno di una fase di processamento aggiuntiva, ovvero é necessario allineare le registrazioni di tutti i macchinari tenendo in considerazione il tempo che impiega il cuscinetto a sfera a spostarsi lungo la linea di montaggio. In un esempio, ipotizzando tre macchine di cui la terza é MVM ed un cuscinetto a sfera che parte dalla linea di montaggio a tempo $t$, la prima macchina esegue la registrazione su quel cuscinetto a sfera a tempo $t$, la seconda a tempo $t+1$ e la terza a tempo $t+2$. Per allineare le registrazioni viene quindi rimossa un'unità temporale dalle registrazioni del secondo macchinario e 2 unità dalle registrazioni del terzo macchinario. Così facendo si crea un'istantanea delle registrazioni per ogni cuscinetto a sfera. Questo procedimento é simile a quello svolto per le valutazioni precedenti, con la differenza che in questo caso si aveva soltanto il macchinario M1 ed MVM, di conseguenza solamente i dati MVM erano da traslare.
 Allineati i dati é necessario aggregare le etichette di ogni macchinario per ogni punto temporale. È stato scelto di applicare un approccio del tipo \textit{almeno uno}, ovvero se il modello di AD trova un'anomalia per un dato macchinario e per un dato punto temporale, quel punto temporale risulterà anomalo anche per tutti gli altri macchinari. 
-Purtroppo però anche con questo approccio la corrispondenza tra anomalie e qualità é bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione e aggregando con il metodo \textit{almeno uno}, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter, figura \ref{quality_all_machines} che la matrice di confusione, tabella \ref{cm_quality_all}, sono stati posti per visualizzazione.
+Purtroppo però anche con questo approccio la corrispondenza tra anomalie e qualità é bassa, inoltre eseguendo l'algoritmo di AD su tutti e 10 i macchinari a disposizione e aggregando con il metodo \textit{almeno uno}, potenzialmente il numero di anomalie rilevate viene moltiplicato per 10, passando da un 5\% ad un 50\%. Questo fa lievitare i numeri di false positive a dismisura. Sia il plot scatter, figura \ref{quality_all_machines} che la matrice di confusione, tabella \ref{cm_quality_all}, sono stati posti per visualizzazione. Anche qui per motivi di riservatezza sono presenti soltanto i valori percentuali.
 
 \begin{figure}[t]
 	\centering
@@ -1128,8 +1129,8 @@ Purtroppo però anche con questo approccio la corrispondenza tra anomalie e qual
 	\begin{tabular}{|l|l|l|}
 		\hline
 		                  & \textbf{Real Positive} & \textbf{Real Negative} \\ \hline
-		\textbf{Positive} & 1510 (0.31)            & 2750 (0.37)            \\ \hline
-		\textbf{Negative} & 3376 (0.69)            & 4507 (0.62)            \\ \hline
+		\textbf{Positive} & 0.31            & 0.37            \\ \hline
+		\textbf{Negative} & 0.69            & 0.62            \\ \hline
 	\end{tabular}
 	\caption{\label{cm_quality_all}Confusion Matrix KDE su tutti i macchinari}
 	
