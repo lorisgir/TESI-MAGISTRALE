@@ -868,6 +868,32 @@ Possiamo quindi concludere che mentre il model Selection non supervisionato non 
 		
 \end{figure}
 
+\subsubsection{Confronto con baseline}
+In questa sezione vengono proposte, rispetto a tutti i dataset, le performance del miglior modello secondo il Model Selection confrontate a tre baseline:
+\begin{enumerate}
+\item Random: viene preso casualmente, per ogni dataset, un modello dalla lista dei modelli candidati
+\item AVG: ovvero il modello con le performance medie migliori rispetto a tutti i dataset. Valutato usando le etichette con la metrica F1-Score
+\item Best: per ogni dataset viene preso il miglior modello secondo F1-Score
+\end{enumerate}
+In Tabella \ref{wins} sono riportati i conteggi delle vittorie o pareggi, rispetto a tutti e 39 i dataset di benchmark, del miglior modello secondo Model Selection contro le tre baseline. I risultati proposti fanno riferimento sia alle tre metriche surrogate prese singolarmente, considerando anche le varie misure interne di ognuna, sia al punteggio finale prodotto dall'aggregazione delle tre metriche surrogate utilizzando Round Robin, Mix e Clustering Cohesion con il metodo ottimale di Kemeny-Young.
+I risultati vanno a confermare quanto già detto nelle sezioni precedenti. La metrica di Model Centrality ha un numero di vittorie maggiore rispetto alle altre due, e nello specifico Round Robin e Sampling hanno il numero di vittorie più alto in assoluto.
+I vari metodi di Anomaly Injection hanno un numero di vittorie comparabile, in linea anche con la metrica di Clustering Cohesion. Final Score rappresenta le vittorie utilizzando il ranking aggregato con Kemeny-Young e risulta meno performante se paragonato esclusivamente a Model Centrality.
+Confrontando invece il numero di vittorie del ranking aggregato rispetto alle baseline, Model Centrality riesce a trovare un modello che riesce a vincere 29 volte rispetto ad una selezione casuale. Questo significa che su 39 dataset, 29 volte Model Selection è risultato più utile rispetto ad una selezione casuale. Contro il modello che ha le performance medie migliori, in questo caso è stato KNN, Model Centrality ha vinto 23 volte. Non un risultato incoraggiante, considerando che vengono allenati molti modelli per poi ottenere delle performance comparabili ad un unico modello (KNN). La situazione migliorerebbe se si andasse a considerare soltanto Model Centrality.
+Infine il numero di pareggi, ovvero quante volte Model Centrality riesce a trovare effettivamente il modello migliore, sono molto bassi, segno che le metriche surrogate implementate non sono sufficienti.
+
+\begin{table}[]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|cl|l|l|l|l|l|l|l|l|l|l|}
+\hline
+\multicolumn{2}{|l|}{}                                             & rr & mv & score\_corr & samp & scale & spike & wander & mix & rank\_score\_clust & final\_score \\ \hline
+\multicolumn{1}{|c|}{\multirow{3}{*}{vittorie o pareggi}} & random & 36 & 34 & 32          & 36   & 29    & 27    & 28     & 26  & 29                 & 29           \\ \cline{2-12} 
+\multicolumn{1}{|c|}{}                                    & avg    & 29 & 26 & 27          & 30   & 20    & 18    & 18     & 19  & 18                 & 23           \\ \cline{2-12} 
+\multicolumn{1}{|c|}{}                                    & best   & 3  & 2  & 2           & 2    & 4     & 4     & 3      & 3   & 2                  & 3            \\ \hline
+\end{tabular}%
+}
+\captionof{table}{Numero di vittorie o pareggi del miglior modello secondo Model Selection rispetto alle baseline. Conteggio rispetto a tutti i dataset (39).}\label{wins}
+\end{table}
 
 \newpage
 \section{Risultati SKF}
