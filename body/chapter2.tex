@@ -23,7 +23,7 @@ Le anomalie possono essere classificate in tre categorie:
 \subsection{Applicazioni dell'Anomaly Detection}
 L'Anomaly Detection può essere applicata in una vasta serie di domini i quali possono presentare caratteristiche molto diverse tra loro. I più conosciuti sono:
 \begin{itemize}
-	\item \textbf{Finanziario}: in questo campo l'Anomaly Detection viene usata per rivelare una serie di acquisti o movimentazioni fuori dal normale, sia per quanto riguarda la frequenza, gli importi o la localizzazione.
+	\item \textbf{Finanziario}: in questo campo l'Anomaly Detection viene usata per rivelare una serie di acquisti o movimentazioni sospette, sia per quanto riguarda la frequenza, gli importi o la localizzazione.
 	\item \textbf{Medico}: dati medici collezionati ad esempio da strumenti come ECG possono essere analizzati per scoprire anomalie che riflettono malattie.
 	\item \textbf{Rilevamento di Intrusioni}: all'interno di sistemi informatici vengono raccolti diversi tipi di dati riguardanti chiamate di sistema, il traffico di rete o altre attività nel sistema. Questi dati possono mostrare un comportamento insolito a causa di attività sospette. Il rilevamento di tali attività è noto come rilevamento delle intrusioni di sistema.
 	\item \textbf{Condition Monitoring}: i sensori sono spesso posti su strumenti o macchinari e scoprire pattern anomali può rivelare informazioni sulla salute o sul funzionamento degli impianti.
@@ -37,7 +37,7 @@ Uno degli aspetti più complessi da tenere in considerazione quando si applicano
 	\item Le anomalie variano in base al contesto o dominio in cui si opera, rendendo impossibile la generalizzazione di un singolo metodo.
 	\item Spesso non si hanno a disposizione etichette che identifichino anomalie all'interno di un dataset, oppure si ha solo una piccola porzione di etichette.
 \end{itemize}
-A causa di queste problematiche il rischio di avere un alto numero di falsi-positivi o falsi-negativi è molto alto. In questi casi è opportuno, tramite un trade-off, scegliere se preferire un numero di falsi allarmi più alto rispetto all'ignorare situazioni potenzialmente anomale.
+A causa di queste problematiche il rischio di avere molti falsi-positivi o falsi-negativi è alto. In questi casi è opportuno, tramite un trade-off, scegliere se preferire un numero di falsi allarmi più alto rispetto all'ignorare situazioni potenzialmente anomale.
 
 \section{Serie Temporali}
 Una serie temporale è definita come una sequenza ordinata di valori continui, che rappresenta l'evoluzione di una variabile numerica nel tempo. È la misurazione di un sistema che evolve nel tempo con attributi numerici: ad esempio, la temperatura di un computer/server, il valore delle azioni di un'azienda o l'attività elettrica del cuore (ECG). Una serie temporale è, quindi, qualsiasi sequenza di osservazioni indicizzate dal tempo. Una serie temporale contiene molte informazioni sul sistema misurato e queste possono essere utilizzate per garantire il corretto funzionamento del sistema.
@@ -48,7 +48,7 @@ Una serie temporale univariata è un insieme di valori misurati che modellano e 
 Più formalmente, una serie temporale univariata è una sequenza di punti
 \[\tau = \left\{ x_1, \ldots, x_T  \right\}\]
 ognuno dei quali è un'osservazione di un processo misurato in un momento specifico $t$. Le serie temporali univariate contengono una singola variabile in ogni istante di tempo, mentre le serie temporali multivariate registrano più di una variabile alla volta. Esse sono denotate da
-\[\tau = \left\{ x_1, \ldots, x_T  \right\}, x \in \mathbb{R^n} \]
+\[\tau = \left\{ x_1, \ldots, x_T  \right\}, x \in \mathbb{R}^T \]
 
 \subsection{Decomposizione delle Serie Temporali}
 Una serie temporale è un'aggregazione di quattro componenti: trend, stagionalità, livello e rumore.

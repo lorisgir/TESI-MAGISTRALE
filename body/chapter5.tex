@@ -25,8 +25,8 @@ La frequenza di registrazione dei dati CoMo è di 10 minuti. Questo valore così
 
 \subsection{MVM}
 I dati di qualità vengono registrati per ogni prodotto che esce dalla catena di produzione.
-Le misure di qualità fornite sono quattro fasce, indicate con A, B, C e D.
-Tutte le fasce sono positive per definizione ed ognuna di esse tratta uno specifico tipo di difetto in ogni cuscinetto attraverso l'analisi dello spettro. In particolare:
+Le misure di qualità fornite sono quattro bande, indicate con A, B, C e D.
+Tutte le bande sono positive per definizione ed ognuna di esse tratta uno specifico tipo di difetto in ogni cuscinetto attraverso l'analisi dello spettro. In particolare:
 \begin{itemize}
 	\item Banda A riguarda i cosiddetti errori geometrici risultanti dalla fase di rettifica.
 	\item Banda B e C riguardano errori nella fase di levigatura.
@@ -37,7 +37,7 @@ Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione,
 
 \subsubsection{Qualità}
 I dati di qualità MVM vengono usati per definire la classe di qualità di appartenenza dei cuscinetti a sfera. Per fare ciò, sono state definite per ogni banda delle soglie alla quale il superamento di una porta il prodotto a ricevere una classificazione di qualità più bassa.
-La tabella \ref{mvm-soglie} mostra come le classi di qualità vengano definite. Per questioni di riservatezza vengono mostrati dei valori di soglia modificati, andando a moltiplicare i valori reali per uno scalare.
+La Tabella \ref{mvm-soglie} mostra come le classi di qualità vengano definite. Per questioni di riservatezza vengono mostrati dei valori di soglia modificati, andando a moltiplicare i valori reali per uno scalare.
 
 \begin{table}
 	\caption{\label{mvm-soglie}Soglie bande MVM.}
@@ -54,7 +54,7 @@ La tabella \ref{mvm-soglie} mostra come le classi di qualità vengano definite. 
 
 Valori di banda più bassi indicano una qualità maggiore, di conseguenza la classe Q1 rappresenta i prodotti migliori mentre la classe Q4 rappresenta gli scarti. 
 Per passare da una classe alla successiva è necessario che solamente una delle 4 bande superi il valore di soglia. 
-La tabella \ref{mvm-esempio} mostra un esempio di come le classi vengano computate.
+La Tabella \ref{mvm-esempio} mostra un esempio di come le classi vengano computate.
 
 \begin{table}
 	\caption{\label{mvm-esempio}Esempio di associazione di Classe qualità.}
@@ -64,7 +64,7 @@ La tabella \ref{mvm-esempio} mostra un esempio di come le classi vengano computa
 		Bearing & \multicolumn{1}{c|}{Banda A} & \multicolumn{1}{c|}{Banda B} & \multicolumn{1}{c|}{Banda C} & \multicolumn{1}{c|}{Banda D} & Qualità \\ \hline
 		B1      & 20                           & 7                            & 4                            & 2                            & Q1      \\ \hline
 		B2      & 19                           & 18                           & 2                            & 5.8                          & Q3      \\ \hline
-		B3      & 70                           & 20                           & 20                           & 18                           & Q4      \\ \hline
+		B3      & 70                           & 20                           & 20                           & 22                           & Q4      \\ \hline
 	\end{tabular}
 \end{table}
 
@@ -103,10 +103,10 @@ osservare qualsiasi cambiamento nel comportamento delle serie temporali CoMo.
 \subsubsection{Dati Mancanti}
 Per alcuni sensori sono disponibili solo poche settimane di dati e di conseguenza devono essere scartati. Per la parte restante dei dati, escludendo i tempi di inattività, in media il 15\% dei sensori è mancante in un dato momento e ogni misura è mancante in media il 17\% delle volte. Considerato anche quanto detto nel paragrafo precedente, esistono diverse cause possibili per cui un sensore non registra alcun valore in un dato momento. Per esempio, un errore nella configurazione dei sensori, è in corso il turno di riposo ed è possibile che lo stesso accada anche durante le manutenzioni o i crash della macchina.
 In generale, non è chiaro come questi eventi possano influenzare l'attività dei sensori. D'altra parte, i sensori potrebbero essere semplicemente mal funzionanti o instabili, così come ci potrebbero essere problematiche nella memorizzazione dei dati all'interno del server locale. 
-In conclusione, riuscire a decodificare le reali motivazioni per cui si ha una mancata registrazione potrebbe migliorare in maniera significativa le performance di algoritmi di Machine Learning. Purtroppo a causa della bassa frequenza di registrazione e data la non possibilità di interagire o comunicare con i tecnici dell'impianto di produzione, sono state messe in atto solamente delle semplici operazioni di processamento.
+In conclusione, riuscire a decodificare le reali motivazioni per cui si ha una mancata registrazione potrebbe migliorare in maniera significativa le performance di algoritmi di Machine Learning. Purtroppo a causa della bassa frequenza di registrazione e data la non possibilità di interagire con i tecnici dell'impianto di produzione per queste questioni, sono state messe in atto solamente delle semplici operazioni di processamento.
 
 \subsubsection{Andamento Serie Temporali}
-Le serie temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in figura \ref{sensors_plot}, elementi di stagionalità non sono presenti e non vi è presenza di trend e quindi le serie possono riferirsi stazionarie. Ipotesi confermata anche dall'esecuzione del test Augmented Dickey-Fuller nel quale veniva rifiutata la Null Hypothesis (la Null Hypothesis affermava la NON stazionarietà dei dati).
+Le serie temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in Figura \ref{sensors_plot}, elementi di stagionalità non sono presenti e non vi è presenza di trend e quindi le serie possono riferirsi stazionarie. Ipotesi confermata anche dall'esecuzione del test Augmented Dickey-Fuller nel quale veniva rifiutata la Null Hypothesis (la Null Hypothesis affermava la NON stazionarietà dei dati).
 Per questo motivo, nelle fasi di processamento, operazioni di decomposizione delle serie temporali non sono state fatte.
 È possibile comunque notare un'alta variabilità dei dati all'interno della singola serie temporale, con fluttuazioni più o meno visibili.
 \begin{figure}[t]
@@ -138,3 +138,4 @@ Come ultimo passaggio si è deciso di andare a normalizzare i valori utilizzando
 \[X_{scaled} = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))\]
 
 Il valore originario massimo assumerà valore 1, quello minimo 0 e tutti gli altri un valore compreso.
+Questo passaggio è necessario in quanto i sensori producono range di valori molto diversi tra di loro e range molto grandi rischiano di andare a pesare di più rispetto a sensori con range bassi. Stringendo il range tra 0 e 1 per tutti i sensori viene risolto questo problema.
