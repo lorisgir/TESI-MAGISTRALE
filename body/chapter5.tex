@@ -79,7 +79,7 @@ Prima di entrare nel dettaglio è però necessario condividere alcune osservazio
 \subsection{Proprietà}
 
 \subsubsection{Parzialità dei dati}
-Solamente una parte delle macchine del canale di produzione viene monitorata, di conseguenza i dati CoMo a disposizione non sono esaustivi di tutti macchinari che effettuato la levigatura o la rettifica. Al contrario, tutte le registrazioni di qualità MVM sono invece disponibili.
+Solamente una parte delle macchine del canale di produzione viene monitorata, di conseguenza i dati CoMo a disposizione non sono esaustivi di tutti i macchinari che effettuano la levigatura o la rettifica. Al contrario, tutte le registrazioni di qualità MVM sono invece disponibili.
 
 \subsubsection{Frequenza di registrazione}
 I vari tipi di sensori non registrano con la stessa frequenza di registrazione e allo stesso momento.
@@ -91,7 +91,7 @@ La frequenza di produzione cambia nel tempo. Se vengono aggregati i dati di qual
 Poiché ogni cuscinetto prodotto passa attraverso le macchine di qualità, questa quantità è ovviamente correlata alla velocità media di produzione
 lungo l'intervallo di tempo considerato. 
 
-Il motivo principale per cui la velocità media di produzione è interessante è che può essere utilizzata come indicatore del fatto che il canale è stato inattivo lungo nell'intervallo di dieci minuti considerato. In particolare, se la velocità media di produzione di un intervallo è significativamente più piccola del solito, indicherà che la produzione è stata interrotta nel periodo considerato. Le possibili cause di tale sospensione possono essere un malfunzionamento, la manutenzione o anche la chiusura programmata del canale.
+Il motivo principale per cui la velocità media di produzione è interessante è che può essere utilizzata come indicatore del fatto che il canale è stato inattivo lungo intervallo di dieci minuti considerato. In particolare, se la velocità media di produzione di un intervallo è significativamente più piccola del solito, indicherà che la produzione è stata interrotta nel periodo considerato. Le possibili cause di tale sospensione possono essere un malfunzionamento, la manutenzione o anche la chiusura programmata del canale.
 Per quanto riguarda la quantità di cuscinetti analizzati dalla macchina di qualità monitorata, è vero che, se il processo di produzione è stato sospeso, questa quantità sarà bassa, ma non si può dire con certezza l'opposto.
 Questa misura fornisce comunque alcuni indizi sull'attività del canale. Per esempio, esplorando il set di dati, si può notare che la quantità menzionata vada a zero ogni domenica dalle 12:00 alle 22:00 circa, conseguenza del fatto che in quel periodo di tempo c'è stato un turno di riposo. Questo viene confermato anche analizzando i dati CoMo nello stesso periodo temporale: numerosi sensori che producono valori a 0 oppure non li producono affatto, mentre quelli della temperatura iniziano a declinare. 
 
@@ -100,12 +100,12 @@ Inoltre, la maggior parte delle manutenzioni dura meno di 10 minuti e
 non disponendo di dati ad alta frequenza, è quasi sempre impossibile
 osservare qualsiasi cambiamento nel comportamento delle serie temporali CoMo. 
 
-\subsubsection{Dati Mancanti}
+\subsubsection{Dati mancanti}
 Per alcuni sensori sono disponibili solo poche settimane di dati e di conseguenza devono essere scartati. Per la parte restante dei dati, escludendo i tempi di inattività, in media il 15\% dei sensori è mancante in un dato momento e ogni misura è mancante in media il 17\% delle volte. Considerato anche quanto detto nel paragrafo precedente, esistono diverse cause possibili per cui un sensore non registra alcun valore in un dato momento. Per esempio, un errore nella configurazione dei sensori, è in corso il turno di riposo ed è possibile che lo stesso accada anche durante le manutenzioni o i crash della macchina.
 In generale, non è chiaro come questi eventi possano influenzare l'attività dei sensori. D'altra parte, i sensori potrebbero essere semplicemente mal funzionanti o instabili, così come ci potrebbero essere problematiche nella memorizzazione dei dati all'interno del server locale. 
 In conclusione, riuscire a decodificare le reali motivazioni per cui si ha una mancata registrazione potrebbe migliorare in maniera significativa le performance di algoritmi di Machine Learning. Purtroppo a causa della bassa frequenza di registrazione e data la non possibilità di interagire con i tecnici dell'impianto di produzione per queste questioni, sono state messe in atto solamente delle semplici operazioni di processamento.
 
-\subsubsection{Andamento Serie Temporali}
+\subsubsection{Andamento serie temporali}
 Le serie temporali di SKF presentano un comportamento stabile nel tempo. Come mostrato in Figura \ref{sensors_plot}, elementi di stagionalità non sono presenti e non vi è presenza di trend e quindi le serie possono riferirsi stazionarie. Ipotesi confermata anche dall'esecuzione del test Augmented Dickey-Fuller nel quale veniva rifiutata la Null Hypothesis (la Null Hypothesis affermava la NON stazionarietà dei dati).
 Per questo motivo, nelle fasi di processamento, operazioni di decomposizione delle serie temporali non sono state fatte.
 È possibile comunque notare un'alta variabilità dei dati all'interno della singola serie temporale, con fluttuazioni più o meno visibili.
@@ -123,9 +123,9 @@ Per creare una tabella contente una colonna per ogni sensore e con un indice tem
 D'altra parte, i dati sulla qualità sono raccolti in tempo reale quando viene analizzato ogni cuscinetto. In questo caso è quindi necessario aggregare questi dati secondo una qualche misura ed è stata scelta l'operazione di media.
 Chiaramente, i dati MVM forniscono informazioni sull'intero intervallo di tempo mentre dati CoMo forniscono invece un'istantanea all'interno dell'intervallo di tempo.
 Nell'unire queste misure si è ipotizzato che l'istantanea sia rappresentativa dell'intervallo di tempo ma a causa dell'alta variabilità della maggior parte delle serie temporali, questa ipotesi è lontana dalla realtà.
-Questa condizione è molto distante da una situazione ottimale, per questo motivo si sta cercando per spingere a portare la frequenza di registrazione ad uno al minuto. Frequenze più alte consentiranno all'ipotesi sopra descritta di essere valida.
+Questa condizione è molto distante da una situazione ottimale, per questo motivo si sta cercando per spingere a portare la frequenza di registrazione ad uno al minuto. Frequenze più alte consentiranno all'ipotesi sopra descritta di essere validata.
 
-Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all'interno dei dati CoMo che più record dello stesso sensore possano ricadere nello stesso intervallo di tempo. In questo, per ogni tipologia di sensore è stata scelta una funzione di aggregazione tra massimo, minimo e media. La scelta è stata fatta pensando a quali potessero essere i valori più informativi per la caratteristica. Ad esempio, le pressioni sono state sono state aggregate con la funzione di massimo, poiché è probabile che le anomalie siano dei valori elevati; mentre per i flussi è stata scelta la funzione di minimo. Nei casi dubbi l'aggregazione è stata effettuata attraverso la funzione di media.
+Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all'interno dei dati CoMo che più record dello stesso sensore possano ricadere nello stesso intervallo di tempo. In questo caso, per ogni tipologia di sensore è stata scelta una funzione di aggregazione tra massimo, minimo e media. La scelta è stata fatta pensando a quali potessero essere i valori più informativi per la caratteristica. Ad esempio, le pressioni sono state sono state aggregate con la funzione di massimo, poiché è probabile che le anomalie siano dei valori elevati; mentre per i flussi è stata scelta la funzione di minimo. Nei casi dubbi l'aggregazione è stata effettuata attraverso la funzione di media.
 
 Dopo i passaggi precedenti, è possibile fare il pivoting della tabella CoMo  prendendo il timestamp come indice di riga. Il risultato è una tabella in cui ogni colonna corrisponde a una serie temporale. 
 Come passo finale è necessario trattare i valori mancanti:
@@ -135,7 +135,7 @@ Come passo finale è necessario trattare i valori mancanti:
 \end{itemize}
 A questo punto i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.
 Come ultimo passaggio si è deciso di andare a normalizzare i valori utilizzando un MinMax Scaler. Questa tecnica permette di normalizzare i valori passando il range del codominio della funzione come parametro di input, in questo caso [0,1]. La formula è definita come:
-\[X_{scaled} = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))\]
+\[X_{scaled} = (X - X_{min}) / (X_{max} - X_{min})\]
 
 Il valore originario massimo assumerà valore 1, quello minimo 0 e tutti gli altri un valore compreso.
 Questo passaggio è necessario in quanto i sensori producono range di valori molto diversi tra di loro e range molto grandi rischiano di andare a pesare di più rispetto a sensori con range bassi. Stringendo il range tra 0 e 1 per tutti i sensori viene risolto questo problema.

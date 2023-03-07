@@ -1,14 +1,14 @@
-\chapter{Anomaly Detection}
+\chapter{Anomaly detection}
 \label{chap:intro}
 
 \section{Definizione del problema}
 
-L'Anomaly Detection, anche definita come Outlier Detection, è il processo d'identificazione di eventi od osservazioni che hanno un comportamento anomalo. 
+L'Anomaly Detection, anche definita come Outlier Detection, è il processo di identificazione di eventi od osservazioni che hanno un comportamento anomalo. 
 La definizione del termine anomalo è specifica al caso d'uso ma quella più comune va a definire l'anomalia come un osservazione che devia in maniera significativa dalle altre.
 
 Le anomalie nelle serie temporali sono punti o sequenze di punti che non corrispondono a un comportamento normale. Il concetto di comportamento normale è difficile da formalizzare, pertanto, un'altra possibile definizione di anomalie potrebbe essere un pattern di dati inaspettato mai stato visto prima.
 
-Un presupposto implicito è che le anomalie siano eventi rari e non sono da non confondere con il rumore presente nei dati. Il rumore è un fenomeno che, a differenza delle anomalie, ha meno interesse a essere analizzato.
+Un presupposto implicito è che le anomalie siano eventi rari e non sono da confondere con il rumore presente nei dati. Il rumore è un fenomeno che, a differenza delle anomalie, ha meno interesse a essere analizzato.
 Tuttavia, le anomalie possono indicare un problema significativo in diverse applicazioni. Ad esempio, un'anomalia nei sistemi di controllo industriale può indicare un malfunzionamento, anomalie finanziarie possono essere il risultato di una frode oppure nel campo medico possono indicare malattie o complicazioni.
 
 \subsection{Tipi di anomalie}
@@ -20,7 +20,7 @@ Le anomalie possono essere classificate in tre categorie:
 \end{itemize}
 
 
-\subsection{Applicazioni dell'Anomaly Detection}
+\subsection{Applicazioni dell'anomaly detection}
 L'Anomaly Detection può essere applicata in una vasta serie di domini i quali possono presentare caratteristiche molto diverse tra loro. I più conosciuti sono:
 \begin{itemize}
 	\item \textbf{Finanziario}: in questo campo l'Anomaly Detection viene usata per rivelare una serie di acquisti o movimentazioni sospette, sia per quanto riguarda la frequenza, gli importi o la localizzazione.
@@ -39,18 +39,18 @@ Uno degli aspetti più complessi da tenere in considerazione quando si applicano
 \end{itemize}
 A causa di queste problematiche il rischio di avere molti falsi-positivi o falsi-negativi è alto. In questi casi è opportuno, tramite un trade-off, scegliere se preferire un numero di falsi allarmi più alto rispetto all'ignorare situazioni potenzialmente anomale.
 
-\section{Serie Temporali}
-Una serie temporale è definita come una sequenza ordinata di valori continui, che rappresenta l'evoluzione di una variabile numerica nel tempo. È la misurazione di un sistema che evolve nel tempo con attributi numerici: ad esempio, la temperatura di un computer/server, il valore delle azioni di un'azienda o l'attività elettrica del cuore (ECG). Una serie temporale è, quindi, qualsiasi sequenza di osservazioni indicizzate dal tempo. Una serie temporale contiene molte informazioni sul sistema misurato e queste possono essere utilizzate per garantire il corretto funzionamento del sistema.
+\section{Serie temporali}
+Una serie temporale è definita come una sequenza ordinata di valori, che rappresenta l'evoluzione di una variabile numerica nel tempo. È la misurazione di un sistema che evolve nel tempo con attributi numerici: ad esempio, la temperatura di un computer/server, il valore delle azioni di un'azienda o l'attività elettrica del cuore (ECG). Una serie temporale è, quindi, qualsiasi sequenza di osservazioni indicizzate dal tempo. Una serie temporale contiene molte informazioni sul sistema misurato e queste possono essere utilizzate per garantire il corretto funzionamento del sistema.
 
-\subsection{Univariato vs Multivariato}
+\subsection{Univariato e multivariato}
 Una serie temporale univariata è un insieme di valori misurati che modellano e rappresentano il comportamento di un processo nel tempo. Invece, una serie temporale multivariata è un insieme di misurazioni correlate tra loro nel tempo, che modella e rappresenta il comportamento di un processo multivariato nel tempo. 
 
 Più formalmente, una serie temporale univariata è una sequenza di punti
-\[\tau = \left\{ x_1, \ldots, x_T  \right\}\]
+\[\tau = \left\{ x_1, \ldots, x_T  \right\}, x_i \in \mathbb{R}\]
 ognuno dei quali è un'osservazione di un processo misurato in un momento specifico $t$. Le serie temporali univariate contengono una singola variabile in ogni istante di tempo, mentre le serie temporali multivariate registrano più di una variabile alla volta. Esse sono denotate da
-\[\tau = \left\{ x_1, \ldots, x_T  \right\}, x \in \mathbb{R}^T \]
+\[\tau = \left\{ x_1, \ldots, x_T  \right\}, x_i \in \mathbb{R}^k \]
 
-\subsection{Decomposizione delle Serie Temporali}
+\subsection{Decomposizione delle serie temporali}
 Una serie temporale è un'aggregazione di quattro componenti: trend, stagionalità, livello e rumore.
 
 \subsubsection{Trend}
@@ -66,6 +66,6 @@ Il livello corrisponde al valore medio della serie temporale. Se questa ha trend
 Il rumore corrisponde a fluttuazioni irregolari di natura casuale.
 
 \subsection{Stazionarietà}
-La caratteristica della stazionarietà è rappresentata dalla capacità di un processo di essere de-correlato da un indice temporale. Una serie temporale $T$ è detta stazionaria quando il valore medio del processo è indipendente da $t$. 
+La caratteristica della stazionarietà è rappresentata dalla capacità di un processo di essere de-correlato da un indice temporale. Una serie temporale $T$ è detta stazionaria quando la distribuzione, e quindi anche il valore medio del processo, è indipendente da $t$. 
 
 La stazionarietà indica stabilità dove la distribuzione di $\left\{ x_1, \ldots, x_T  \right\}$ è identica alla distribuzione $\left\{ x_2, \ldots, x_{T+1}  \right\}$ in cui la serie oscilla intorno alla media con una varianza costante.

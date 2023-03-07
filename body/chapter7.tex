@@ -47,7 +47,7 @@ I parametri richiesti sono (1) il nome del Compute Cluster su cui eseguire il fl
 Gli step della pipeline sono invece definiti dal percorso allo script del file Python locale, i parametri di input e i parametri di output. Condividono lo stesso spazio di archiviazione, di conseguenza per passare dati tra gli step è necessario andare a salvare su file questi dati e valorizzare i vari input e output con i percorsi a questi.
 A questo punto la pipeline è completa e può essere pubblicata su Azure Machine Learning per essere poi schedulata ad una cadenza regolare.
 
-\subsection{Pipeline di Training SKF}
+\subsection{Pipeline di training SKF}
 In questa sezione vengono descritti i flussi di lavoro della pipeline per il training di SKF.
 \begin{enumerate}
 	\item La tabella \textit{Dataset} contiene al suo interno le registrazioni dei sensori del macchinario M1 di SKF. La struttura dati, a questo punto del flusso di lavoro, è ancora grezza: ogni riga della tabella corrisponde ad un'unica osservazione per uno specifico sensore. Attraverso l'uso di un connettore, questi dati vengono prelevati dalla tabella SQL e trasformati in un Pandas Data Frame.
@@ -71,7 +71,7 @@ La piattaforma mette a disposizioni numerose operazioni come step della pipeline
 Gli step sono collegati tramite flussi condizionali sulla base se concludono correttamente o meno ed è possibile passare dati tra i vari step.
 Un'altra differenza con le pipeline di Azure Machine Learning è che non bisogna definire l'environment o il Compute Cluster ma è tutto eseguito sulle risorse computazionali di Azure On-Demand.
 Infine, la pipeline può essere pubblicata e schedulata a cadenza regolare per automatizzarne l'esecuzione.
-\subsection{Pipeline di Inferenza SKF}
+\subsection{Pipeline di inferenza SKF}
 In questa sezione sono definiti gli step della pipeline di inferenza.
 \begin{enumerate}
 	\item Il primo step si occupa di prelevare dal database SQL i dati appena inseriti da SKF che contengono le ultime registrazione dei sensori di un macchinario. 

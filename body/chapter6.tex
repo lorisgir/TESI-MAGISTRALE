@@ -5,14 +5,14 @@ In questo capitolo viene discussa l'implementazione e l'applicazione delle metri
 
 Riassumendo, questo capitolo si dividerà in:
 \begin{enumerate}
-	\item Definizione e implementazione delle metriche surrogate per il Model Selection e delle tecniche di Rank Aggregation
-	\item Valutazione su dataset benchmark
-	\item Valutazione su SKF
+	\item Definizione e implementazione delle metriche surrogate per il Model Selection e delle tecniche di Rank Aggregation.
+	\item Valutazione su dataset benchmark.
+	\item Valutazione su SKF.
 \end{enumerate}
 
 
 \section{Implementazione}
-Come introdotto nel Capitolo \ref{chap:modelselection}, il task da risolvere è l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello dato un dataset. L'approccio scelto è stato quello di definire delle metriche "surrogate" che siano correlate con metriche supervisionate e che non richiedano etichette. Le metriche proposte sono indipendenti tra di loro ed è necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazione è rappresentato in Figura \ref{flow-scheme}.
+Come introdotto nel Capitolo \ref{chap:modelselection}, il task da risolvere è l'implementazione di un metodo di Model Selection non supervisionato che scelga il modello dato un dataset. L'approccio scelto è stato quello di definire delle metriche "surrogate" che siano correlate con metriche supervisionate e che non richiedano etichette. Le metriche proposte sono indipendenti tra di loro ed è necessario usarne una come candidata oppure aggregarle secondo qualche criterio. Vengono quindi proposti diversi metodologie di Rank Aggregation. Uno schema rappresentante il flusso operazionale è rappresentato in Figura \ref{flow-scheme}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=14cm, scale=1]{images/model-selection-scheme}
@@ -21,21 +21,21 @@ Come introdotto nel Capitolo \ref{chap:modelselection}, il task da risolvere è 
 		
 \end{figure}
 
-\subsection{Metriche Surrogate}
+\subsection{Metriche surrogate}
 Ogni metrica non supervisionata serve come misura della bontà di un modello e riduce il problema del Model Selection ad una selezione di quello con lo score più alto. 
 Sono state identificate tre classi di metriche e vengono definite non supervisionate in quanto non richiedono etichette. Tuttavia, due di queste utilizzano internamente lo F1 Score, tipicamente utilizzato per la valutazione supervisionata; per evitare confusione viene quindi utilizzato il termine "surrogato".
 Di seguito viene analizzata ogni classe di metriche surrogate. 
 
 
-\subsubsection{Model Centrality}
+\subsubsection{Model centrality}
 \textit{Esiste una sola ground truth, quindi i modelli vicini a questa sono anch'essi vicini tra loro ed il modello più "centrale" è il migliore.}
 Metodi basati sulla centralità hanno ottenuto successi recenti nel Model Selection e nell'Anomaly Detection \cite{DBLP:journals/corr/abs-2104-01422}. 
 Per adottare quest'idea si è fatto uso di diverse tecniche che andassero a produrre delle classifiche nella quale i modelli con score più alto erano indicati come quelli più "centrali".
 Sono state proposti 4 metodi per computare lo score di Model Centrality. Ognuna di queste riceve come input un set di $K$ modelli a cui è stato fatto training non supervisionato su un dataset di riferimento. 
 \begin{itemize}
-	\item \textbf{Round Robin}: dati i $K$ modelli, ognuno di questi viene selezionato a turno e le sue etichette prodotte vengono usate come ground truth per valutare le performance degli altri $K-1$ modelli. Infine viene prodotto un'unica classifica finale andando a calcolare la media delle performance di ogni modello rispetto alle $k-1$ iterazioni. 
-	\item \textbf{Majority Vote} è il metodo più semplice per generare consenso: dati $K$ modelli e le loro etichette, viene generato un nuovo set di labels finale andando a prendere, per ogni sample, l'etichetta che riceve più voti. Questo nuovo set viene usato come ground truth per valutare i K modelli.
-	\item \textbf{Sampling}: per ogni sample all'interno del dataset viene scelto in maniera casuale un modello da usare per estrarne l'etichetta. Viene quindi prodotto un nuovo set di labels da usare come ground truth per valutare i K modelli.
+	\item \textbf{Round Robin}: dati i $K$ modelli, ognuno di questi viene selezionato a turno e le sue etichette prodotte vengono usate come ground truth per valutare le performance degli altri $K-1$ modelli. Infine viene prodotto un'unica classifica finale andando a calcolare la media delle performance di ogni modello rispetto alle $K-1$ iterazioni. 
+	\item \textbf{Majority Vote} è il metodo più semplice per generare consenso: dati $K$ modelli e le loro etichette, viene generato un nuovo set di labels finale andando a prendere, per ogni sample, l'etichetta che riceve più voti. Questo nuovo set viene usato come ground truth per valutare i $K$ modelli.
+	\item \textbf{Sampling}: per ogni sample all'interno del dataset viene scelto in maniera casuale un modello da usare per estrarne l'etichetta. Viene quindi prodotto un nuovo set di labels da usare come ground truth per valutare i $K$ modelli.
 	\item \textbf{Score Correlation}: questo metodo utilizza gli score prodotti da ogni modello, dove lo score, al contrario delle etichette, rappresenta un valore direttamente proporzionale alla probabilità che quel sample sia anomalo. Inizialmente vengono calcolati i ranking di posizione per ognuno di questi set di score: sia ${\sigma}k(i)$ il rank del sample $i$ secondo gli score prodotti dal modello K. Viene poi definita la distanza dal modello $Ak$ al modello $Al$ come la distanza di Kendall, ovvero il numero di disaccordi per ogni possibile coppia tra i rank di posizione dei due modelli. Infine viene misurata la centralità di un modello come la distanza media rispetto a tutti gli altri modelli.
 \end{itemize}
 
@@ -45,7 +45,7 @@ Questa metrica surrogata non è perfetta, mentre funziona bene quando i modelli 
 Nella parte della valutazione su dataset di benchmark verranno analizzate le performance di ognuna di queste 4 metodologie.
 
 
-\subsubsection{Performance on Injected Synthetic Anomalies}
+\subsubsection{Performance on injected synthetic anomalies}
 \textit{Un buon modello di Anomaly Detection si comporterà bene anche su dataset con anomalie iniettate sinteticamente}. Alcuni paper hanno precedentemente esplorato l'uso dell' iniezione di anomalie sintetiche per addestrare modelli di rilevamento delle anomalie \cite{DBLP:journals/corr/abs-2107-07702}. Attraverso questa metrica surrogata, viene estesa questa linea di ricerca valutando sistematicamente la capacità dell'algoritmo di Model Selection dopo aver iniettato diversi tipi di anomalie. Dato un dataset di input senza etichette, vengono iniettate casualmente anomalie. La posizione dell'anomalia iniettata viene trattata come un'etichetta pseudo-positiva, mentre il resto dei punti sono trattati come punti pseudo-negativi. 
 Infine ogni modello viene valutato attraverso l'F1 Score rispetto alle pseudo-etichette.
 
@@ -95,7 +95,7 @@ Il flusso di lavoro di questa metrica surrogata può essere riassunta in questi 
 
 Questa procedura può essere molto efficace ma non è esente da problemi: (1) le anomalie reali non vengono considerate e di conseguenza sono etichettate come pseudo-negative. Questo potrebbe portare a score falsati nel caso i modelli andassero a riconoscere prevalentemente solo le anomalie reali, che però nella fase di valutazione vengono visti come sample negativi. Infine (2) le tipologie di anomalie iniettate possono risultare molto differenti da quelle che sono le reali anomali, rischiando quindi di produrre score molto alti per certi modelli ma che nella realtà funzioneranno particolarmente male sul dataset originario.
 
-\subsubsection{Clustering Cohesion}
+\subsubsection{Clustering cohesion}
 \textit{Un buon modello riesce a trovare una buona separazione tra i punti normali ed i punti anomali}.
 Nel contesto dei modelli non supervisionati, tecniche e metriche di valutazione inerenti al clustering sono molto efficaci quando non si hanno a disposizione le etichette. Misure di coesione tra i cluster prodotti da un modello sono indicatori di quanto quest'ultimo sia riuscito a separare efficacemente i dati.
 All'interno del task dell'Anomaly Detection, le anomalie sono punti che di discostano in maniera significativa da un comportamento normale e di conseguenza avranno valori molto diversi rispetto al resto dei punti. Immaginando i punti considerati normali con un unico cluster, ci si aspetta che questi siano ben raggruppati insieme mentre i punti anomali sono sparsi o al più raggruppati in zone poco dense.
@@ -126,7 +126,7 @@ Applicando quindi DBSCAN si ottengono i cluster per i punti anomali come mostrat
 Infine viene calcolato il Silhouette Score su questi, tenendo anche in considerazione il cluster di punti normali originario. Questa procedura viene poi applicata su ogni modello per andare a produrre un ranking finale.
 
 Questa metrica surrogata può funzionare particolarmente bene quando una serie temporale è stazionaria e la sua autocorrelazione relativamente bassa, quindi vi è una forte indipendenza tra i punti temporali. Le anomalie a punto così come le anomalie collettive sono identificate con più precisione rispetto alle anomalie contestuali. Infatti, per definizione, i primi due tipi rappresentano punti molto distanti rispetto all'insieme totale, mentre il terzo tipo rappresenta punti distanti rispetto ad un intorno ma che potrebbero essere valutati normali rispetto ad altri intervalli, risultando quindi con più probabilità nel cluster di punti normali.
-\subsection{Rank Aggregation}
+\subsection{Rank aggregation}
 Nel Capitolo \ref{chap:modelselection} è stata fatta una panoramica su Rank Aggregation, vediamo ora quali tecniche sono state implementate. Un'analisi sulle performance di ognuno sarà svolta nelle sezioni successive.
 Ognuno di questi metodi riceve in input un set di ranking, ognuno prodotto da una metrica surrogata diversa, ed in output viene generato un'unica classifica finale.
 Nel caso delle metriche surrogate Model Centrality e Performance on Injected Synthetic Anomalies, il ranking prodotto si basa sul F1 Score; mentre per Clustering Cohesion sul Silhouette Score.
@@ -171,7 +171,7 @@ Dopo aver effettuato questa computazione rispetto a tutte e 3 le classifiche del
 
 
 Nella Tabella \ref{borda}, viene riproposto l'esempio precedente ma utilizzando Borda. Le prime 3 colonne sono gli stessi score delle metriche surrogate, invece le seconde 3 colonne rappresentano i punteggi che ogni modello ha ricevuto secondo il metodo Borda. Infine, l'ultima colonna rappresenta il punteggio medio. Lo score più alto è stato ottenuto dal modello M3, risultando poi primo nella classifica finale.
-\subsubsection{Robust Borda}
+\subsubsection{Robust borda}
 È una variazione del metodo Borda in cui viene scelto un parametro $k$ e per ogni ranking viene assegnato il punteggio solamente ai top-k modelli mentre i restanti vengono considerati come se fossero tutti in ultima posizione, ricevendo così il punteggio minimo, ovvero 1. Questo metodo cerca di migliorare le performance del metodo Borda andando a penalizzare i modelli che finiscono in ultima posizione in un determinato ranking. 
 
 \begin{table}
@@ -190,7 +190,7 @@ Nella Tabella \ref{borda}, viene riproposto l'esempio precedente ma utilizzando 
 
 Continuando con lo stesso esempio in Tabella \ref{rborda} e assumendo il parametro \(k=2\), i punteggi di Robust Borda per Model Centrality e Performance on Injected Synthetic Anomalies cambiano rispettivamente per i modelli M3 e M2 che ricevono entrambi il punteggio minimo, ovvero 1, nonostante non siano ultimi e andando a penalizzare il loro score finale. M3 è sempre quello con score più alto ma in questo caso la differenza con M1 si è fatta più piccola.
 
-\subsubsection{AVG Score}
+\subsubsection{AVG score}
 Questo metodo è il più semplice dei 3 in quanto viene semplicemente fatta una media degli score dei 3 ranking per ogni modello, per poi ordinare in ordine decrescente e quindi ottenere un ranking finale.
 Utilizzando questo metodo e sempre considerando gli stessi score degli esempi precedenti, in Tabella \ref{score} si può notare come questa volta il modello migliore sia M2 e non più M3.
 
@@ -226,7 +226,7 @@ Dato che questi coefficienti hanno caratteristiche diverse è necessario andare 
  
 
 \newpage
-\section{Risultati di Benchmark}
+\section{Risultati di benchmark}
 \subsection{Dataset}
 I dataset trattati sono diversi sia per struttura ma anche per tipologia: verranno dapprima introdotti semplici dataset multidimensionali a punto per poi passare a serie temporali multivariate. 
 
@@ -333,7 +333,7 @@ KPCA           & Linear Model      & Kernel Principal Component Analysis        
 \hline
 MCD            & Linear Model      & Minimum Covariance Determinant                                          \\ 
 \hline
-OCSVM          & Linear Model      & One-Class Support Vector Machines                                       \\ 
+OCSVM          & Non Linear Model      & One-Class Support Vector Machines                                       \\ 
 \hline
 LMDD           & Linear Model      & Deviation-based Outlier Detection                                       \\ 
 \hline
@@ -392,7 +392,7 @@ I risultati saranno mostrati in formato tabulare rispetto a tutti i dataset di b
 I valori fanno riferimento agli indici di correlazione dei ranking prodotti rispetto alla classifica prodotta usando le etichette e F1 Score.
 
 
-\subsubsection{Model Centrality}
+\subsubsection{Model centrality}
 Questa metrica surrogata si basa sul concetto di Model Centrality andando a favorire quei modelli che producono output comparabili alla maggior parte degli altri modelli. Delle quattro tecniche proposte, Round Robin è quella che generalmente si comporta meglio. In Tabella \ref{mc-results} possiamo vedere come gli indici di correlazione favoriscano questa tecnica.
 Majority Vote e Sampling seguono con punteggi molto simili, sia per le performance medie che per deviazione standard. Il metodo AVG Score fatica a trovare correlazione con il ranking supervisionato. 
 Generalmente però, la metrica funziona discretamente bene tranne qualche dataset specifico come Machine-3-10.  Nelle Figure \ref{model-centrality-plot-bad} e \ref{model-centrality-plot-good} sono mostrati dei scatter plot in cui i punti rappresentano i modelli e dove questi si posizionano in uno spazio bidimensionale. La posizione viene calcolata riducendo a due dimensioni l'output delle predizioni di ogni modello.  Nella figura della Machine-3-10 possiamo notare come i punti sono sparsi lungo tutto il piano rendendo difficile alla metrica surrogata riuscire a trovare una definizione per modello centrale.
@@ -512,7 +512,7 @@ D'altro canto, però, questo è anche il suo punto di forza perché riesce a sfr
 \end{table}
 
 \newpage
-\subsubsection{Performance on Injected Synthetic Anomalies}
+\subsubsection{Performance on injected synthetic anomalies}
 Passando alla metrica surrogata usante le pseudo-etichette dopo l'iniezione di anomalie, le tipologie di anomalia iniettate sono Spike, Scale, Growing e Mix dove Mix rappresenta i dataset a cui sono state iniettate tutte e tre le tipologie di anomalie trattate a inizio capitolo. Possiamo notare in Tabella \ref{pai-results} come generalmente le performance siano inferiori rispetto alla tecnica del Model Centrality. I motivi di ciò possono essere molteplici: primo tra tutti il fatto che questa metrica non utilizza in nessun modo l'informazione proveniente dagli altri modelli, questi vengono infatti considerati in maniera indipendente e separata. Altre motivazioni possono ricondursi agli aspetti negativi introdotti precedentemente che riguardano questo approccio: (1) come le anomalie vengono generate e (2) le anomalie reali vengano ignorate.
 
 Il primo punto non è banale, avere una conoscenza forte dal dataset di riferimento permette di creare anomalie che possano risultare realistiche ma spesso ciò non è possibile. Attraverso metodi statistici si possono estrarre informazioni riguardanti l'andamento e l'evoluzione dei dati ma spesso le anomalie non seguono un pattern preciso rendendo quindi la generazione di queste un problema non triviale. 
@@ -636,7 +636,7 @@ Delle quattro tipologie di anomalie iniettate (compreso Mix), ci sono tre metodi
 \end{table}
 
 \newpage
-\subsubsection{Clustering Cohesion}
+\subsubsection{Clustering cohesion}
 Questa metrica surrogata invece va a favorire soluzioni cui le anomalie sono ben separate dai dati normali, infatti le performance variano di molto per ogni dataset preso in considerazione con un AVG score più basso rispetto alle altre due metriche (Tabella \ref{cc-results}).
 
 
@@ -709,7 +709,7 @@ Al contrario il dataset Machine-1-7, Figura \ref{scatter-cluster-bad} ha una cor
 \end{center}
 
 \newpage
-\subsubsection{Rank Aggregation}
+\subsubsection{Rank aggregation}
 A questo punto ci si può concentrare sulle varie tecniche di aggregazione. L'aggregazione è stata fatta andando a considerare sempre tutte e tre le metriche surrogate, senza fare eccezione nonostante ci fossero dataset in cui alcune metriche surrogate avevano performance particolarmente basse. 
 Si può vedere, in Tabella \ref{agg-results}, come il metodo ottimale di aggregazione, che ricordiamo essere NP-Hard, produca i risultati migliori. 
 I valori medi rispetto ai dataset si aggirano intorno al range [0.4,0.6], in linea con le performance di Model Centrality e migliori rispetto a Performance on Injected Synthetic Anomalies e Clustering Cohesion. Questo vuol dire che i metodi di aggregazione riescono comunque a produrre buoni risultati nonostante le metriche surrogante non funzioni sempre bene. 
@@ -853,7 +853,7 @@ Queste differenze negli score vanno anche ad impattare poi il coefficiente di co
 \end{figure}
 
 
-\subsubsection{Intersezione dei Quantili}
+\subsubsection{Intersezione dei quantili}
 Oltre a valutare le performance sullo score di correlazione tra il ranking non supervisionato e quello supervisionato, può risultare utile cambiare punto di vista e comparare i ranking dal punto di vista dell'intersezione dei quantili.
 Per questa valutazione sono stati ordinati i ranking per il loro score e poi sono stati divisi in 2 o 4 quantili. Successivamente viene calcolata l'intersezione del quantile di un ranking con il corrispondente dell'altro ranking.
 Come mostrato nella Figura \ref{quantile-intersection}, si può notare come dividendo in 4 quantili, l'intersezione produca uno score di circa 0.55 per i primi 3 quantili, segno che faccia più fatica nel classificare correttamente le performance dei modelli nelle posizioni più alte. Il quarto quantile però ha un punteggio di circa 0.77, segno che l'algoritmo di Model Selection sa distinguere i modelli più performanti con quelli meno performanti.
@@ -992,7 +992,7 @@ Sono proposti i primi 10 e gli ultimi 10 modelli con i relativi score finali. Le
 Il primo modello è KDE, ovvero Kernel Density Estimation, ed in generale i metodi di Machine Learning hanno uno score più alto di quelli Deep Learning. Situazione rimarcata dal fatto che per le ultime 10 posizioni sono presenti 4 metodi di Deep Learning. Una spiegazione a questo fenomeno risiede nel fatto che questi ultimi modelli hanno score di Model Centrality e Anomaly Injection molto bassi. Eccezione per SO-GALL che riesce a riconoscere quasi perfettamente tutte le anomalie sintetiche iniettate. Gli Score di Clustering Cohesion vanno anche questa volta a favorire metodi di Machine Learning, anche se in misura più lieve. Infatti i modelli come DeepSVDD o ALAD riescono a  raggiungere punteggi intorno al 0.35.
 Model Centrality va sicuramente a favorire quei modelli che producono output simile tra di loro, implicando una forte varianza dei risultati sulla base di quali modelli candidati vengono passati all'algoritmo di Model Selection. Potrebbe essere il caso che i modelli di Deep Learning siano effettivamente i migliori, ma essendo pochi rispetto al numero totale di modelli considerati, il loro punteggio di Model Centrality va abbassandosi. In questi casi, per trovare conferma, un'analisi visiva delle anomalie rilevate può risultare utile.
 
-\subsubsection{Anomalie Rilevate}
+\subsubsection{Anomalie rilevate}
 Attraverso un grafico a linee con barre verticali per rappresentare i punti temporali rilevati come anomalia, possiamo notare nella Figura \ref{kde} come KDE, ovvero il miglior modello, riesca a riconoscere bene i punti di Spike o gli intervalli di Scale in cui certi sensori raggiungono valori sufficientemente distanti da un comportamento standard. Al contrario, Figura \ref{worst_clf}, Telemanom raggruppa tutti i punti anomali in un unico intervallo continuo nonostante ci siano dei punti temporali che non presentino, ad occhio, un comportamento anomalo.
 
 \begin{figure}[t]
@@ -1035,7 +1035,7 @@ Ovviamente non si ha la certezza che il cluster di destra sia effettivamente com
 		
 \end{figure}
 
-\subsubsection{Confronto Qualità}
+\subsubsection{Confronto qualità}
 In questa sezione viene fatto un confronto tra le anomalie rilevate e la qualità. Come anticipato più volte, la qualità non è da considerarsi un perfetto indicatore delle anomalie: 
 \begin{itemize}
 	\item La qualità viene registrata ogni due secondi mentre i dati CoMo ogni 10 minuti. Di conseguenza la qualità viene aggregata con una media, andando a nascondere, nel calcolo aggregato, i valori più alti che sono anche i più rari. Usare altre tecniche di aggregazione come Min o Max non è immediato in quanto avrebbe poi favorito troppo o troppo poco la presenza di valori di qualità estremi.
@@ -1099,7 +1099,7 @@ La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1
 \end{table}
 
 
-\subsubsection{Confronto Qualità - Alternative}
+\subsubsection{Confronto qualità - Alternative}
 Si potrebbe tentare di risolvere i due problemi elencati ad inizio paragrafo andando a cambiare approccio per l'analisi della correlazione.
 Per il primo di questi, ovvero il problema della media di tutte le registrazioni di qualità in un dato intervallo di 10 che va a nascondere eventuali registrazioni più rare in cui la qualità è bassa, si può andare a contare il numero di registrazioni, sempre all'interno di ogni intervallo, che superano la soglia Q1 per la banda A.
 I risultati ottenuti sono riportati nelle Tabelle \ref{count-sopra-soglia} e \ref{count-sopra-soglia-norm}. Per questioni di riservatezza, i valori sono stati alterati andando a moltiplicarli per uno scalare comune. 
