@@ -162,6 +162,19 @@ Immaginando un approccio brute-force, l'algoritmo itera su ogni possibile sottoi
 Linear Method for Deviation-based Outlier Detection (LMDD) \cite{arning1996linear} impiega il concetto di Smoothing Factor il quale indica quanto può essere ridotta la misura di dissimilarità andando a rimuovere un sottoinsieme degli elementi dal dataset. La funzione di dissimilarità può essere qualsiasi misura di dispersione come la varianza, inter-quantile range, mediana ecc.
 I punti rimossi che riducono maggiormente questa misura di dissimilarità possono essere valutati come anomalie.
 
+\subsection{Modelli non lineari}
+I modelli non lineari riescono a modellare relazioni non lineari nei dati, catturando relazioni più complesse e anche non linearmente separabili, limite dei modelli lineari.
+
+\subsubsection{OCSVM}
+Il metodo One Class Support Vector Machine (OCSVM) \cite{scholkopf2001estimating} è una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'ipersfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
+La Figura \ref{ocsvm} mostra un esempio del funzionamento di OCSVM.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=8cm, scale=1]{images/ocsvm}
+	\caption{OCSVM}
+	\label{ocsvm}
+\end{figure}
+
 \subsection{Modelli a distanza}
 I modelli non supervisionati basati sulla distanza sono una categoria di algoritmi che utilizzano la distanza tra i dati per scoprire relazioni e strutture nel dataset.
 
@@ -174,15 +187,6 @@ DBSCAN è un metodo di clustering che raggruppa i punti in aree ad alta densità
 DBSCAN classifica quindi i punti in tre categorie. I punti centrali sono punti
 contenenti almeno $minPts$ nel loro intorno definito da un parametro $\epsilon$. I border-point sono i punti che contengono almeno un punto centrale nel loro intorno, mentre gli altri punti sono considerati come rumore/anomalie. 
 
-\subsubsection{OCSVM}
-Il metodo One Class Support Vector Machine (OCSVM) \cite{scholkopf2001estimating} è una versione derivata dalle Support Vector Machine al rilevamento di una sola classe. L'idea alla base consiste nel minimizzare l'ipersfera contenente i punti di una singola classe e considerare tutti i punti esterni alla sfera come outliers.
-La Figura \ref{ocsvm} mostra un esempio del funzionamento di OCSVM.
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=8cm, scale=1]{images/ocsvm}
-	\caption{OCSVM}
-	\label{ocsvm}
-\end{figure}
 
 \subsubsection{LOF}
 Local Outlier Factor (LOF) \cite{breunig2000lof} misura la deviazione locale di un dato punto rispetto ai suoi vicini. Sulla base del metodo dei KNN, la densità locale di questo punto viene valutata considerando la distanza rispetto ai suoi \textit{k} punti più vicini. Il punteggio di anomalia viene invece calcolato confrontando la sua densità locale con quella dei suoi \textit{k} vicini più prossimi. Un punteggio elevato indica una densità inferiore a quella dei suoi vicini e quindi potenzialmente un'anomalia. In Figura \ref{lof} è presente il funzionamento di LOF dove si possono notare cerchi più grandi per i punti più isolati.
