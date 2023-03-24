@@ -60,16 +60,17 @@ Invece di affidarsi a modelli generativi complessi \cite{DBLP:journals/corr/abs-
 
 
 \begin{enumerate}
-	\item \textbf{Spike Anomaly} sono delle anomalie a punto in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno. Lo spike ha un magnitudo governato da una distribuzione \[s \approx N(1.5, 3) \]
-	\item \textbf{Scale Anomalies} è un intervallo di punti anomali in cui il  valore medio dei punti al suo interno è significativamente più grande o più piccolo rispetto all'intorno. I dati vengono scalati \[ ts_a[start:end] = ts[start:end] * factor \] dove \textit{factor} segue sempre la distribuzione \(s \approx N(1.5, 3) \).
+	\item \textbf{Spike Anomaly} sono delle anomalie a punto in cui il valore nel punto si discosta in maniera significativa rispetto all'intorno. Lo spike viene generato nel seguente modo: \[ts_a[i] = ts[i] * rnd(1.5, 3) \]
+ dove $i$ è un punto nella serie temporale. Nel caso in cui lo spike venga generato verso il basso, il valore casuale rientra nell'intervallo $[0.3,0.5]$.
+	\item \textbf{Scale Anomalies} è un intervallo di punti anomali in cui il  valore medio dei punti al suo interno è significativamente più grande o più piccolo rispetto all'intorno. I dati vengono scalati \[ ts_a[start:end] = ts[start:end] * factor \] dove \textit{factor} è sempre un valore casuale nell'intervallo $[1.5,3]$ nel caso di anomalie verso l'alto e $[0.3,0.5]$ nel verso opposto. 
 	\item \textbf{Growing Anomalies} è un intervallo di punti anomali in cui il valore di essi cresce o decresce linearmente nel tempo. I dati vengono modificati secondo \[ ts_a[start:end] =  ts[start:end] + linear\_vector \] 
- Dove $linear\_vector$ è un vettore della stessa lunghezza dell'intervallo che si va a modificare in cui i valori crescono linearmente da un valore di base $0$ fino ad un valore di massimo di $0.5$.
+ Dove $linear\_vector$ è un vettore della stessa lunghezza dell'intervallo che si va a modificare in cui i valori crescono linearmente da un valore di base $0$ fino ad un valore di massimo di $0.5$. Nel caso in cui i valori della serie temporale debbano essere portati verso il basso si utilizza l'intervallo $[-0.5,0]$.
 \end{enumerate}
 
 I valori scelti a mano per alterare le serie temporali sono frutto di considerazioni svolte sui dati di SKF e poi mantenuti anche su tutti i dataset di benchmark. Chiaramente metodi e valori differenti per l'iniezione di anomalie genereranno risultati che possono essere di molto differenti.
 Uno sviluppo futuro potrebbe concentrarsi a sviluppare tecniche più raffinate per l'iniezione di anomalie, in questa tesi si è cercato di mantenere il processo di iniezione il più semplice possibile.
 
-Altro aspetto da tenere in considerazione è il fatto che le anomalie vengono iniettate sui dati scalati nell'intervallo $[0,1]$, generando quindi valori che potrebbero uscire da questo intervallo. Per risolvere a questo problema si è deciso di applicare prima una funzione di \textit{clip}, ovvero i dati modificati vengono limitati ad un range di $[-0.1,1.1]$, e dopo viene ri-eseguita la funziona di normalizzazione nell'intervallo $[0,1]$. Il primo passaggio consente che nuovi spike o valori estremi vengano effettivamente considerati, il secondo passaggio invece riporta all'intervallo desiderato i nuovi valori.
+Altro aspetto da tenere in considerazione è il fatto che le anomalie vengono iniettate sui dati scalati nell'intervallo $[0,1]$, generando quindi valori che potrebbero uscire da questo intervallo. Per risolvere a questo problema si è deciso di applicare prima una funzione di \textit{clip}, ovvero i dati modificati vengono limitati ad un range di $[-0.1,1.1]$, e dopo viene ri-eseguita la funziona di normalizzazione nell'intervallo $[0,1]$. Il primo passaggio consente che i nuovi spike o valori estremi vengano effettivamente mantenuti, il secondo passaggio invece riporta all'intervallo desiderato i nuovi valori.
 
 Il numero di anomalie da iniettare viene calcolato sulla base del fattore di contaminazione associato ad un determinato dataset. Ad esempio, su un dataset con 1000 sample ed un fattore di contaminazione di 0.05(5\%), 50 anomalie saranno iniettate.
 La posizione nella quale vengono iniettate le anomalie a Spike viene scelta casualmente; invece per quanto riguarda le anomalie a Scale e Growing, vengono generati casualmente dei punti di inizio intervallo mentre la lunghezza di questi è predisposta a mano in base alla frequenza dei sample o alla dimensione del dataset.
@@ -1077,6 +1078,8 @@ Con Telemanom, Figura \ref{worst_clf_quality} la situazione non è migliore, in 
 \end{figure}
 
 La conferma arriva dalle matrici di confusione nelle Tabelle \ref{mvm-confusion1} e \ref{mvm-confusion2}. Sia KDE che Telemanom non riescono a trovare punti che siano effettivamente di qualità bassa. Per motivi di riservatezza vengono lasciati soltanto i valori percentuali e rimossi i conteggi.
+
+Uno dei motivi per questi risultati poco incoraggianti deriva dal fatto che il numero di anomalie stimato tramite ${\gamma}GMM$ è troppo diverso rispetto al numero di punti considerati come anomali che hanno superato la soglia della banda A, abbassando di molto il numero di true-positive per tutti i modelli. Questo inoltre influenza i due modelli, KDE e Telemanom, che sono rispettivamente il migliore ed il peggiore, a produrre risultati simili.
 
 
 
