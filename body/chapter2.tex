@@ -4,7 +4,7 @@
 \section{Definizione del problema}
 
 L'Anomaly Detection, anche definita come Outlier Detection, è il processo di identificazione di eventi od osservazioni che hanno un comportamento anomalo. 
-La definizione del termine anomalo è specifica al caso d'uso ma quella più comune va a definire l'anomalia come un osservazione che devia in maniera significativa dalle altre.
+La definizione del termine anomalo è specifica al caso d'uso ma quella più comune va a definire l'anomalia come un'osservazione che devia in maniera significativa dalle altre.
 
 Le anomalie nelle serie temporali sono punti o sequenze di punti che non corrispondono a un comportamento normale. Il concetto di comportamento normale è difficile da formalizzare, pertanto, un'altra possibile definizione di anomalie potrebbe essere un pattern di dati inaspettato mai stato visto prima.
 
@@ -14,14 +14,14 @@ Tuttavia, le anomalie possono indicare un problema significativo in diverse appl
 \subsection{Tipi di anomalie}
 Le anomalie possono essere classificate in tre categorie:
 \begin{itemize}
-	\item \textbf{Anomalie a Punto}: quando un singola osservazione devia significativamente dal resto dei dati.
+	\item \textbf{Anomalie a Punto}: quando una singola osservazione devia significativamente dal resto dei dati.
 	\item \textbf{Anomalie Contestuali}: quando una sequenza di punti è anomala rispettivamente al contesto in cui si trova ma è considerata normale rispetto ad altri contesti. Per esempio, una temperatura di 30 $\tccentigrade$ è normale in estate ma anomala in inverno. 
 	\item \textbf{Anomalie Collettive}: quando una sequenza di punti è considerata anomala rispetto al resto dei dati, ma i punti presi singolarmente non lo sono.
 \end{itemize}
 
 
 \subsection{Applicazioni dell'anomaly detection}
-L'Anomaly Detection può essere applicata in una vasta serie di domini i quali possono presentare caratteristiche molto diverse tra loro. I più conosciuti sono:
+L'Anomaly Detection può essere applicata in una vasta serie di domini, i quali possono presentare caratteristiche molto diverse tra loro. I più conosciuti sono:
 \begin{itemize}
 	\item \textbf{Finanziario}: in questo campo l'Anomaly Detection viene usata per rivelare una serie di acquisti o movimentazioni sospette, sia per quanto riguarda la frequenza, gli importi o la localizzazione.
 	\item \textbf{Medico}: dati medici collezionati ad esempio da strumenti come ECG possono essere analizzati per scoprire anomalie che riflettono malattie.
@@ -30,7 +30,7 @@ L'Anomaly Detection può essere applicata in una vasta serie di domini i quali p
 \end{itemize}
 
 \subsection{Sfide}
-Uno degli aspetti più complessi da tenere in considerazione quando si applicano tecniche di Anomaly Detection è quello di andare a definire un "comportamento normale" da usare come riferimento. Purtroppo a volte riuscire a farlo è molto difficile per i seguenti motivi:
+Uno degli aspetti più complessi da tenere in considerazione quando si applicano tecniche di Anomaly Detection è quello di andare a definire un "comportamento normale" da usare come riferimento. Purtroppo, a volte riuscire a farlo è molto difficile per i seguenti motivi:
 \begin{itemize}
 	\item Le anomalie solitamente sono eventi rari, la cui frequenza è molto bassa. Di conseguenza i dati a disposizione possono essere molto pochi.
 	\item Le anomalie possono avere una distribuzione di dati mai vista in precedenza, diventando così difficile distinguerle a priori.

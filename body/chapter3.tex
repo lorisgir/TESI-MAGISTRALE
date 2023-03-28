@@ -56,7 +56,7 @@ Ci sono diverse tipologie di algoritmi di apprendimento non supervisionato, tra 
 \end{itemize}
 Nel rilevamento supervisionato delle anomalie, se vogliamo che un modello sia in grado di rilevare le anomalie, bisogna allenare il sistema in modo molto preciso sia nell'identificare il comportamento normale che quello anomalo.
 Tuttavia, i comportamenti normali possono essere molteplici così come i
-comportamenti in presenza di anomalie e questo porta con se la necessità di fornire una grande quantità di dati etichettati per catturare più comportamenti possibili. Purtroppo non è sempre possibile in quanto le anomalie sono eventi rari e se il dataset di addestramento è relativamente piccolo, anche il numero di anomalie non sarà sufficientemente grande, rendendo difficile la loro classificazione. 
+comportamenti in presenza di anomalie e questo porta con sé la necessità di fornire una grande quantità di dati etichettati per catturare più comportamenti possibili. Purtroppo, non è sempre possibile in quanto le anomalie sono eventi rari e se il dataset di addestramento è relativamente piccolo, anche il numero di anomalie non sarà sufficientemente grande, rendendo difficile la loro classificazione. 
 Pertanto, l'apprendimento non supervisionato si adatta perfettamente al problema del rilevamento delle anomalie, poiché non è necessario etichettare i dati. Inoltre, una parte delle anomalie derivano da nuovi comportamenti del sistema e per definizione questi comportamenti non possono essere classificati correttamente con i metodi di rilevamento delle anomalie supervisionati senza effettuare prima un re-training.
 
 
@@ -119,7 +119,7 @@ Definiamo prima $T_e$ come l'insieme dei punti del nostro dataset, a questo punt
 Quest'ultima misura introduce il parametro $\beta$ che serve per dare più o meno peso alle componenti della formula: se $\beta = 1$, allora sia la precision che la recall avranno lo stesso peso, un valore di $\beta < 1$ da più peso alla precision, infine un valore di $\beta > 1$ da più peso alla recall.
 
 In generale non esiste una misura migliore e bisogna fare un'attenta valutazione su quale sia la preferibile rispetto al task da risolvere.
-Ad esempio bisogna tenere in considerazione se c'è una prevalenza di punti di una classe. Accuracy è preferibile quando ci si aspetta una distribuzione equa delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision è preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall è la scelta corretta.
+Ad esempio, bisogna tenere in considerazione se c'è una prevalenza di punti di una classe. Accuracy è preferibile quando ci si aspetta una distribuzione equa delle classi. Quando i falsi-negativi non sono di interesse, ma lo sono i falsi-positivi, precision è preferibile; al contrario quando i falsi-negativi sono molto importanti e non ci interessa dei falsi-positivi, recall è la scelta corretta.
 F-Measure invece è necessaria quando si cerca un bilanciamento tra precision e recall dando importanza a entrambi i falsi-positivi ed i falsi-negativi. 
 All'interno del contesto SKF e Anomaly Detection le anomalie sono sicuramente importanti da riconoscere e marcarle come negative, quindi falsi-negativi, potrebbe risultare in problemi alla linea di produzione. Ma allo stesso tempo un modello che produce molti più positivi di quanto deve risulterebbe in una perdita di fiducia da parte dell'operatore che inizierebbe semplicemente ad ignorare il feedback del modello. Per questo motivo la scelta della metrica di valutazione è ricaduta sulla F-Measure.
 
@@ -148,7 +148,7 @@ Kernel-PCA \cite{hoffmann2007kernel} è un'estensione non lineare di PCA. I dati
 
 
 \subsubsection{Auto-Regressivo}
-In un modello a regressione multipla viene fatta previsione di una variabile di interesse attraverso una combinazione lineare di predittori. Un modello Auto Regressivo, invece, fa previsione di questa variabile di interesse usando una combinazione lineare su \textit{valori passati} di questa variabile. Il termine auto-regressione indica una regressione della variabile fatta su se stessa.
+In un modello a regressione multipla viene fatta previsione di una variabile di interesse attraverso una combinazione lineare di predittori. Un modello Auto Regressivo, invece, fa previsione di questa variabile di interesse usando una combinazione lineare su \textit{valori passati} di questa variabile. Il termine auto-regressione indica una regressione della variabile fatta su sé stessa.
 Di conseguenza, un modello auto-regressivo di ordine \textit{p} può essere scritto come:
 \[y_t=c+\phi_1 y_{t-1}+\phi_2 y_{t-2}+\cdots+\phi_p y_{t-p}+\varepsilon_t\]
 dove $\varepsilon_t$ è rumore bianco. Può essere visto come una regressione multipla ma con valori ritardati di $y_t$ come predittori. 
@@ -199,10 +199,10 @@ Local Outlier Factor (LOF) \cite{breunig2000lof} misura la deviazione locale di 
 
 \subsubsection{COF}
 Connectivity Outlier Factor (COF) \cite{tang2002enhancing} è un'evoluzione di LOF. Si basa sull'idea di assegnare un grado di anomalia ad ognuno dei punti, chiamato connectivity outlier factor.
-Per ogni punto $x_i$, vengono selezionati i \textit{k} punti più vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti più vicini.
+Per ogni punto $x_i$, vengono selezionati i \textit{k} punti più vicini e viene generato il percorso minimo che attraversi tutti i \textit{k} punti partendo da $x_i$. Infine, COF viene calcolato andando a fare una media delle distanze di ogni percorso di $x_i$ verso i suoi \textit{k} punti più vicini.
 
 \subsubsection{CBLOF}
-Cluster-Based Local Outlier Factor (CBLOF) \cite{he2003discovering} è anch'esso un evoluzione di LOF.
+Cluster-Based Local Outlier Factor (CBLOF) \cite{he2003discovering} è anch'esso un'evoluzione di LOF.
 Come primo step, CBLOF riceve in input i dati ed un algoritmo di clustering per andare a formare dei cluster. Attraverso dei parametri va poi a definire quale cluster viene considerato "grande" e quale viene considerato "piccolo". Vengono poi calcolati gli outlier score per tutti i punti andando a considerare la dimensione del cluster a cui un punto appartiene e la distanza più vicina rispetto al centro di un cluster grande. Quindi più un cluster di appartenenza è piccolo e più il punto è lontano dal centro di un cluster grande, più lo score di anomalia sarà alto. 
 
 \subsubsection{HBOS}
@@ -240,7 +240,7 @@ L'applicazione di questo modello nell'Anomaly Detection avviene andando a genera
 \subsubsection{GMM}
 I GMM \cite{aggarwal2015outlier} sono una generalizzazione delle distribuzioni gaussiane e possono essere utilizzati per rappresentare qualsiasi serie di dati che possono essere raggruppati in più distribuzioni gaussiane. GMM è un modello probabilistico che presuppone che tutti i punti dati siano generati da una insieme di distribuzioni gaussiane con parametri sconosciuti e può essere utilizzato per il clustering, oppure per stimare la probabilità che un nuovo punto dati appartenga a ciascun cluster. Può essere inteso come un modello probabilistico in cui si ipotizzano distribuzioni gaussiane per ciascun gruppo, con medie e covarianze che ne definiscono i parametri.
 
-Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato così in quanto vengono alternate iterativamente due fasi: quella di expectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questa valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
+Per la stima di questi parametri si esegue l'algoritmo di Expectation-Maximization chiamato così in quanto vengono alternate iterativamente due fasi: quella di expectation e quella di maximization. L'algoritmo parte inizializzando prima i parametri del GMM. A ogni iterazione, la fase di expectation calcola il valore atteso della funzione log-likelihood rispetto ai parametri correnti. Questo valore viene poi utilizzato per massimizzare la log-likelihood nella fase di massimizzazione.
 
 È possibile adottare questo modello nell'Anomaly Detection allenandolo rispetto ad un set di dati e poi assegnando un punteggio ai nuovi punti: quelli significativamente diversi dal resto dei dati verranno marcati come anomalia.
 
@@ -258,7 +258,7 @@ Se si considera come pivot invece il punto verde e procedendo con gli stessi cal
 
 \subsubsection{ECOD}
 Empirical-Cumulative-distribution-based Outlier Detection (ECOD) \cite{li2021ecod} è un modello probabilistico che basa il suo funzionamento nel calcolare, per ogni punto $x_i \in X$, la probabilità che esista un punto almeno "estremo" come $x_i$.
-ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilità, su ogni dimensione, per ogni punto. Infine computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilità su tutte le dimensioni.
+ECOD prima stima la distribuzione dei dati di input senza l'ausilio di parametri esterni andando a computare la distribuzione cumulativa empirica per ogni dimensione del dataset. Successivamente usa la distribuzione empirica per stimare la probabilità, su ogni dimensione, per ogni punto. Infine, computa lo score di anomalia di ognuno dei punti andando ad aggregare le stime di probabilità su tutte le dimensioni.
 
 \subsubsection{COPOD}
 Copula Based Outlier Detection (COPOD) \cite{li2020copod} si ispira alla copula per modellare la distribuzione dei dati multivariati. Costruisce dapprima una copula empirica e la utilizza per predire la tail-probability di ogni punto per determinare il suo
@@ -287,7 +287,7 @@ La Figura \ref{iforest} mostra a sinistra un esempio di punto normale e a destra
 	\label{iforest}
 \end{figure}
 \subsubsection{INNE}
-l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest-neighbour (INNE) \cite{bandaragoda2018isolation} è un metodo per rilevare anomalie in cui un ensemble di nearest-neighbor viene addestrato sui dati normali per identificare i punti di dati che sono isolati dal resto dei dati, che vengono considerati anomalie.
+l rilevamento di anomalie basato sull'isolamento utilizzando ensemble di nearest neighbour (INNE) \cite{bandaragoda2018isolation} è un metodo per rilevare anomalie in cui un ensemble di nearest-neighbor viene addestrato sui dati normali per identificare i punti di dati che sono isolati dal resto dei dati, che vengono considerati anomalie.
 
 Il processo di solito funziona come segue:
 \begin{enumerate}
@@ -334,7 +334,7 @@ Le reti neurali vengono definite profonde quando hanno molti strati di neuroni. 
 Deep Support Vector Data Description (DeepSVDD) \cite{ruff2018deepsvdd} è una rete neurale profonda che durante la fase di training punta a minimizzare il volume della ipersfera che racchiude la rappresentazione sui dati. Minimizzare il volume dell'ipersfera forza la rete neurale ad estrarre i fattori comuni di variazione dato che deve mappare i punti del dataset al centro della sfera.  La Figura \ref{deepsvdd} mostra le trasformazioni di DeepSVDD.
 
 \subsection{Auto-Encoders}
-Un Auto-Encoder (AE) \cite{aggarwal2015outlier} è una rete neurale che combina un encoder $E$ e un decoder $D$. L'encoder è un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un insieme di variabili latenti $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder è il secondo modulo il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ è chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder a compiere errori nella fase di ricostruzione. L'architettura di un auto-encoder è presente nella Figura \ref{ae}.
+Un Auto-Encoder (AE) \cite{aggarwal2015outlier} è una rete neurale che combina un encoder $E$ e un decoder $D$. L'encoder è un modulo che comprime i dati. Riceve come input il vettore di dati $W$ inerente ad un'osservazione del dataset e li mappa in un insieme di variabili latenti $Z$ che solitamente sono situati in uno spazio dimensionale minore. Il decoder è il secondo modulo, il quale si occupa di decodificare le variabili latenti Z, rimappandole nello spazio originario di input come ricostruzione $\widehat{W}$. La differenza tra il vettore di dati $W$ e il vettore ricostruito $\widehat{W}$ è chiamata \textit{errore di ricostruzione}. Pertanto, l'obiettivo dell'addestramento mira a minimizzare questo errore. Nell'ambito dell'Anomaly Detection, viene utilizzato questo errore come score di anomalia: se un auto-encoder riesce a ricostruire senza errori un sample vuol dire che questo esprime caratteristiche normali; un sample anomalo invece porta l'auto-encoder a compiere errori nella fase di ricostruzione. L'architettura di un auto-encoder è presente nella Figura \ref{ae}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=10cm, scale=1]{images/ae}
@@ -423,7 +423,7 @@ Il processo funziona come segue:
 \item I punti di dati che si trovano al di fuori del range tra la soglia inferiore e la soglia superiore vengono considerati anomalie.
 \end{enumerate}
 
-Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati, quindi è un metodo semplice ed efficiente per determinare i valori di soglia. Tuttavia, questo metodo è sensibile ai valori estremi, quindi potrebbe non essere adatto per i dati con molti valori estremi.
+Il vantaggio di questo metodo è che si basa solo sui dati e non richiede alcuna conoscenza a priori dei dati; quindi è un metodo semplice ed efficiente per determinare i valori di soglia. Tuttavia, questo metodo è sensibile ai valori estremi, quindi potrebbe non essere adatto per i dati con molti valori estremi.
 
 \subsection{Z-Score}
 Z-Score \cite{Bagdonavi_ius_2020} è una misura della distanza di un punto di dati dalla media dei dati in termini di deviazione standard. I punti di dati con Z-Score alti o troppo bassi vengono considerati anomalie.

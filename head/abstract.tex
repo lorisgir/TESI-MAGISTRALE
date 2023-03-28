@@ -6,7 +6,7 @@ Il task che risolve è quello di identificare eventi od osservazioni rari oppure
 I metodi di Anomaly Detection si dividono tra supervisionati, semi-supervisionati o non supervisionati e un ampio numero di essi sono stati proposti nella letteratura ma non esiste un metodo che sia il più accurato per ogni dataset. Inoltre, la disponibilità di etichette di anomalia per un certo dataset è solitamente bassa o completamente assente nella pratica. 
 
 
-L’obiettivo di questa tesi è quello applicare metodi non supervisionati di Anomaly Detection all'interno del progetto Beat 4.0 portato avanti da SKF e ALTEN ITALIA. 
+L’obiettivo di questa tesi è quello di applicare metodi non supervisionati di Anomaly Detection all'interno del progetto Beat 4.0 portato avanti da SKF e ALTEN ITALIA. 
 
 A seguito di un'introduzione sul contesto in cui si opera, dei problemi e delle principali tecniche proposte nella letteratura, verrà mostrato un algoritmo di Model Selection che va a rispondere alla seguente domanda: dato un dataset senza etichette e un set di Anomaly Detectors, come poter selezionare il modello più accurato? A questo scopo vengono definite tre classi di metriche non supervisionate chiamate \textit{Model Centrality}, \textit{Clustering Coefficient} e \textit{Performance on Injected Synthetic Anomalies} e viene mostrato come queste siano correlate rispetto alla metrica supervisionata F1-Score. Saranno proposti anche diversi metodi di Rank Aggregation: Borda, Robust Borda, AVG Score e Kemeny-Young utilizzati per combinare le tre metriche non supervisionate, e un'analisi approfondita sulle performance di ognuno rispetto a dataset di benchmark provenienti da ODDS e SMD.
 

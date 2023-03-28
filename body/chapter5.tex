@@ -21,7 +21,7 @@ Poiché i dati sono di proprietà della SKF, la descrizione è ridotta e i nomi 
 \subsection{CoMo}
 I dati includono le misurazioni di differenti caratteristiche di alcune delle macchine della catena di produzione. Per ogni macchina monitorata, sono incluse le velocità radiali e assiali, gli inviluppi radiali e assiali, la temperatura, pressione e vibrazione.
 Poiché non tutte le macchine dell'impianto sono monitorate vengono persi dettagli e completezza nei dati, ma nonostante questo il dataset a disposizione contiene una grande quantità di dati.
-La frequenza di registrazione dei dati CoMo è di 10 minuti. Questo valore così basso porta con se delle problematiche che verranno discusse più avanti, per questo motivo si sta cercando per richiedere di alzare la frequenza.
+La frequenza di registrazione dei dati CoMo è di 10 minuti. Questo valore così basso porta con sé delle problematiche che verranno discusse più avanti, per questo motivo si sta cercando per richiedere di alzare la frequenza.
 
 \subsection{MVM}
 I dati di qualità vengono registrati per ogni prodotto che esce dalla catena di produzione.
@@ -33,7 +33,7 @@ Tutte le bande sono positive per definizione ed ognuna di esse tratta uno specif
 	\item Banda D trova errori causati dalla presenza di impurità negli oli o liquidi di pulizia usati sui cuscinetti.
 \end{itemize}
 
-Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione, i dati MVM sono prodotti ogni due secondi. Questi verranno poi aggregati in intervalli di 10 minuti. La scelta di dieci minuti per la lunghezza del gap temporale non è casuale, infatti è stata fatta per adattarsi alla granularità dei dati CoMo.
+Considerato la frequenza di uscita di prodotti finiti dalla linea di produzione, i dati MVM sono prodotti ogni due secondi. Questi verranno poi aggregati in intervalli di 10 minuti. La scelta di dieci minuti per la lunghezza del gap temporale non è casuale; infatti, è stata fatta per adattarsi alla granularità dei dati CoMo.
 
 \subsubsection{Qualità}
 I dati di qualità MVM vengono usati per definire la classe di qualità di appartenenza dei cuscinetti a sfera. Per fare ciò, sono state definite per ogni banda delle soglie alla quale il superamento di una porta il prodotto a ricevere una classificazione di qualità più bassa.
@@ -91,7 +91,7 @@ La frequenza di produzione cambia nel tempo. Se vengono aggregati i dati di qual
 Poiché ogni cuscinetto prodotto passa attraverso le macchine di qualità, questa quantità è ovviamente correlata alla velocità media di produzione
 lungo l'intervallo di tempo considerato. 
 
-Il motivo principale per cui la velocità media di produzione è interessante è che può essere utilizzata come indicatore del fatto che il canale è stato inattivo lungo intervallo di dieci minuti considerato. In particolare, se la velocità media di produzione di un intervallo è significativamente più piccola del solito, indicherà che la produzione è stata interrotta nel periodo considerato. Le possibili cause di tale sospensione possono essere un malfunzionamento, la manutenzione o anche la chiusura programmata del canale.
+Il motivo principale per cui la velocità media di produzione è interessante è che può essere utilizzata come indicatore del fatto che il canale è stato inattivo lungo l'intervallo di dieci minuti considerato. In particolare, se la velocità media di produzione di un intervallo è significativamente più piccola del solito, indicherà che la produzione è stata interrotta nel periodo considerato. Le possibili cause di tale sospensione possono essere un malfunzionamento, la manutenzione o anche la chiusura programmata del canale.
 Per quanto riguarda la quantità di cuscinetti analizzati dalla macchina di qualità monitorata, è vero che, se il processo di produzione è stato sospeso, questa quantità sarà bassa, ma non si può dire con certezza l'opposto.
 Questa misura fornisce comunque alcuni indizi sull'attività del canale. Per esempio, esplorando il set di dati, si può notare che la quantità menzionata vada a zero ogni domenica dalle 12:00 alle 22:00 circa, conseguenza del fatto che in quel periodo di tempo c'è stato un turno di riposo. Questo viene confermato anche analizzando i dati CoMo nello stesso periodo temporale: numerosi sensori che producono valori a 0 oppure non li producono affatto, mentre quelli della temperatura iniziano a declinare. 
 
@@ -130,7 +130,7 @@ Allo stesso modo in cui sono stati aggregati i dati MVM, può capitare anche all
 Dopo i passaggi precedenti, è possibile fare il pivoting della tabella CoMo  prendendo il timestamp come indice di riga. Il risultato è una tabella in cui ogni colonna corrisponde a una serie temporale. 
 Come passo finale è necessario trattare i valori mancanti:
 \begin{itemize}
-	\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo è quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non è di nostro interesse rilevare anomalie in quei intervalli di tempo.
+	\item Nel caso di intervalli più lunghi di 8 ore con almeno il 50\% di valori mancanti, questi vengono eliminati dal dataset. L'obiettivo è quello di pulire il dataset dai dati registrati durante i turni di riposo in quanto non è di nostro interesse rilevare anomalie in quegli intervalli di tempo.
 	\item Tutti gli altri valori nulli vengono interpolati linearmente.
 \end{itemize}
 A questo punto i sensori vengono raggruppati per macchinario, andando quindi a produrre una tabella per ogni macchina.

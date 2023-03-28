@@ -84,15 +84,15 @@ Attraverso uno studio di correlazione fra le feature del dataset si è andati a 
 		
 \end{figure}
 
-Utilizzando il coefficiente di Skewness si va a vedere in che direzione portare l'anomalia: se verso il basso o verso l'alto. Feature con un right-skew avranno anomalie orientate verso l'alto, left-swek verso il basso mentre se non rientrano in nessuno dei due casi allora si generano anomalie casuali o verso il basso o verso l'alto.
+Utilizzando il coefficiente di Skewness si va a vedere in che direzione portare la anomalia: se verso il basso o verso l'alto. Feature con un right-skew avranno anomalie orientate verso l'alto, left-swek verso il basso mentre se non rientrano in nessuno dei due casi allora si generano anomalie casuali o verso il basso o verso l'alto.
 
-Infine, calcolando l'indice di Kurtosis di definisce la probabilità con cui si sceglie una determinata feature per inserirvi un anomalia per ogni determinato punto. Un valore di Kurtosis più alto indica una probabilità di anomalie più alta per quella feature, questo per andare a favorire la generazione di anomalie per quelle feature che hanno una deviazione standard molto alta, al contrario di feature più "piatte" che cambiano di rado.
+Infine, calcolando l'indice di Kurtosis di definisce la probabilità con cui si sceglie una determinata feature per inserirvi un'anomalia per ogni determinato punto. Un valore di Kurtosis più alto indica una probabilità di anomalie più alta per quella feature, questo per andare a favorire la generazione di anomalie per quelle feature che hanno una deviazione standard molto alta, al contrario di feature più "piatte" che cambiano di rado.
 
 
 Le tipologie di anomalie sintetiche possono essere iniettate in modo esclusivo, ovvero generando N copie del dataset originario in cui si inseriscono una sola tipologia di anomalia per ognuna; oppure combinandole insieme in un unico dataset. 
 Ognuno di questi dataset prodotti viene poi utilizzato per effettuare la valutazione sui modelli generando quindi N ranking differenti. Le performance di ognuno di questi metodi verranno valutate successivamente utilizzando lo F1 Score.
 
-Il flusso di lavoro di questa metrica surrogata può essere riassunta in questi step:
+Il flusso di lavoro di questa metrica surrogata può essere riassunto in questi step:
 \begin{enumerate}
 	\item Training dei modelli sul dataset originario.
 	\item Creazione di dataset modificati andando ad iniettare i diversi tipi di anomalie e producendo quindi le pseudo-etichette.
@@ -158,7 +158,7 @@ Nel caso delle metriche surrogate Model Centrality e Performance on Injected Syn
 \end{table}
 
 \subsubsection{Borda}
-Le tre classifiche a score prodotte dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score più alto sarà in posizione 1, il secondo con score più alto in posizione 2 e cosi via. 
+Le tre classifiche a score prodotte dalle metriche surrogate contenenti gli score per ogni modello vengono convertiti in semplici ranking di posizione in cui il modello con lo score più alto sarà in posizione 1, il secondo con score più alto in posizione 2 e così via. 
 Successivamente, per ognuno dei tre ranking di posizione, vengono assegnati dei punteggi ai modelli in base alla posizione in cui si trovano: il modello in ultima posizione riceverà 1 punto, il penultimo 2 punti e così via. Il modello in prima posizione riceverà un numero di punti pari al numero di modelli. 
 Dopo aver effettuato questa computazione rispetto a tutte e 3 le classifiche delle metriche surrogate, viene calcolato il punteggio di aggregazione, di ogni modello, come la media dei 3 valori.
 
@@ -305,8 +305,8 @@ Come definito nel Capitolo \ref{chap:modelselection}, questi modelli producono i
 Ognuno di questi modelli è stato allenato utilizzando sia i valori predefiniti per gli iperparametri, sia variazioni di questi. 
 Per la maggior parte degli algoritmi sono state considerate in media 3 versioni con parametri differenti, alcuni invece sono algoritmi parameter-free e quindi viene considerata solamente una versione, portando il totale dei modelli a 70.
 La scelta dei valori modificati agli iperparametri è stata fatta manualmente a priori, senza conoscere le performance del modello. Il focus della tesi si mantiene sul Model Selection, mentre un approfondimento sul tuning dei parametri può essere lasciato a sviluppi futuri.
-I modelli di Deep Learning contengono un parametro chiamato \textit{window\_len}, che come discusso prima serve per andare a specificare la finestra temporale che il modello deve considerare durante l'esecuzione di train e prediction. Per questo parametro sono stati scelti i valori 1 e 48, andando cosi a creare due modelli per tipologia di algoritmo. 
-Un valore di \textit{window\_len} a 1 significa che verrà trattato ogni sample in maniera indipendente, cosi come fanno i classici metodi di Machine Learning; mentre un valore di 48 consente ai modelli di andare a utilizzare l'informazione temporale per il training e predizione.
+I modelli di Deep Learning contengono un parametro chiamato \textit{window\_len}, che, come discusso prima, serve per andare a specificare la finestra temporale che il modello deve considerare durante l'esecuzione di train e prediction. Per questo parametro sono stati scelti i valori 1 e 48, andando così a creare due modelli per tipologia di algoritmo. 
+Un valore di \textit{window\_len} a 1 significa che verrà trattato ogni sample in maniera indipendente, così come fanno i classici metodi di Machine Learning; mentre un valore di 48 consente ai modelli di andare a utilizzare l'informazione temporale per il training e predizione.
 
 Il fattore di contaminazione passato ad ogni modello corrisponde esattamente alla percentuale di anomalie presenti in ogni dataset di benchmark. Questa situazione è ottimale in quanto il numero di punti anomali trovati dai modelli coincide con il numero di anomalie reali. Ovviamente non è possibile replicare questo anche sul dataset di SKF in quanto qualsiasi informazione sulle anomalie non è presente. Per risolvere questo problema si utilizzerà un metodo di Thresholding chiamato ${\gamma}GMM$, come introdotto nel Capitolo \ref{chap:methods}, che stima il fattore di contaminazione. Un fattore di contaminazione stimato erroneamente porta ovviamente a degradare le performance del Model Selection. Così come per la variazione degli iperparametri, in sviluppi futuri potrebbe risultare utile un'analisi più approfondita andando anche a testare l'algoritmo con diversi valori per il fattore di contaminazione.
 
@@ -1046,7 +1046,7 @@ Ovviamente non si ha la certezza che il cluster di destra sia effettivamente com
 In questa sezione viene fatto un confronto tra le anomalie rilevate e la qualità. Come anticipato più volte, la qualità non è da considerarsi un perfetto indicatore delle anomalie: 
 \begin{itemize}
 	\item La qualità viene registrata ogni due secondi mentre i dati CoMo ogni 10 minuti. Di conseguenza la qualità viene aggregata con una media, andando a nascondere, nel calcolo aggregato, i valori più alti che sono anche i più rari. Usare altre tecniche di aggregazione come Min o Max non è immediato in quanto avrebbe poi favorito troppo o troppo poco la presenza di valori di qualità estremi.
-	\item Analizzando un solo macchinario non è possibile avere una situazione completa della linea di produzione: una qualità bassa può essere data da un anomalia su un macchinario non mappato. Ma anche analizzando tutti i macchinari insieme non è certo che la qualità sia correlata al 100\% con i dati CoMo. Ci possono essere fattori come la qualità del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualità. Producendo quindi valori di qualità bassa nonostante registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualità.
+	\item Analizzando un solo macchinario non è possibile avere una situazione completa della linea di produzione: una qualità bassa può essere data da un'anomalia su un macchinario non mappato. Ma anche analizzando tutti i macchinari insieme non è certo che la qualità sia correlata al 100\% con i dati CoMo. Ci possono essere fattori come la qualità del materiale o degli oli, o altri movimenti dei macchinari non registrati che impattano la qualità. Producendo quindi valori di qualità bassa nonostante registrazioni CoMo nella norma. Oppure il contrario, ovvero registrazioni CoMo anomale ma che non impattano la qualità.
 \end{itemize}
 
 Prima di proseguire è necessario applicare una trasformazione ai dati. Il macchinario analizzato M1 è il primo della linea di montaggio, mentre il macchinario di misura qualità MVM è posto alla fine. Il cuscinetto a sfera dal momento che parte impiega un tempo ${\nabla}t$ ad arrivare ad MVM e quindi essere registrato per la misura di qualità. Per allineare quindi la registrazione CoMo di M1 con la registrazione di MVM è necessario traslare di ${\nabla}t$ l'indice temporale della tabella MVM.

@@ -12,7 +12,7 @@ All'interno di questo progetto, sono stati utilizzate le seguenti risorse:
 PowerBI è stato utilizzato per lo sviluppo front-end. È un software interattivo per la Data Visualization con un focus primario alla Business Intelligence. Al suo interno sono presenti numerosi connettori da cui prelevare i dati, insieme ad una serie di strumenti per aggregare, filtrare, comporre e visualizzare i dati attraverso grafici o report.
 
 \section{Architettura}
-Questa sezione è dedicata a come gli strumenti sopracitati comunicano e interagiscono tra di loro. L'architettura può essere divisa in 4 macro aree:
+Questa sezione è dedicata a come gli strumenti sopracitati comunicano e interagiscono tra di loro. L'architettura può essere divisa in 4 macroaree:
 \begin{enumerate}
 	\item \textbf{Data}: i dati sono archiviati all'interno di SQL Server e vengono aggiornati in tempo reale a seguito dell'inserimento di nuove registrazioni da parte di SKF.
 	\item \textbf{Orchestrazione}: il workflow viene gestito da Data Factory il quale si occupa di richiamare l'endpoint di inferenza ad una frequenza regolare.
@@ -87,7 +87,7 @@ In questa sezione sono definiti gli step della pipeline di inferenza.
 \end{figure}
 
 \section{Dashboard}
-L'ultimo elemento dell'architettura è PowerBI. Come introdotto a inizio capitolo, è un software interattivo per la Data Visualization che offre diversi connettori da cui prelevare i dati. Uno di questi è il Direct Query: questo strumento permette di collegarsi direttamente all'origine dei dati ed interrogarla On-Demand. È un modo particolarmente efficace di recuperare i dati quando si ha a disposizione un archivio molto grande e non si vuole scaricarli tutti in locale; questo metodo consente infatti di ottenere i dati già trasformati e raggruppati, pronti per essere mostrati, riducendo cosi il carico di lavoro e la quantità di dati trasferiti. È però necessario andare a schedulare un refresh dei dati in modo da mostrare report sempre aggiornati. 
+L'ultimo elemento dell'architettura è PowerBI. Come introdotto a inizio capitolo, è un software interattivo per la Data Visualization che offre diversi connettori da cui prelevare i dati. Uno di questi è il Direct Query: questo strumento permette di collegarsi direttamente all'origine dei dati ed interrogarla On-Demand. È un modo particolarmente efficace di recuperare i dati quando si ha a disposizione un archivio molto grande e non si vuole scaricarli tutti in locale; questo metodo consente infatti di ottenere i dati già trasformati e raggruppati, pronti per essere mostrati, riducendo così il carico di lavoro e la quantità di dati trasferiti. È però necessario andare a schedulare un refresh dei dati in modo da mostrare report sempre aggiornati. 
 Attraverso questo metodo si ha quindi un collegamento diretto al database SQL utilizzato per andare a prelevare i dati salvati dalla pipeline di inferenza.
 L'interfaccia pensata per gli operatori di SKF risiede in un semplice grafico a linee con delle barre verticali rosse per indicare l'anomalia in uno specifico timestamp. Per questo tipo di report, Direct Query è indubbiamente la scelta migliore di recuperare i dati.  
 
