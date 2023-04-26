@@ -1,61 +1,7 @@
-# Master thesis template for the Univeristy of Torino
+# Unsupervised Anomaly Detection for a Manufacturing Industry
 
-Hey guys ! Since I was not really satisfied by any of the templates online for the thesis, and our university has no defined template I decided to write one by myself.
+This is my Master Thesis at University of Turin.
 
-Hope is helpful to anyone to save some time!
+## Abstract
+Anomaly Detection is an increasingly important topic, and its use ranges from the medical field to the financial field via more standard approaches such as the analysis of sensors installed on instruments or machinery. The task it solves is to identify events or observations that are rare or deviate significantly from the majority of data and do not fit a definition of normal behavior. Looking for these anomalies can be useful when statistical methods are to be applied and a data cleanup is necessary, but not only that. In many applications, anomalies are of high interest because they may contain important information and therefore need attention. Anomaly Detection methods are divided into Supervised, Semi-Supervised or Unsupervised and a large number of them have been proposed in the literature but there is no method that is the most accurate for every dataset. Moreover, the availability of anomaly labels for a certain dataset is usually low or completely absent in practice. The objective of this thesis is to apply Unsupervised Anomaly Detection methods within the Beat 4.0 project carried out by SKF and ALTEN ITALY. Following an introduction on the context in which it operates, the problems and the main techniques proposed in the literature, a Model Selection algorithm will be shown that goes to answer the following question: given a dataset without labels and a set of Anomaly Detectors, how to be able to select the most accurate model? For this purpose, three classes of unsupervised metrics called Model Centrality, Clustering Coefficient, and Performance on Injected Synthetic Anomalies are defined and it is shown how they are correlated with respect to the supervised metric F1-Score. Several Rank Aggregation methods will also be proposed: Borda, Robust Borda, AVG Score, and Kemeny-Young used to combine the three unsupervised metrics, and an in-depth analysis on the performance of each against benchmark datasets from ODDS and SMD.
 
-It was written from scratch with the help of many guides/tamplates found on the web, so feel free to modify and distribute it
-
-### Folder structure
-
-```
-.                
-└── Thesis folder            # The folder containing this repository
-    ├── thesis.tex           # The main file
-    ├── head                 # place for the tex files of the introductory part
-        ├── frontPage.tex
-        ├── dedication.tex
-        └── abstract.tex
-    ├── body                 # place for the tex files of the body part
-        ├── chapter1.tex
-        ├── chapter2.tex
-        ├── ...
-        └── conclusions.tex
-    ├── tail                 # place for the tex files for the final part
-        ├── appendix1.tex
-        ├── aknowledgments.tex
-        ├── bibliography.tex
-        └── ...
-    ├── images 
-    └── bibliography
-        └── bibThesis.bib
-```
-
-### Compiling instructions
-The main file `thesis.tex`, eventually you can rename it as you wish. The compile sequence with bibliography is:
-
-Using TeXShop
-
-    Run LaTeX
-    Run BibTeX
-    Run LaTeX
-    Run LaTex
-    
-Using a sh script
-
-    same sequence but you have to compile the subfiles as well
-
-### Useful readings
-About latex itself
-* [L'arte di scrivere con LaTeX (in Italian)](http://www.lorenzopantieri.net/LaTeX_files/ArteLaTeX.pdf "L'arte di scrivere con LaTeX")
-* [??? (in English)](http://)
-
-About how to write a text which is clear and concise text
-* [A very brief guide about what NOT to do (in Italian)](https://users.dimi.uniud.it/~stefano.mizzaro/dida/come-non-scrivere-la-tesi.html)
-* [Strunk & White (in English)](http://www.bartleby.com/141/)
-
-### One last warning
-This template is thinked to be used for a thesis written in english, so no effort was put in the integration of features typical of italian (e.g. return at the beginning of the chapter).
-If you do a modification in that sense please do a pull request ! 
-
-So enjoy and good luck !
